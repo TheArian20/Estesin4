@@ -1,0 +1,6 @@
+# Biblioteca original: supera el límite de GitHub y se debe alojar externamente.
+biblioteca-archivos/
+biblioteca-digital/
+
+# Archivos de control locales.
+biblioteca-importacion*.estado

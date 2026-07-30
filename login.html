@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login | STESIN</title>
+
+<link rel="stylesheet" href="css/style.css">
+<script src="js/aulax.js" defer></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="login-body">
+
+<div class="login-box">
+
+<h1>STESIN</h1>
+
+<p>Plataforma Virtual</p>
+
+<input
+type="text"
+id="usuario"
+placeholder="Usuario"
+autocomplete="username"
+required>
+
+<input
+type="password"
+id="password"
+placeholder="Contraseña"
+autocomplete="current-password"
+required>
+
+<button type="button" onclick="login()">
+
+Ingresar
+
+</button>
+<br><br>
+
+<p>
+
+¿No tienes cuenta?
+
+<a href="registro.html">
+
+Crear cuenta
+
+</a>
+
+<br><br>
+
+<a href="index.html">
+
+Volver al inicio
+
+</a>
+
+</p>
+
+<p id="mensaje" aria-live="polite"></p>
+
+</div>
+
+<script>
+
+function login(){
+
+const usuario=document.getElementById("usuario").value.trim();
+
+const password=document.getElementById("password").value.trim();
+
+// Usuario administrador
+
+if(usuario==="admin" && password==="1234"){
+
+localStorage.setItem("login","true");
+
+localStorage.setItem("usuario","Administrador");
+
+window.location="index.html";
+
+return;
+
+}
+
+// Usuario registrado
+
+const usuarioGuardado=
+
+localStorage.getItem("usuarioRegistrado");
+
+const passwordGuardada=
+
+localStorage.getItem("passwordRegistrada");
+
+if(
+
+usuario===usuarioGuardado &&
+
+password===passwordGuardada
+
+){
+
+localStorage.setItem("login","true");
+
+localStorage.setItem("usuario",usuario);
+
+window.location="index.html";
+
+}
+
+else{
+
+document.getElementById("mensaje").style.color="red";
+
+document.getElementById("mensaje").textContent=
+
+"❌ Usuario o contraseña incorrectos";
+
+}
+
+}
+
+document.addEventListener("keydown", function(event){
+if(event.key === "Enter") login();
+});
+
+</script>
+
+</body>
+
+</html>
