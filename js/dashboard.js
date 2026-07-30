@@ -147,8 +147,7 @@
             proxima
                 ? { id: `clase-${proxima.fecha}`, icono: "📅", titulo: `Próxima clase: ${proxima.nombre}`, detalle: proxima.detalle, pagina: "calendario.html#horario-julio" }
                 : { id: "horario-finalizado", icono: "🗓️", titulo: "Horario de julio finalizado", detalle: "Consulta el calendario para próximas programaciones.", pagina: "calendario.html" },
-            { id: "material-psicopedagogia", icono: "📄", titulo: "Nuevo material de Psicopedagogía", detalle: "Hay 2 documentos disponibles para consulta.", pagina: "materia.html", materia: "Psicopedagogía", ciclo: "Ciclo V" },
-            { id: "videos-ciclo-v", icono: "🎬", titulo: "Clases grabadas preparadas", detalle: "El espacio de videos del Ciclo V está listo para tus grabaciones.", pagina: "videos.html", cicloVideos: "Ciclo V" }
+            { id: "material-psicopedagogia", icono: "📄", titulo: "Nuevo material de Psicopedagogía", detalle: "Hay 2 documentos disponibles para consulta.", pagina: "materia.html", materia: "Psicopedagogía", ciclo: "Ciclo V" }
         ];
         const leidas = new Set(leerJSON("notificacionesLeidas", []));
 
@@ -172,7 +171,6 @@
                         localStorage.setItem("subcicloSeleccionado", notificacion.materia);
                         localStorage.setItem("cicloDeSubciclo", notificacion.ciclo || "Ciclo V");
                     }
-                    if (notificacion.cicloVideos) localStorage.setItem("cicloVideosSeleccionado", notificacion.cicloVideos);
                     renderizar();
                     window.location.href = notificacion.pagina;
                 });
