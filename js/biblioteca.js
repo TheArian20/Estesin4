@@ -34,10 +34,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const tipo = tipoDocumento(documento.nombre);
             const enlace = document.createElement("a");
             enlace.className = "library-item";
-            enlace.href = bibliotecaDrive;
+            enlace.href = documento.enlaceDrive || bibliotecaDrive;
             enlace.target = "_blank";
             enlace.rel = "noopener";
-            enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small>${tipo.toUpperCase()} · Abrir en Google Drive</small></span>`;
+            enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small>${tipo.toUpperCase()} · ${documento.enlaceDrive ? "Abrir documento" : "Abrir en Google Drive"}</small></span>`;
             enlace.querySelector("strong").textContent = documento.nombre;
             lista.appendChild(enlace);
         });
@@ -47,7 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-        documentos = window.BIBLIOTECA_CATALOGO;
+        const enlacesDirectos = await window.BIBLIOTECA_ENLACES;
+        documentos = window.BIBLIOTECA_CATALOGO.map((documento, indice) => ({ ...documento, enlaceDrive: enlacesDirectos?.[indice] || "" }));
         if (!Array.isArray(documentos)) throw new Error("No se pudo cargar el catálogo");
         total.textContent = `${documentos.length} documentos disponibles`;
         renderizar();
