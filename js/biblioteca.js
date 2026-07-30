@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const total = document.getElementById("totalDocumentos");
     const vacio = document.getElementById("bibliotecaVacia");
     const cargarMas = document.getElementById("cargarMas");
+    const bibliotecaDrive = document.body.dataset.bibliotecaDrive;
     let documentos = [];
     let filtro = "todos";
     let limite = 24;
@@ -33,9 +34,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const tipo = tipoDocumento(documento.nombre);
             const enlace = document.createElement("a");
             enlace.className = "library-item";
-            enlace.href = `biblioteca-archivos/${documento.ruta}`;
-            enlace.download = documento.nombre;
-            enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small>${tipo.toUpperCase()} · Descargar documento</small></span>`;
+            enlace.href = bibliotecaDrive;
+            enlace.target = "_blank";
+            enlace.rel = "noopener";
+            enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small>${tipo.toUpperCase()} · Abrir en Google Drive</small></span>`;
             enlace.querySelector("strong").textContent = documento.nombre;
             lista.appendChild(enlace);
         });
