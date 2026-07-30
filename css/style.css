@@ -2869,3 +2869,55 @@ body.dark .notificacion-dinamica small{color:#c9d3cd;}
 .library-result-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:18px;}.library-result-head h2{margin:0;}.library-result-head span{color:#89640c;font-size:14px;font-weight:700;}.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:15px;}.library-item{display:flex;align-items:flex-start;gap:13px;min-height:112px;padding:17px;border:1px solid #e6dcc8;border-radius:17px;background:#fffdf8;color:#102b25;text-decoration:none;transition:.2s ease;}.library-item:hover{transform:translateY(-3px);border-color:#d8ae42;box-shadow:0 14px 27px rgba(16,43,37,.12);}.library-file-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:13px;background:#f8ebc4;font-size:22px;}.library-file-data{min-width:0;}.library-file-data strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;color:#173d34;font-size:14px;line-height:1.35;}.library-file-data small{display:block;margin-top:7px;color:#89640c;font-size:11px;font-weight:600;}.library-empty{padding:36px;text-align:center;border:2px dashed #ead79d;border-radius:17px;background:#faf5e8;color:#5c450a;}.library-more{display:block;margin:26px auto 0;padding:12px 22px;}
 body.dark .library-toolbar,body.dark .library-item{background:#102b25;border-color:#2c5148;color:#fffaf0;}body.dark .library-search{background:#081b17;border-color:#42685e;}body.dark .library-search input{background:#081b17;color:#fffaf0;}body.dark .library-filters button{background:#173d34;border-color:#42685e;color:#fffaf0;}body.dark .library-filters button.active,body.dark .library-filters button:hover{background:var(--color-acento);color:#102b25;}body.dark .library-file-icon{background:#264b41;}body.dark .library-file-data strong{color:#fffaf0;}body.dark .library-file-data small,body.dark .library-result-head span{color:#f1c64d;}body.dark .library-empty{background:#12362f;border-color:#42685e;color:#f5f1e7;}
 @media(max-width:700px){.library-hero{padding:26px;align-items:flex-start;}.library-hero-icon{flex-basis:58px;width:58px;height:58px;font-size:28px;}.library-toolbar{align-items:stretch;}.library-search{min-width:100%;}.library-result-head{align-items:flex-start;flex-direction:column;gap:4px;}}
+
+/* Experiencia móvil: teléfonos pequeños, grandes y tabletas. */
+html{min-width:320px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{overflow-x:hidden;}
+img,svg,video,iframe,canvas{max-width:100%;height:auto;}
+button,input,select,textarea{font:inherit;}
+button,.btn-clase,.btn-curso,.btn-navegacion,.btn-continuar{min-height:44px;}
+.main,.card,.stat-card,.activity-card,.profile-card,.perfil-estudiante,.document-link,.library-item{min-width:0;}
+
+@media(max-width:900px){
+    body{display:block;}
+    .menu-mobile{display:grid;place-items:center;top:max(14px,env(safe-area-inset-top));left:14px;width:48px;height:48px;padding:0;border:1px solid rgba(255,255,255,.25);border-radius:14px;background:#14382f;color:#fff;box-shadow:0 12px 26px rgba(16,43,37,.28);}
+    .sidebar{width:min(86vw,300px);height:100dvh;left:calc(-1 * min(86vw,300px) - 16px);padding:calc(24px + env(safe-area-inset-top)) 18px 24px;overflow-y:auto;overscroll-behavior:contain;transition:left .25s ease;}
+    .sidebar.mostrar{left:0;}
+    .sidebar h2{margin:0 0 26px;font-size:24px;}
+    .sidebar a{display:flex;width:100%;min-height:48px;margin:0 0 7px;padding:12px 14px;}
+    .main{width:100%;margin-left:0;padding:82px 22px 32px;}
+    header{gap:16px;padding:20px;}
+    header h1{font-size:clamp(25px,5vw,38px);line-height:1.12;}
+    header p{overflow-wrap:anywhere;}
+    .profile{min-width:0;}
+    .banner{padding:clamp(26px,5vw,40px);margin-bottom:28px;}
+    .banner h1{font-size:clamp(27px,5.5vw,42px);line-height:1.12;}
+    .cards,.grid-cursos,.courses-grid,.video-grid,.materias-grid,.activity-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .schedule-wrap{border-radius:16px;-webkit-overflow-scrolling:touch;}
+}
+
+@media(max-width:560px){
+    .main{padding:76px 14px calc(24px + env(safe-area-inset-bottom));}
+    header{padding:17px;border-radius:16px;align-items:flex-start;}
+    header .profile{width:100%;justify-content:space-between;}
+    .profile img{width:44px;height:44px;}
+    .modo-global{margin-left:0;}
+    .banner{padding:25px 20px;border-radius:20px;}
+    .cards,.grid-cursos,.courses-grid,.video-grid,.materias-grid,.activity-grid{grid-template-columns:1fr;}
+    .card,.stat-card,.activity-card,.profile-card,.perfil-estudiante{padding:18px;}
+    .cycle-summary,.materia-info,.schedule-summary{grid-template-columns:1fr;gap:12px;}
+    .subcycle-hero{gap:16px;padding:20px;}
+    .document-link{align-items:flex-start;padding:15px;gap:11px;}
+    .document-link strong,.library-file-data strong{overflow-wrap:anywhere;}
+    .library-hero{padding:23px 18px;gap:14px;border-radius:20px;}
+    .library-hero-icon{display:none;}
+    .library-toolbar{padding:13px;border-radius:16px;}
+    .library-filters{width:100%;}
+    .library-filters button{flex:1 1 110px;min-height:42px;}
+    .library-grid{grid-template-columns:1fr;}
+    .calendar{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+    .calendar .day{min-height:54px;padding:12px 4px;font-size:14px;}
+    .panel-notificaciones{top:70px;right:10px;width:calc(100vw - 20px);max-height:calc(100dvh - 84px);overflow-y:auto;}
+    .schedule{min-width:720px;}
+    .schedule th,.schedule td{padding:13px 10px;}
+}
