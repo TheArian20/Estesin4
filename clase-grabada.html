@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase grabada | STESIN</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/aulax.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+    <h2>STESIN</h2>
+    <a href="index.html">🏠 Inicio</a>
+    <a href="cursos.html">📚 Ciclos</a>
+    <a href="clases.html" class="active">🎥 Clases</a>
+    <a href="biblioteca.html">📚 Biblioteca</a>
+    <a href="calendario.html">📅 Calendario</a>
+    <a href="configuracion.html">⚙️ Configuración</a>
+</aside>
+
+<main class="main">
+    <header>
+        <div>
+            <a class="back-link" href="videos.html">← Volver a los subciclos</a>
+            <p class="eyebrow" id="cicloClaseGrabada">CLASES GRABADAS</p>
+            <h1 id="tituloClaseGrabada">Clase grabada</h1>
+            <p>Cuando agregues una grabación de esta materia, se mostrará en este espacio.</p>
+        </div>
+    </header>
+
+    <section class="card" style="text-align:center; padding:48px 24px;">
+        <div style="font-size:48px;">🎬</div>
+        <h2>Aún no hay una clase grabada</h2>
+        <p>La grabación de <strong id="nombreClaseGrabada">esta materia</strong> estará disponible aquí próximamente.</p>
+    </section>
+</main>
+
+<script>
+const materia = localStorage.getItem("claseGrabadaSeleccionada") || "Materia";
+const ciclo = localStorage.getItem("cicloVideosSeleccionado") || "Ciclo académico";
+document.getElementById("tituloClaseGrabada").textContent = materia;
+document.getElementById("nombreClaseGrabada").textContent = materia;
+document.getElementById("cicloClaseGrabada").textContent = ciclo.toUpperCase();
+document.title = `${materia} | STESIN`;
+</script>
+</body>
+</html>

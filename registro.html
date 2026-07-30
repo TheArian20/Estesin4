@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Registro | STESIN</title>
+
+<link rel="stylesheet" href="css/style.css">
+<script src="js/aulax.js" defer></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="login-body">
+
+<div class="login-box">
+
+<h1>Crear Cuenta</h1>
+
+<p>Regístrate en STESIN</p>
+
+<input
+type="text"
+id="nuevoUsuario"
+placeholder="Nombre de usuario"
+autocomplete="username"
+required>
+
+<input
+type="email"
+id="correo"
+placeholder="Correo electrónico"
+autocomplete="email"
+required>
+
+<input
+type="text"
+id="carrera"
+placeholder="Carrera"
+required>
+
+<input
+type="password"
+id="nuevaPassword"
+placeholder="Contraseña"
+autocomplete="new-password"
+minlength="4"
+required>
+
+<button type="button" onclick="registrar()">
+
+Registrarse
+
+</button>
+
+<br><br>
+
+<a href="login.html">
+
+Ya tengo una cuenta
+
+</a>
+
+<br><br>
+
+<a href="index.html">
+
+Volver al inicio
+
+</a>
+
+<p id="mensaje" aria-live="polite"></p>
+
+</div>
+
+<script>
+
+function registrar(){
+
+const usuario=document.getElementById("nuevoUsuario").value.trim();
+
+const correo=document.getElementById("correo").value.trim();
+
+const carrera=document.getElementById("carrera").value.trim();
+
+const password=document.getElementById("nuevaPassword").value.trim();
+
+if(usuario==="" || correo==="" || carrera==="" || password===""){
+
+document.getElementById("mensaje").style.color="red";
+
+document.getElementById("mensaje").textContent="Completa todos los campos.";
+
+return;
+
+}
+
+if(!document.getElementById("correo").checkValidity()){
+
+document.getElementById("mensaje").style.color="red";
+
+document.getElementById("mensaje").textContent="Ingresa un correo electrónico válido.";
+
+return;
+
+}
+
+if(password.length < 4){
+
+document.getElementById("mensaje").style.color="red";
+
+document.getElementById("mensaje").textContent="La contraseña debe tener al menos 4 caracteres.";
+
+return;
+
+}
+
+localStorage.setItem("usuarioRegistrado",usuario);
+
+localStorage.setItem("correoUsuario",correo);
+
+localStorage.setItem("carreraUsuario",carrera);
+
+localStorage.setItem("passwordRegistrada",password);
+
+localStorage.setItem("fechaRegistro",
+
+new Date().toLocaleDateString());
+
+document.getElementById("mensaje").style.color="green";
+
+document.getElementById("mensaje").textContent=
+
+"✅ Cuenta creada correctamente";
+
+setTimeout(function(){
+
+window.location="login.html";
+
+},1500);
+
+}
+
+document.addEventListener("keydown", function(event){
+if(event.key === "Enter") registrar();
+});
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>STESIN | Inicio</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div id="loader">
+
+    <h1>STESIN</h1>
+
+    <p>Cargando plataforma...</p>
+
+    <div class="loader-circle"></div>
+
+</div>
+
+<div class="sidebar">
+
+<h2>STESIN</h2>
+
+<a href="index.html">🏠 Inicio</a>
+
+<a href="cursos.html">📚 Ciclos</a>
+
+<a href="clases.html">🎥 Clases</a>
+
+<a href="biblioteca.html">📚 Biblioteca</a>
+
+<a href="calendario.html">📅 Calendario</a>
+
+<a href="configuracion.html">⚙ Configuración</a>
+
+</div>
+
+<div class="main">
+
+<button 
+id="menuMobile" 
+class="menu-mobile"
+aria-label="Abrir menú">
+
+☰
+
+</button>
+
+<header>
+
+<div class="header-info">
+
+    <h1 id="saludo">👋 Bienvenido</h1>
+
+    <p id="fecha"></p>
+
+</div>
+
+<div class="top-right">
+
+<div class="clock">
+
+🕒 <span id="hora"></span>
+
+</div>
+
+<button class="icon" id="modoOscuro">
+
+🌙
+
+</button>
+
+<input
+type="text"
+id="buscador"
+placeholder="🔍 Buscar ciclos...">
+
+<div class="notification-icon" id="campana">
+
+🔔
+
+<span id="contadorNotificaciones">4</span>
+
+</div>
+
+<section class="panel-notificaciones" id="panelNotificaciones" aria-label="Notificaciones" hidden>
+
+<div class="panel-notificaciones-head">
+    <div><strong>Notificaciones</strong><small id="resumenNotificaciones"></small></div>
+    <button type="button" id="marcarLeidas">Marcar leídas</button>
+</div>
+
+<div id="listaNotificaciones" class="lista-notificaciones"></div>
+
+</section>
+
+<div class="profile" id="perfil" tabindex="0">
+
+<img id="fotoHeader"
+src="https://i.pravatar.cc/150?img=12">
+
+<div class="perfil-menu">
+
+    <strong id="usuarioHeader"></strong>
+
+    <span>🎓 Estudiante</span>
+
+</div>
+
+<div class="dropdown-perfil" id="menuPerfil">
+
+<a href="configuracion.html">👤 Mi perfil</a>
+
+<a href="configuracion.html">⚙ Configuración</a>
+
+<p onclick="cerrarSesion()">
+🚪 Cerrar sesión
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- Banner Principal -->
+
+<section class="banner">
+
+    <div class="banner-info">
+
+        <span class="badge">📚 Curso activo</span>
+
+        <h2>📚 Continúa con tu ciclo académico</h2>
+
+        <p class="curso-actual">
+            Ciclo V · Formación ministerial
+        </p>
+
+        <button class="btn-navegacion"
+            data-pagina="cursos.html">
+
+                Ver mis ciclos
+
+        </button>
+
+    </div>
+
+</section>
+
+<!-- Resumen General -->
+
+<section class="reveal">
+
+<h2>📊 Resumen General</h2>
+
+<div class="dashboard">
+
+<div class="stat-card">
+
+<div class="icon-box">📚</div>
+
+<h1 id="cursos">0</h1>
+
+<p>Ciclos Activos</p>
+
+<small>+2 este mes</small>
+
+</div>
+
+<div class="stat-card">
+
+<div class="icon-box">🎥</div>
+
+<h1 id="clases">0</h1>
+
+<p>Clases Completadas</p>
+
+<small>56 vistas</small>
+
+</div>
+
+<div class="stat-card">
+
+<div class="icon-box">📝</div>
+
+<h1 id="tareas">0</h1>
+
+<p>Documentos Disponibles</p>
+
+<small>22 enviadas</small>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- Aquí continúa la Parte 2 -->
+
+<!-- ================= CONTINÚA APRENDIENDO ================= -->
+
+<section class="reveal">
+
+<h2>🎯 Continúa Aprendiendo</h2>
+
+<div class="activity-grid">
+
+<div class="activity-card destacado">
+
+<h3>📚 Ciclo V</h3>
+
+<button class="btn-navegacion" data-pagina="cursos.html">
+
+Ver materias del ciclo
+
+</button>
+
+</div>
+
+<div class="activity-card">
+
+<h3>📅 Próxima Clase</h3>
+
+<p id="proximaClaseNombre">Cargando próxima clase…</p>
+
+<p><strong id="proximaClaseDetalle">Consultando el horario académico…</strong></p>
+
+<button class="btn-navegacion" id="btnProximaClase" data-pagina="calendario.html#horario-julio">
+
+Ver horario completo
+
+</button>
+
+</div>
+
+<div class="activity-card">
+
+<h3>📄 Material destacado</h3>
+
+<p id="materialDestacadoNombre">Cargando material…</p>
+
+<p><strong id="materialDestacadoDetalle">Buscando recursos disponibles…</strong></p>
+
+<button class="btn-materia" id="btnMaterialDestacado" data-materia="" data-ciclo="">
+
+Abrir material
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= ACCESOS RÁPIDOS ================= -->
+
+<section class="reveal">
+
+<h2>⚡ Accesos Rápidos</h2>
+
+<div class="cards">
+
+<div class="card">
+
+<h3>🎥 Clases</h3>
+
+<p>Accede a todas las clases grabadas.</p>
+
+<button onclick="location.href='clases.html'">
+
+Abrir
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>📚 Ciclos</h3>
+
+<p>Consulta todos tus ciclos.</p>
+
+<button class="btn-navegacion" data-pagina="cursos.html">
+
+Abrir
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>📚 Biblioteca</h3>
+
+<p>Consulta libros, sílabos y documentos.</p>
+
+<button onclick="location.href='biblioteca.html'">
+
+Abrir
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+<h3>STESIN</h3>
+
+<p>Plataforma Virtual de Aprendizaje</p>
+
+<br>
+
+<p>
+
+Versión 1.0 | © 2026 Todos los derechos reservados
+
+</p>
+
+<br>
+
+<p>
+
+Desarrollado como proyecto académico.
+
+</p>
+
+</footer>
+
+<script src="js/dashboard.js" defer></script>
+
+</body>
+
+</html>

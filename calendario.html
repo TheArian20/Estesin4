@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horario de clases | STESIN</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/aulax.js" defer></script>
+<style>
+.schedule-intro{display:flex;justify-content:space-between;gap:20px;align-items:center;margin:0 0 26px}.schedule-intro p{margin-top:6px}.schedule-badge{padding:10px 14px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-weight:700;white-space:nowrap}.schedule-wrap{overflow-x:auto;background:#fff;border-radius:20px;box-shadow:0 15px 40px rgba(15,23,42,.08);border:1px solid #e2e8f0}.schedule{width:100%;min-width:900px;border-collapse:collapse}.schedule th,.schedule td{border:1px solid #e2e8f0;padding:16px;text-align:center}.schedule thead th{background:#172554;color:#fff;font-size:14px}.schedule thead th:first-child{background:#0f172a}.schedule .hour{font-weight:700;color:#334155;white-space:nowrap;background:#f8fafc}.schedule td.class{font-weight:700;color:#172554}.schedule td.class span{display:block;margin-top:7px;font-size:12px;font-weight:600;opacity:.8}.homiletica,.hermeneutica{background:#fed7aa}.consejeria{background:#bfdbfe}.sociologia{background:#d9f99d}.administracion{background:#fdba74}.psicopedagogia{background:#fde047}.schedule-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}.schedule-summary .card{padding:20px}.schedule-summary strong{display:block;font-size:22px;color:#1d4ed8;margin-bottom:6px}@media(max-width:700px){.schedule-intro{align-items:flex-start;flex-direction:column}.schedule-summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside class="sidebar"><h2>STESIN</h2><a href="index.html">🏠 Inicio</a><a href="cursos.html">📚 Ciclos</a><a href="clases.html">🎥 Clases</a><a href="biblioteca.html">📚 Biblioteca</a><a href="calendario.html">📅 Calendario</a><a href="configuracion.html">⚙ Configuración</a></aside>
+<main class="main">
+<header><div><p class="eyebrow">AGENDA ACADÉMICA</p><h1>Horario de clases</h1><p>Programación oficial de julio.</p></div><div class="profile"><img id="fotoHeader" src="https://i.pravatar.cc/150?img=12" alt="Foto de perfil"><p id="usuarioHeader"></p></div></header>
+<section class="schedule-intro"><div><h2>Julio 2026</h2><p>Consulta materia, fecha y franja horaria de cada clase.</p></div><span class="schedule-badge">5 jornadas programadas</span></section>
+<section class="schedule-wrap" id="horario-julio" aria-label="Horario de julio 2026"><table class="schedule"><thead><tr><th>Hora</th><th>Lunes 06</th><th>Martes 14</th><th>Lunes 20</th><th>Martes 21</th><th>Miércoles 29</th></tr></thead><tbody>
+<tr><td class="hour">6:00 – 6:45</td><td class="class homiletica" rowspan="2">Homilética Bíblica II<span>6:00 – 7:30</span></td><td class="class consejeria" rowspan="2">Consejería Pastoral<span>6:00 – 7:30</span></td><td class="class administracion" rowspan="3">Administración Eclesiástica<span>6:00 – 8:15</span></td><td class="class consejeria" rowspan="2">Consejería Pastoral<span>6:00 – 7:30</span></td><td class="class psicopedagogia" rowspan="2">Psicopedagogía<span>6:00 – 7:30</span></td></tr>
+<tr><td class="hour">6:45 – 7:30</td></tr>
+<tr><td class="hour">7:30 – 8:15</td><td class="class hermeneutica" rowspan="2">Hermenéutica Bíblica II<span>7:30 – 9:00</span></td><td class="class sociologia" rowspan="2">Introducción a la Sociología<span>7:30 – 9:00</span></td><td class="class sociologia" rowspan="2">Introducción a la Sociología<span>7:30 – 9:00</span></td><td></td></tr>
+<tr><td class="hour">8:15 – 9:00</td><td></td><td></td></tr>
+</tbody></table></section>
+<section class="schedule-summary"><article class="card"><strong>5</strong><p>Materias programadas</p></article><article class="card"><strong>06–29</strong><p>Fechas de clase en julio</p></article><article class="card"><strong>6:00</strong><p>Hora de inicio de las jornadas</p></article></section>
+</main>
+</body>
+</html>

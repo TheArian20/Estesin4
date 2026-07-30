@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="STESIN">
+  <path fill="#061a16" stroke="#fff" stroke-width="7" d="M128 8 238 39c-14 42-12 121-41 164-21 31-46 40-69 45-23-5-48-14-69-45C30 160 32 81 18 39Z"/>
+  <path fill="#14382f" d="M128 28 42 53c12 40 10 106 35 143 15 23 32 31 51 36Z"/>
+  <path fill="#dda91e" d="m128 28 86 25c-12 40-10 106-35 143-15 23-32 31-51 36Z"/>
+  <g fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M87 103c10-28 72-28 82 0v39H87Z"/>
+    <path d="M128 75v68M88 101h80M99 83c14 17 44 17 58 0M99 122c14-17 44-17 58 0"/>
+    <path fill="#fff" d="M74 123c25 0 43 6 54 25v50c-14-19-32-25-56-26-6 0-10-4-10-10v-29c0-6 5-10 12-10Z"/>
+    <path fill="#fff" d="M182 123c-25 0-43 6-54 25v50c14-19 32-25 56-26 6 0 10-4 10-10v-29c0-6-5-10-12-10Z"/>
+  </g>
+</svg>

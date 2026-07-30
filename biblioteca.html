@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblioteca digital | STESIN</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/aulax.js" defer></script>
+<script src="biblioteca-catalogo.js" defer></script>
+<script src="js/biblioteca.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+    <h2>STESIN</h2>
+    <a href="index.html">🏠 Inicio</a><a href="cursos.html">📚 Ciclos</a><a href="clases.html">🎥 Clases</a>
+    <a href="biblioteca.html" class="active">📚 Biblioteca</a><a href="calendario.html">📅 Calendario</a><a href="configuracion.html">⚙ Configuración</a>
+</aside>
+
+<main class="main">
+    <header><div><p class="eyebrow">BIBLIOTECA DIGITAL</p><h1>Recursos STESIN</h1><p>Consulta, busca y descarga los libros y documentos académicos disponibles.</p></div></header>
+
+    <section class="library-hero"><div><span class="library-kicker">COLECCIÓN ACADÉMICA</span><h2 id="totalDocumentos">Cargando biblioteca…</h2><p>Una colección de recursos teológicos, bíblicos, ministeriales y de formación.</p></div><span class="library-hero-icon">📖</span></section>
+
+    <section class="library-toolbar" aria-label="Buscar en biblioteca">
+        <label class="library-search"><span>🔍</span><input id="buscarBiblioteca" type="search" placeholder="Buscar por título, autor o tema…"></label>
+        <div class="library-filters" id="filtrosBiblioteca"><button type="button" class="active" data-filtro="todos">Todos</button><button type="button" data-filtro="pdf">PDF</button><button type="button" data-filtro="word">Word</button><button type="button" data-filtro="archivo">Archivos</button></div>
+    </section>
+
+    <section><div class="library-result-head"><h2 id="tituloResultados">Documentos disponibles</h2><span id="contadorResultados"></span></div><div class="library-grid" id="listaBiblioteca"></div><p class="library-empty" id="bibliotecaVacia" hidden>No encontramos documentos con esa búsqueda.</p><button type="button" class="library-more" id="cargarMas" hidden>Ver más documentos</button></section>
+</main>
+</body>
+</html>
