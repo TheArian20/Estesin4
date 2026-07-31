@@ -95,9 +95,12 @@ const AulaX = (() => {
         const calendario = document.querySelector(".calendar");
         if (!calendario) return;
         const eventos = {
-            15: "Clase en vivo: Desarrollo Web Full Stack · 8:00 PM",
-            20: "Entrega: Landing Page HTML y CSS",
-            25: "Examen: Evaluación de JavaScript"
+            3: "Homilética Bíblica II · 6:00 – 7:30",
+            10: "Administración Eclesiástica · 6:00 – 8:15",
+            11: "Teología Bíblica III y Sociología · 6:00 – 9:45",
+            17: "Administración Eclesiástica · 6:00 – 8:15",
+            18: "Consejería Pastoral y Teología Bíblica III · 6:00 – 9:45",
+            26: "Psicopedagogía · 6:00 – 7:30"
         };
         const detalle = document.createElement("div");
         detalle.className = "calendar-detail";
@@ -111,7 +114,7 @@ const AulaX = (() => {
             const seleccionar = () => {
                 calendario.querySelectorAll(".day.selected").forEach((elemento) => elemento.classList.remove("selected"));
                 dia.classList.add("selected");
-                detalle.textContent = eventos[numero] || `No hay actividades programadas para el ${numero} de julio.`;
+                detalle.textContent = eventos[numero] || `No hay actividades programadas para el ${numero} de agosto.`;
             };
             dia.addEventListener("click", seleccionar);
             dia.addEventListener("keydown", (evento) => {
