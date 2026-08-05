@@ -4,3 +4,6 @@ biblioteca-digital/
 
 # Archivos de control locales.
 biblioteca-importacion*.estado
+
+# Credenciales entregadas únicamente por el administrador.
+credenciales-estudiantes.csv
