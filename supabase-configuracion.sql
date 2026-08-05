@@ -8,6 +8,11 @@ create table if not exists public.perfiles (
   creado_en timestamptz not null default now()
 );
 
+alter table public.perfiles add column if not exists usuario text;
+update public.perfiles set usuario = lower(split_part(correo, '@', 1)) where usuario is null;
+alter table public.perfiles alter column usuario set not null;
+create unique index if not exists perfiles_usuario_unico on public.perfiles (lower(usuario));
+
 alter table public.perfiles enable row level security;
 
 create or replace function public.crear_perfil_usuario()
@@ -16,8 +21,8 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.perfiles (id, correo, nombre, carrera)
-  values (new.id, new.email, coalesce(new.raw_user_meta_data->>'nombre', 'Estudiante'), coalesce(new.raw_user_meta_data->>'carrera', 'Sin especificar'));
+  insert into public.perfiles (id, correo, usuario, nombre, carrera)
+  values (new.id, new.email, lower(coalesce(new.raw_user_meta_data->>'usuario', split_part(new.email, '@', 1))), coalesce(new.raw_user_meta_data->>'nombre', 'Estudiante'), coalesce(new.raw_user_meta_data->>'carrera', 'Sin especificar'));
   return new;
 end;
 $$;
