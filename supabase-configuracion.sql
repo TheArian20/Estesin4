@@ -1,0 +1,45 @@
+create table if not exists public.perfiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  correo text not null,
+  nombre text not null default 'Estudiante',
+  carrera text not null default 'Sin especificar',
+  rol text not null default 'estudiante' check (rol in ('admin', 'estudiante')),
+  activo boolean not null default true,
+  creado_en timestamptz not null default now()
+);
+
+alter table public.perfiles enable row level security;
+
+create or replace function public.crear_perfil_usuario()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.perfiles (id, correo, nombre, carrera)
+  values (new.id, new.email, coalesce(new.raw_user_meta_data->>'nombre', 'Estudiante'), coalesce(new.raw_user_meta_data->>'carrera', 'Sin especificar'));
+  return new;
+end;
+$$;
+
+drop trigger if exists al_crear_usuario on auth.users;
+create trigger al_crear_usuario after insert on auth.users for each row execute procedure public.crear_perfil_usuario();
+
+create or replace function public.es_administrador()
+returns boolean
+language sql
+stable
+security definer set search_path = public
+as $$ select exists (select 1 from public.perfiles where id = auth.uid() and rol = 'admin'); $$;
+
+grant execute on function public.es_administrador() to authenticated;
+
+drop policy if exists "El usuario ve su perfil" on public.perfiles;
+create policy "El usuario ve su perfil" on public.perfiles for select to authenticated using (id = auth.uid());
+drop policy if exists "El usuario actualiza su perfil" on public.perfiles;
+create policy "El usuario actualiza su perfil" on public.perfiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid() and rol = 'estudiante' and activo = true);
+drop policy if exists "Administrador gestiona perfiles" on public.perfiles;
+create policy "Administrador gestiona perfiles" on public.perfiles for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+
+-- Después de crear tu primera cuenta, reemplaza tu-correo@ejemplo.com por tu correo y ejecuta esta línea:
+-- update public.perfiles set rol = 'admin' where correo = 'tu-correo@ejemplo.com';

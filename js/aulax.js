@@ -18,9 +18,11 @@ const AulaX = (() => {
         return localStorage.getItem("fotoPerfil") || fotoPredeterminada;
     }
 
-    function cerrarSesion() {
+    async function cerrarSesion() {
+        await window.STESIN_SUPABASE?.auth.signOut();
         localStorage.removeItem("login");
         localStorage.removeItem("usuario");
+        localStorage.removeItem("rolUsuario");
         window.location.replace("login.html");
     }
 
@@ -99,6 +101,18 @@ const AulaX = (() => {
         enlace.textContent = "📄 Sílabos";
         const calendario = sidebar.querySelector('a[href="calendario.html"]');
         if (calendario) calendario.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
+    function agregarEnlaceAdministracion() {
+        if (localStorage.getItem("rolUsuario") !== "admin") return;
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="administracion.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "administracion.html";
+        enlace.textContent = "Administración";
+        const configuracion = sidebar.querySelector('a[href="configuracion.html"]');
+        if (configuracion) configuracion.insertAdjacentElement("beforebegin", enlace);
         else sidebar.appendChild(enlace);
     }
 
@@ -465,6 +479,7 @@ const AulaX = (() => {
         });
 
         agregarEnlaceSilabos();
+        agregarEnlaceAdministracion();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
         mejorarCalendario();
@@ -472,13 +487,35 @@ const AulaX = (() => {
         configurarMateria();
     }
 
-    const paginaActual = window.location.pathname.split("/").pop() || "index.html";
-    const paginasPublicas = ["login.html", "registro.html"];
-    if (!paginasPublicas.includes(paginaActual) && localStorage.getItem("login") !== "true") {
-        window.location.replace("login.html");
+    async function iniciarAplicacion() {
+        const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+        const paginasPublicas = ["login.html", "registro.html"];
+        if (paginasPublicas.includes(paginaActual)) {
+            inicializarInterfaz();
+            return;
+        }
+        const cliente = window.STESIN_SUPABASE;
+        const { data: { user } } = await cliente.auth.getUser();
+        if (!user) {
+            window.location.replace("login.html");
+            return;
+        }
+        const { data: perfil, error } = await cliente.from("perfiles").select("nombre, correo, carrera, rol, activo, creado_en").eq("id", user.id).single();
+        if (error || !perfil?.activo) {
+            await cliente.auth.signOut();
+            window.location.replace("login.html?estado=inactivo");
+            return;
+        }
+        localStorage.setItem("login", "true");
+        localStorage.setItem("usuario", perfil.nombre);
+        localStorage.setItem("correoUsuario", perfil.correo);
+        localStorage.setItem("carreraUsuario", perfil.carrera);
+        localStorage.setItem("rolUsuario", perfil.rol);
+        localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
+        inicializarInterfaz();
     }
 
-    document.addEventListener("DOMContentLoaded", inicializarInterfaz);
+    document.addEventListener("DOMContentLoaded", iniciarAplicacion);
 
     return {
         obtenerClasesCompletadas: () => leerJSON("clasesCompletadas", []),
