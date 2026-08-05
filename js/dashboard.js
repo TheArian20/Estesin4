@@ -1,5 +1,5 @@
 /* Lógica exclusiva del panel de inicio de STESIN. */
-(() => {
+(async () => {
     "use strict";
 
     const $ = (selector) => document.querySelector(selector);
@@ -14,10 +14,28 @@
     };
     const limitar = (valor, minimo, maximo) => Math.min(Math.max(valor, minimo), maximo);
 
-    if (localStorage.getItem("login") !== "true") {
+    const cliente = window.STESIN_SUPABASE;
+    if (!cliente) {
         window.location.replace("login.html");
         return;
     }
+
+    const { data: { user } } = await cliente.auth.getUser();
+    if (!user) {
+        window.location.replace("login.html");
+        return;
+    }
+    const { data: perfil, error: errorPerfil } = await cliente.from("perfiles").select("nombre, correo, carrera, rol, activo, creado_en").eq("id", user.id).single();
+    if (errorPerfil || !perfil?.activo) {
+        await cliente.auth.signOut();
+        window.location.replace("login.html?estado=inactivo");
+        return;
+    }
+    localStorage.setItem("login", "true");
+    localStorage.setItem("usuario", perfil.nombre);
+    localStorage.setItem("correoUsuario", perfil.correo);
+    localStorage.setItem("carreraUsuario", perfil.carrera);
+    localStorage.setItem("rolUsuario", perfil.rol);
 
     const estado = {
         usuario: localStorage.getItem("usuario") || "Estudiante",
@@ -319,6 +337,18 @@
         }));
     }
 
+    function agregarAccesoAdministracion() {
+        if (localStorage.getItem("rolUsuario") !== "admin") return;
+        const sidebar = $(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="administracion.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "administracion.html";
+        enlace.textContent = "Administración";
+        const configuracion = sidebar.querySelector('a[href="configuracion.html"]');
+        if (configuracion) configuracion.insertAdjacentElement("beforebegin", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
     function configurarAnimaciones() {
         const elementos = $$(".reveal");
         if (!("IntersectionObserver" in window)) {
@@ -333,7 +363,8 @@
         elementos.forEach((elemento) => observador.observe(elemento));
     }
 
-    window.cerrarSesion = () => {
+    window.cerrarSesion = async () => {
+        await cliente.auth.signOut();
         localStorage.removeItem("login");
         localStorage.removeItem("usuario");
         window.location.replace("login.html");
@@ -354,6 +385,7 @@
     configurarCiclosInicio();
     actualizarPanelAcademico();
     configurarNavegacion();
+    agregarAccesoAdministracion();
     configurarAnimaciones();
     $(".btn-progreso")?.addEventListener("click", completarClase);
 

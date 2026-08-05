@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administración | STESIN</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/aulax.js" defer></script>
+<style>
+.admin-hero{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;padding:30px;border-radius:22px;background:linear-gradient(135deg,#123a31,#dca91b);color:#fff;margin-bottom:24px}.admin-hero h1{margin:7px 0}.admin-hero p{margin:0;max-width:670px;color:#fff8db}.admin-summary{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}.admin-summary span{border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:7px 10px;font-weight:700;font-size:13px}.admin-card{padding:22px;border:1px solid #dce8e1;border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(16,43,37,.07)}.admin-card h2{margin:0 0 6px;color:#123a31}.admin-card>p{margin:0 0 20px;color:#5b6b64}.account-list{display:grid;gap:12px}.account-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:17px;border:1px solid #e0e9e3;border-radius:14px}.account-row h3{margin:0 0 5px;color:#173b32;font-size:17px}.account-row p{margin:2px 0;color:#66766e;font-size:14px;overflow-wrap:anywhere}.account-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.account-meta span{border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700;background:#eef5ef;color:#315646}.account-meta .inactive{background:#fbe8e5;color:#9c382a}.account-meta .admin{background:#fff4cc;color:#745b07}.account-action{border:0;border-radius:10px;padding:10px 13px;font-weight:700;cursor:pointer;background:#123a31;color:#fff}.account-action:hover{background:#dca91b;color:#123a31}.account-action:disabled{background:#d8dedb;color:#66766e;cursor:not-allowed}.admin-state{padding:19px;border-radius:13px;background:#f5f8f6;color:#456056}.admin-state.error{background:#fce8e5;color:#8c3228}@media(max-width:700px){.admin-hero{display:block}.account-row{grid-template-columns:1fr}.account-action{width:100%}}
+</style>
+</head>
+<body>
+<aside class="sidebar"><h2>STESIN</h2><a href="index.html">Inicio</a><a href="cursos.html">Ciclos</a><a href="biblioteca.html">Biblioteca</a><a href="calendario.html">Calendario</a><a href="configuracion.html">Configuración</a></aside>
+<main class="main">
+<header><div><p class="eyebrow">GESTIÓN ACADÉMICA</p><h1>Administración de cuentas</h1><p>Controla quién puede ingresar a la plataforma.</p></div></header>
+<section class="admin-hero"><div><p class="eyebrow">ACCESO CENTRALIZADO</p><h1>Estudiantes STESIN</h1><p>Desactiva una cuenta cuando un estudiante ya no participe. Al volver a activarla, podrá ingresar de nuevo con la misma contraseña.</p><div class="admin-summary" id="resumen"><span>Cargando cuentas…</span></div></div></section>
+<section class="admin-card"><h2>Usuarios registrados</h2><p>Solo las cuentas activas pueden abrir los recursos académicos.</p><div class="account-list" id="listaUsuarios"><div class="admin-state">Cargando usuarios…</div></div></section>
+</main>
+<script>
+(() => {
+  const cliente = window.STESIN_SUPABASE;
+  const lista = document.getElementById('listaUsuarios');
+  const resumen = document.getElementById('resumen');
+  let miId = null;
+
+  function mostrarError(mensaje) {
+    lista.innerHTML = `<div class="admin-state error">${mensaje}</div>`;
+  }
+
+  async function cargarUsuarios() {
+    if (!cliente) return mostrarError('No se pudo conectar con el servicio de cuentas.');
+    const { data: { user } } = await cliente.auth.getUser();
+    if (!user) { window.location.href = 'login.html'; return; }
+    miId = user.id;
+    const { data: perfil, error: errorPerfil } = await cliente.from('perfiles').select('rol, activo').eq('id', user.id).single();
+    if (errorPerfil || !perfil?.activo || perfil.rol !== 'admin') {
+      mostrarError('No tienes permiso para administrar las cuentas.');
+      return;
+    }
+    const { data: usuarios, error } = await cliente.from('perfiles').select('id, nombre, correo, carrera, rol, activo, creado_en').order('creado_en', { ascending: false });
+    if (error) return mostrarError('No se pudieron cargar las cuentas: ' + error.message);
+    const activos = usuarios.filter((usuario) => usuario.activo).length;
+    resumen.innerHTML = `<span>${usuarios.length} cuentas</span><span>${activos} activas</span><span>${usuarios.length - activos} sin acceso</span>`;
+    lista.innerHTML = usuarios.map((usuario) => {
+      const esPropia = usuario.id === miId;
+      const estado = usuario.activo ? 'Activa' : 'Sin acceso';
+      const accion = usuario.activo ? 'Quitar acceso' : 'Restablecer acceso';
+      return `<article class="account-row"><div><h3>${usuario.nombre || 'Estudiante'}</h3><p>${usuario.correo}</p><p>${usuario.carrera || 'Sin especificar'}</p><div class="account-meta"><span class="${usuario.activo ? '' : 'inactive'}">${estado}</span><span class="${usuario.rol === 'admin' ? 'admin' : ''}">${usuario.rol === 'admin' ? 'Administrador' : 'Estudiante'}</span></div></div><button class="account-action" data-id="${usuario.id}" data-activo="${usuario.activo}" ${esPropia ? 'disabled title="No puedes desactivar tu propia cuenta"' : ''}>${esPropia ? 'Tu cuenta' : accion}</button></article>`;
+    }).join('') || '<div class="admin-state">Aún no hay cuentas registradas.</div>';
+    lista.querySelectorAll('.account-action:not([disabled])').forEach((boton) => boton.addEventListener('click', cambiarEstado));
+  }
+
+  async function cambiarEstado(evento) {
+    const boton = evento.currentTarget;
+    const activo = boton.dataset.activo === 'true';
+    boton.disabled = true;
+    boton.textContent = 'Guardando…';
+    const { error } = await cliente.from('perfiles').update({ activo: !activo }).eq('id', boton.dataset.id);
+    if (error) { alert('No se pudo actualizar la cuenta: ' + error.message); boton.disabled = false; boton.textContent = activo ? 'Quitar acceso' : 'Restablecer acceso'; return; }
+    cargarUsuarios();
+  }
+
+  document.addEventListener('DOMContentLoaded', cargarUsuarios);
+})();
+</script>
+</body>
+</html>
