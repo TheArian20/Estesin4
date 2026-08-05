@@ -91,6 +91,17 @@ const AulaX = (() => {
         sidebar.querySelectorAll("a").forEach((enlace) => enlace.addEventListener("click", () => sidebar.classList.remove("mostrar")));
     }
 
+    function agregarEnlaceSilabos() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="silabos.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "silabos.html";
+        enlace.textContent = "📄 Sílabos";
+        const calendario = sidebar.querySelector('a[href="calendario.html"]');
+        if (calendario) calendario.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
     function mejorarCalendario() {
         const calendario = document.querySelector(".calendar");
         if (!calendario) return;
@@ -403,7 +414,7 @@ const AulaX = (() => {
                 ["Libro-La-Pedagogia-de-Jesus.pdf", "Libro", "documentos/psicopedagogia", "Libro: La Pedagogía de Jesús"]
             ]
         };
-        const documentos = documentosPorMateria[nombre] || [];
+        const documentos = (documentosPorMateria[nombre] || []).filter(([, sesion]) => !/s[ií]labo|silabus/i.test(sesion));
         const contenedor = document.getElementById("documentosMateria");
         const lista = document.getElementById("listaDocumentos");
         if (!contenedor || !lista || !documentos.length) return;
@@ -453,6 +464,7 @@ const AulaX = (() => {
             boton.addEventListener("click", cerrarSesion);
         });
 
+        agregarEnlaceSilabos();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
         mejorarCalendario();
