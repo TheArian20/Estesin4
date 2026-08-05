@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         const enlacesDirectos = await window.BIBLIOTECA_ENLACES;
-        documentos = window.BIBLIOTECA_CATALOGO.map((documento, indice) => ({ ...documento, enlaceDrive: enlacesDirectos?.[indice] || "" }));
+        documentos = window.BIBLIOTECA_CATALOGO.map((documento, indice) => ({ ...documento, enlaceDrive: enlacesDirectos?.[indice] || "" })).filter((documento) => documento.grupo !== "SILABOS");
         if (!Array.isArray(documentos)) throw new Error("No se pudo cargar el catálogo");
         total.textContent = `${documentos.length} documentos disponibles`;
         renderizar();
