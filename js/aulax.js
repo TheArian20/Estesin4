@@ -104,6 +104,21 @@ const AulaX = (() => {
         else sidebar.appendChild(enlace);
     }
 
+    function agregarEnlaceAlabanzas() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="alabanzas.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "alabanzas.html";
+        enlace.textContent = "Alabanzas";
+        if ((window.location.pathname.split("/").pop() || "index.html") === "alabanzas.html") {
+            enlace.classList.add("active");
+            enlace.setAttribute("aria-current", "page");
+        }
+        const silabos = sidebar.querySelector('a[href="silabos.html"]');
+        if (silabos) silabos.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
     function agregarEnlaceAdministracion() {
         if (localStorage.getItem("rolUsuario") !== "admin") return;
         const sidebar = document.querySelector(".sidebar");
@@ -479,6 +494,7 @@ const AulaX = (() => {
         });
 
         agregarEnlaceSilabos();
+        agregarEnlaceAlabanzas();
         agregarEnlaceAdministracion();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
