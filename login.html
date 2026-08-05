@@ -19,7 +19,7 @@
 </main>
 <script>
 const mensaje=document.getElementById('mensaje');
-function usuarioInterno(valor){const limpio=valor.trim().toLowerCase();return limpio.includes('@')?limpio:`${limpio}@stestin.local`;}
+function usuarioInterno(valor){const limpio=valor.trim().toLowerCase();return limpio.includes('@')?limpio:`${limpio}@stestin-interno.com`;}
 async function login(){const usuario=document.getElementById('usuario').value.trim(),password=document.getElementById('password').value;if(!usuario||!password){mensaje.textContent='Completa tu usuario y contraseña.';return;}const {data,error}=await STESIN_SUPABASE.auth.signInWithPassword({email:usuarioInterno(usuario),password});if(error){mensaje.textContent='Usuario o contraseña incorrectos.';return;}const {data:perfil}=await STESIN_SUPABASE.from('perfiles').select('activo').eq('id',data.user.id).single();if(!perfil?.activo){await STESIN_SUPABASE.auth.signOut();mensaje.textContent='Tu cuenta está desactivada. Comunícate con administración.';return;}window.location.replace('index.html');}
 document.getElementById('btnIngresar').addEventListener('click',login);document.addEventListener('keydown',e=>{if(e.key==='Enter')login()});if(new URLSearchParams(location.search).get('estado')==='inactivo')mensaje.textContent='Tu sesión fue cerrada porque tu cuenta está desactivada.';
 </script>

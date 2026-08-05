@@ -77,7 +77,7 @@
     let creadas = 0, existentes = 0, errores = 0;
     for (const [nombre, usuario, password] of filas) {
       const limpio = usuario.toLowerCase().replace(/[^a-z0-9.]/g, '');
-      const { error } = await registro.auth.signUp({ email: `${limpio}@stestin.local`, password, options: { data: { nombre, carrera: 'STESIN', usuario: limpio } } });
+      const { error } = await registro.auth.signUp({ email: `${limpio}@stestin-interno.com`, password, options: { data: { nombre, carrera: 'STESIN', usuario: limpio } } });
       if (!error) creadas++; else if (/already|registered/i.test(error.message)) existentes++; else errores++;
     }
     resultadoImportacion.textContent = `Proceso terminado: ${creadas} creadas, ${existentes} ya existían y ${errores} con error.`;
