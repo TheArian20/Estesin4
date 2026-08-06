@@ -119,6 +119,21 @@ const AulaX = (() => {
         else sidebar.appendChild(enlace);
     }
 
+    function agregarEnlaceRedes() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="redes.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "redes.html";
+        enlace.textContent = "Redes STESIN";
+        if ((window.location.pathname.split("/").pop() || "index.html") === "redes.html") {
+            enlace.classList.add("active");
+            enlace.setAttribute("aria-current", "page");
+        }
+        const alabanzas = sidebar.querySelector('a[href="alabanzas.html"]');
+        if (alabanzas) alabanzas.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
     function agregarEnlaceAdministracion() {
         if (localStorage.getItem("rolUsuario") !== "admin") return;
         const sidebar = document.querySelector(".sidebar");
@@ -495,6 +510,7 @@ const AulaX = (() => {
 
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
+        agregarEnlaceRedes();
         agregarEnlaceAdministracion();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
