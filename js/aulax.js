@@ -537,8 +537,6 @@ const AulaX = (() => {
     function inicializarInterfaz() {
         const paginaActual = window.location.pathname.split("/").pop() || "index.html";
 
-        document.querySelector("header .profile")?.remove();
-
         document.querySelectorAll(".sidebar a").forEach((enlace) => {
             const activa = enlace.getAttribute("href") === paginaActual;
             enlace.classList.toggle("active", activa);
