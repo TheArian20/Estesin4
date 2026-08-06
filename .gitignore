@@ -6,4 +6,5 @@ biblioteca-digital/
 biblioteca-importacion*.estado
 
 # Credenciales entregadas únicamente por el administrador.
-credenciales-estudiantes.csv
+credenciales-*.csv
+*credenciales*.csv
