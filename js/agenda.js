@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!select || !chips || !lista) return;
   const fechas = [...new Map(sesiones.map((s) => [s.fecha, s.dia])).entries()];
   chips.innerHTML = `<button class="agenda-chip active" data-fecha="todas" type="button">Todas</button>${fechas.map(([fecha, dia]) => `<button class="agenda-chip" data-fecha="${fecha}" type="button">${dia}</button>`).join("")}`;
+  const mes = document.getElementById("mesAgosto");
+  if (mes) { const diasConClase = new Set(sesiones.map((s) => Number(s.fecha.slice(-2)))); mes.innerHTML = `${Array.from({length: 6}, () => '<span class="month-empty"></span>').join("")}${Array.from({length:31},(_,i)=>`<button type="button" class="${diasConClase.has(i+1)?'has-class':''}" data-dia="${String(i+1).padStart(2,'0')}">${i+1}</button>`).join("")}`; mes.addEventListener("click",(e)=>{const b=e.target.closest('[data-dia]');if(b&&diasConClase.has(Number(b.dataset.dia)))renderizar(`2026-08-${b.dataset.dia}`);}); }
   function renderizar(fecha = "todas") {
     select.value = fecha;
     chips.querySelectorAll("button").forEach((boton) => boton.classList.toggle("active", boton.dataset.fecha === fecha));

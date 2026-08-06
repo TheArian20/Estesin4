@@ -87,3 +87,34 @@ for select to authenticated using (activo = true or public.es_administrador());
 drop policy if exists "Administrador gestiona avisos" on public.avisos;
 create policy "Administrador gestiona avisos" on public.avisos
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+
+-- Lecturas y asistencia: cada estudiante solo puede consultar su propio historial.
+create table if not exists public.progreso_lectura (
+  usuario_id uuid not null references auth.users(id) on delete cascade,
+  recurso_id text not null,
+  recurso_nombre text not null,
+  ciclo text,
+  leido_en timestamptz not null default now(),
+  primary key (usuario_id, recurso_id)
+);
+alter table public.progreso_lectura enable row level security;
+drop policy if exists "Usuario gestiona su progreso" on public.progreso_lectura;
+create policy "Usuario gestiona su progreso" on public.progreso_lectura
+for all to authenticated using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
+
+create table if not exists public.asistencia (
+  id bigint generated always as identity primary key,
+  estudiante_id uuid not null references auth.users(id) on delete cascade,
+  fecha date not null,
+  presente boolean not null default true,
+  nota text,
+  registrado_en timestamptz not null default now(),
+  unique (estudiante_id, fecha)
+);
+alter table public.asistencia enable row level security;
+drop policy if exists "Estudiante ve su asistencia" on public.asistencia;
+create policy "Estudiante ve su asistencia" on public.asistencia
+for select to authenticated using (estudiante_id = auth.uid() or public.es_administrador());
+drop policy if exists "Administrador gestiona asistencia" on public.asistencia;
+create policy "Administrador gestiona asistencia" on public.asistencia
+for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
