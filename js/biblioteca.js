@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let documentos = [];
     let filtro = "todos";
     let limite = 24;
+    const favoritos = new Set(JSON.parse(localStorage.getItem("bibliotecaFavoritos") || "[]"));
 
     const normalizar = (texto = "") => texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const tipoDocumento = (archivo = "") => {
@@ -35,22 +36,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function crearTarjeta(documento) {
         const tipo = tipoDocumento(documento.nombre);
+        const id = documento.enlaceDrive || documento.nombre;
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "library-item library-entry";
         const enlace = document.createElement("a");
-        enlace.className = "library-item";
+        enlace.className = "library-open";
         enlace.href = documento.enlaceDrive || bibliotecaDrive;
         enlace.target = "_blank";
         enlace.rel = "noopener";
         enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small></small></span>`;
         enlace.querySelector("strong").textContent = documento.nombre;
         enlace.querySelector("small").textContent = `${documento.categoria} · ${tipo.toUpperCase()} · ${documento.enlaceDrive ? "Abrir documento" : "Abrir en Google Drive"}`;
-        return enlace;
+        const favorito = document.createElement("button");
+        favorito.type = "button";
+        favorito.className = `library-favorite${favoritos.has(id) ? " active" : ""}`;
+        favorito.setAttribute("aria-label", "Guardar en favoritos");
+        favorito.textContent = favoritos.has(id) ? "★" : "☆";
+        favorito.addEventListener("click", () => { favoritos.has(id) ? favoritos.delete(id) : favoritos.add(id); localStorage.setItem("bibliotecaFavoritos", JSON.stringify([...favoritos])); renderizar(); });
+        enlace.addEventListener("click", async () => {
+            localStorage.setItem("ultimaLectura", documento.nombre);
+            const cliente = window.STESIN_SUPABASE;
+            const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
+            if (user) await cliente.from("progreso_lectura").upsert({ usuario_id: user.id, recurso_id: id, recurso_nombre: documento.nombre, ciclo: documento.ciclo || null, leido_en: new Date().toISOString() });
+        });
+        tarjeta.append(enlace, favorito);
+        return tarjeta;
     }
 
     function renderizar() {
         const consulta = normalizar(buscador.value.trim());
         const filtrados = documentos.filter((documento) => {
             const coincideTexto = !consulta || normalizar(documento.nombre).includes(consulta);
-            const coincideTipo = filtro === "todos" || tipoDocumento(documento.nombre) === filtro;
+            const coincideTipo = filtro === "todos" || (filtro === "favoritos" ? favoritos.has(documento.enlaceDrive || documento.nombre) : tipoDocumento(documento.nombre) === filtro);
             const coincideCategoria = categoria.value === "todas" || documento.categoria === categoria.value;
             return coincideTexto && coincideTipo && coincideCategoria;
         }).sort((a, b) => orden.value === "recientes"

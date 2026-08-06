@@ -93,6 +93,29 @@ const AulaX = (() => {
         sidebar.querySelectorAll("a").forEach((enlace) => enlace.addEventListener("click", () => sidebar.classList.remove("mostrar")));
     }
 
+    function configurarBusquedaGlobal() {
+        if (document.getElementById("busquedaGlobal")) return;
+        const dialogo = document.createElement("section");
+        dialogo.id = "busquedaGlobal";
+        dialogo.className = "global-search";
+        dialogo.hidden = true;
+        dialogo.innerHTML = '<div class="global-search-box" role="dialog" aria-modal="true" aria-label="Buscar en STESIN"><div class="global-search-head"><strong>Buscar en STESIN</strong><button type="button" aria-label="Cerrar búsqueda">×</button></div><input type="search" placeholder="Ciclos, biblioteca, calendario, sílabos…" autocomplete="off"><div class="global-search-results"></div><small>Presiona Esc para cerrar</small></div>';
+        document.body.appendChild(dialogo);
+        const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
+        const opciones = [
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Asistencia", "Mi registro de asistencia", "asistencia.html"], ["Equipo STESIN", "Equipo académico", "equipo.html"]
+        ];
+        const abrir = () => { dialogo.hidden = false; campo.value = ""; pintar(); window.setTimeout(() => campo.focus(), 0); };
+        const cerrar = () => { dialogo.hidden = true; };
+        const pintar = () => { const texto = campo.value.toLocaleLowerCase(); const coincidencias = opciones.filter(([titulo, detalle]) => `${titulo} ${detalle}`.toLocaleLowerCase().includes(texto)); resultados.innerHTML = coincidencias.map(([titulo, detalle, enlace]) => `<a href="${enlace}"><strong>${titulo}</strong><span>${detalle}</span></a>`).join("") || '<p>No encontramos resultados.</p>'; };
+        campo.addEventListener("input", pintar);
+        dialogo.querySelector("button").addEventListener("click", cerrar);
+        dialogo.addEventListener("click", (evento) => { if (evento.target === dialogo) cerrar(); });
+        document.addEventListener("keydown", (evento) => { if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === "k") { evento.preventDefault(); abrir(); } if (evento.key === "Escape") cerrar(); });
+        const encabezado = document.querySelector("header");
+        if (encabezado && !document.getElementById("abrirBusquedaGlobal")) { const boton = document.createElement("button"); boton.id = "abrirBusquedaGlobal"; boton.className = "global-search-trigger"; boton.type = "button"; boton.textContent = "Buscar"; boton.setAttribute("aria-label", "Buscar en STESIN"); boton.addEventListener("click", abrir); encabezado.appendChild(boton); }
+    }
+
     function agregarEnlaceSilabos() {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar || sidebar.querySelector('a[href="silabos.html"]')) return;
@@ -117,6 +140,20 @@ const AulaX = (() => {
         const calendario = sidebar.querySelector('a[href="calendario.html"]');
         if (calendario) calendario.insertAdjacentElement("afterend", enlace);
         else sidebar.appendChild(enlace);
+    }
+
+    function agregarEnlacesComunidad() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar) return;
+        const crear = (archivo, texto, despuesDe) => {
+            if (sidebar.querySelector(`a[href="${archivo}"]`)) return;
+            const enlace = document.createElement("a"); enlace.href = archivo; enlace.textContent = texto;
+            if ((window.location.pathname.split("/").pop() || "index.html") === archivo) enlace.classList.add("active");
+            const referencia = sidebar.querySelector(`a[href="${despuesDe}"]`);
+            if (referencia) referencia.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
+        };
+        crear("asistencia.html", "Asistencia", "malla-curricular.html");
+        crear("equipo.html", "Equipo STESIN", "redes.html");
     }
 
     function agregarEnlaceAlabanzas() {
@@ -527,9 +564,11 @@ const AulaX = (() => {
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
+        agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
+        configurarBusquedaGlobal();
         mejorarCalendario();
         configurarSubciclos();
         configurarMateria();
