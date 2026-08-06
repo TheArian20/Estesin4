@@ -242,6 +242,10 @@
         const menuPerfil = $("#menuPerfil");
         perfil?.addEventListener("click", (evento) => {
             evento.stopPropagation();
+            if (window.matchMedia("(max-width: 700px)").matches) {
+                window.location.href = "configuracion.html";
+                return;
+            }
             menuPerfil?.classList.toggle("activo");
         });
         document.addEventListener("click", () => menuPerfil?.classList.remove("activo"));
