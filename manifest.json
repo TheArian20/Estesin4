@@ -1,0 +1,10 @@
+{
+  "name": "STESIN — Plataforma Académica",
+  "short_name": "STESIN",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f7f4ed",
+  "theme_color": "#14382f",
+  "description": "Plataforma académica del Seminario Teológico Superior Internacional.",
+  "icons": [{ "src": "stesin-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

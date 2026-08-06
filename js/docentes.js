@@ -1,1 +1,26 @@
-document.addEventListener("DOMContentLoaded",async()=>{const c=window.STESIN_SUPABASE,host=document.getElementById("materiasDocente"),titulo=document.getElementById("tituloDocente"),resumen=document.getElementById("resumenDocente");if(!c||!host)return;const{data:{user}}=await c.auth.getUser();if(!user)return;const{data:p}=await c.from("perfiles").select("rol,nombre").eq("id",user.id).single();if(!["admin","docente"].includes(p?.rol)){location.replace("index.html");return;}const{data,error}=await c.from("materias_docentes").select("ciclo,materia").eq("docente_id",user.id).order("ciclo");if(error){host.innerHTML='<p class="announcements-empty">Ejecuta el SQL actualizado para activar las asignaciones docentes.</p>';return;}titulo.textContent=`Bienvenido, ${p.nombre}`;resumen.textContent=data?.length?`${data.length} materia(s) asignada(s).`:'Aún no tienes materias asignadas. Administración podrá asignarlas cuando se creen las cuentas docentes.';host.innerHTML=(data||[]).map(m=>`<article><span>${m.ciclo}</span><h2>${m.materia}</h2><p>Consulta recursos relacionados y registra la asistencia de tus estudiantes.</p><a href="asistencia.html">Tomar asistencia →</a></article>`).join('')||'<p class="announcements-empty">Sin asignaciones por ahora.</p>';});
+document.addEventListener("DOMContentLoaded", async () => {
+    const cliente = window.STESIN_SUPABASE;
+    const host = document.getElementById("materiasDocente");
+    const titulo = document.getElementById("tituloDocente");
+    const resumen = document.getElementById("resumenDocente");
+    if (!cliente || !host) return;
+
+    const { data: { user } = {} } = await cliente.auth.getUser();
+    if (!user) return;
+    const { data: perfil } = await cliente.from("perfiles").select("rol,nombre").eq("id", user.id).single();
+    if (!perfil || !["admin", "docente"].includes(perfil.rol)) { location.replace("index.html"); return; }
+
+    let consulta = cliente.from("materias_docentes").select("ciclo,materia,docente_id").order("ciclo");
+    if (perfil.rol === "docente") consulta = consulta.eq("docente_id", user.id);
+    const [{ data: materias, error }, { count: actividad }] = await Promise.all([
+        consulta,
+        cliente.from("progreso_lectura").select("recurso_id", { count: "exact", head: true })
+    ]);
+    if (error) { host.innerHTML = '<p class="announcements-empty">Ejecuta el SQL actualizado para activar las asignaciones docentes.</p>'; return; }
+
+    titulo.textContent = perfil.rol === "admin" ? "Coordinación académica" : `Bienvenido, ${perfil.nombre}`;
+    resumen.textContent = materias?.length
+        ? `${materias.length} materia(s) asignada(s) · ${actividad || 0} aperturas de recursos registradas en la plataforma.`
+        : "Aún no hay materias asignadas. Administración podrá asignarlas cuando se creen las cuentas docentes.";
+    host.innerHTML = (materias || []).map((materia) => `<article><span>${materia.ciclo}</span><h2>${materia.materia}</h2><p>Registra asistencia y revisa la actividad de los recursos de la plataforma.</p><a href="asistencia.html">Tomar asistencia →</a></article>`).join("") || '<p class="announcements-empty">Sin asignaciones por ahora.</p>';
+});

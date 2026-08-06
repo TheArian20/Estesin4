@@ -2937,6 +2937,12 @@ button,.btn-clase,.btn-curso,.btn-navegacion,.btn-continuar{min-height:44px;}
 
 .sidebar a:last-child{margin-bottom:28px;}
 
+/* Navegación organizada por áreas para que el menú siga siendo claro al crecer. */
+.sidebar-navigation{display:grid;gap:18px;}
+.sidebar-group{display:grid;gap:5px;}
+.sidebar-group>span{padding:0 12px;color:#dca91b;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;}
+.sidebar-group a{margin-bottom:0;}
+
 @media(max-width:900px){
     .sidebar{
         height:100dvh;
