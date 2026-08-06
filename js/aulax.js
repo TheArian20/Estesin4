@@ -103,7 +103,7 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
         if (["admin", "docente"].includes(rol)) {
@@ -186,7 +186,7 @@ const AulaX = (() => {
         if (!sidebar || sidebar.querySelector('a[href="redes.html"]')) return;
         const enlace = document.createElement("a");
         enlace.href = "redes.html";
-        enlace.textContent = "Redes STESIN";
+        enlace.textContent = "Enlaces";
         if ((window.location.pathname.split("/").pop() || "index.html") === "redes.html") {
             enlace.classList.add("active");
             enlace.setAttribute("aria-current", "page");
