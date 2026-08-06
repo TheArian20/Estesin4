@@ -534,6 +534,44 @@ const AulaX = (() => {
         });
     }
 
+    function configurarCiclosConHerramientas() {
+        const cuadrícula = document.querySelector(".ciclos-grid");
+        if (!cuadrícula || document.getElementById("herramientasCiclos")) return;
+        const tarjetas = [...cuadrícula.querySelectorAll(".cycle-card")];
+        const cantidades = [8, 8, 7, 8, 7, 6, 7, 8];
+        tarjetas.forEach((tarjeta, indice) => {
+            const cantidad = cantidades[indice] || 0;
+            tarjeta.dataset.grupoCiclo = indice < 4 ? "inicial" : "avanzado";
+            const meta = document.createElement("span");
+            meta.className = "cycle-meta";
+            meta.textContent = `${cantidad} materias disponibles`;
+            tarjeta.querySelector("p")?.insertAdjacentElement("afterend", meta);
+        });
+        const herramientas = document.createElement("section");
+        herramientas.id = "herramientasCiclos";
+        herramientas.className = "cycle-tools";
+        herramientas.innerHTML = '<label><span>Buscar ciclo</span><input type="search" placeholder="Ej.: Ciclo V"></label><label><span>Mostrar</span><select><option value="todos">Todos los ciclos</option><option value="inicial">Ciclos I al IV</option><option value="avanzado">Ciclos V al VIII</option></select></label><p id="resultadoCiclos"></p>';
+        cuadrícula.insertAdjacentElement("beforebegin", herramientas);
+        const campo = herramientas.querySelector("input");
+        const selector = herramientas.querySelector("select");
+        const resultado = herramientas.querySelector("#resultadoCiclos");
+        const filtrar = () => {
+            const consulta = campo.value.trim().toLocaleLowerCase();
+            let visibles = 0;
+            tarjetas.forEach((tarjeta) => {
+                const coincideTexto = tarjeta.textContent.toLocaleLowerCase().includes(consulta);
+                const coincideGrupo = selector.value === "todos" || tarjeta.dataset.grupoCiclo === selector.value;
+                const visible = coincideTexto && coincideGrupo;
+                tarjeta.hidden = !visible;
+                if (visible) visibles += 1;
+            });
+            resultado.textContent = `${visibles} ciclo${visibles === 1 ? "" : "s"} disponible${visibles === 1 ? "" : "s"}`;
+        };
+        campo.addEventListener("input", filtrar);
+        selector.addEventListener("change", filtrar);
+        filtrar();
+    }
+
     function inicializarInterfaz() {
         const paginaActual = window.location.pathname.split("/").pop() || "index.html";
 
@@ -571,6 +609,7 @@ const AulaX = (() => {
         configurarMenuMovil();
         configurarModoOscuroGlobal();
         configurarBusquedaGlobal();
+        configurarCiclosConHerramientas();
         mejorarCalendario();
         configurarSubciclos();
         configurarMateria();
