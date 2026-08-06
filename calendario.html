@@ -17,6 +17,7 @@
 <main class="main">
 <header><div><p class="eyebrow">AGENDA ACADÉMICA</p><h1>Horario de clases</h1><p>Programación oficial de agosto.</p></div><div class="profile"><img id="fotoHeader" src="https://i.pravatar.cc/150?img=12" alt="Foto de perfil"><p id="usuarioHeader"></p></div></header>
 <section class="schedule-intro"><div><h2>Agosto 2026</h2><p>Consulta materia, fecha y franja horaria de cada clase.</p></div><span class="schedule-badge">6 jornadas programadas</span></section>
+<section class="agenda-interactiva" aria-labelledby="tituloAgenda"><div class="section-heading"><div><p class="eyebrow">SELECCIONA UNA FECHA</p><h2 id="tituloAgenda">Agenda interactiva</h2></div><select id="filtroAgenda" aria-label="Filtrar agenda por fecha"><option value="todas">Todas las jornadas</option><option value="2026-08-03">Lunes 03</option><option value="2026-08-10">Lunes 10</option><option value="2026-08-11">Martes 11</option><option value="2026-08-17">Lunes 17</option><option value="2026-08-18">Martes 18</option><option value="2026-08-26">Miércoles 26</option></select></div><div class="agenda-chips" id="agendaChips"></div><div class="agenda-list" id="agendaLista"></div></section>
 <section class="schedule-wrap" id="horario-agosto" aria-label="Horario de agosto 2026"><table class="schedule"><thead><tr><th>Hora</th><th>Lunes 03</th><th>Lunes 10</th><th>Martes 11</th><th>Lunes 17</th><th>Martes 18</th><th>Miércoles 26</th></tr></thead><tbody>
 <tr><td class="hour">6:00 – 6:45</td><td class="class homiletica" rowspan="2">Homilética Bíblica II<span>6:00 – 7:30</span></td><td class="class administracion" rowspan="3">Administración Eclesiástica<span>6:00 – 8:15</span></td><td class="class teologia" rowspan="3">Teología Bíblica III<br>(Cristología)<span>6:00 – 8:15</span></td><td class="class administracion" rowspan="3">Administración Eclesiástica<span>6:00 – 8:15</span></td><td class="class consejeria" rowspan="2">Consejería Pastoral<span>6:00 – 7:30</span></td><td class="class psicopedagogia" rowspan="2">Psicopedagogía<span>6:00 – 7:30</span></td></tr>
 <tr><td class="hour">6:45 – 7:30</td></tr>
@@ -26,5 +27,6 @@
 </tbody></table></section>
 <section class="schedule-summary"><article class="card"><strong>6</strong><p>Jornadas programadas</p></article><article class="card"><strong>03–26</strong><p>Fechas de clase en agosto</p></article><article class="card"><strong>6:00</strong><p>Hora de inicio de las jornadas</p></article></section>
 </main>
+<script src="js/agenda.js"></script>
 </body>
 </html>

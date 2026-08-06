@@ -68,3 +68,22 @@ for select to authenticated using (true);
 drop policy if exists "Administrador gestiona recursos" on public.recursos_personalizados;
 create policy "Administrador gestiona recursos" on public.recursos_personalizados
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+
+-- Avisos visibles para todos los estudiantes desde el inicio.
+create table if not exists public.avisos (
+  id bigint generated always as identity primary key,
+  titulo text not null check (char_length(trim(titulo)) >= 3),
+  mensaje text not null check (char_length(trim(mensaje)) >= 3),
+  destacado boolean not null default false,
+  activo boolean not null default true,
+  creado_en timestamptz not null default now(),
+  creado_por uuid references auth.users(id) on delete set null
+);
+
+alter table public.avisos enable row level security;
+drop policy if exists "Usuarios autenticados ven avisos activos" on public.avisos;
+create policy "Usuarios autenticados ven avisos activos" on public.avisos
+for select to authenticated using (activo = true or public.es_administrador());
+drop policy if exists "Administrador gestiona avisos" on public.avisos;
+create policy "Administrador gestiona avisos" on public.avisos
+for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
