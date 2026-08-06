@@ -48,3 +48,23 @@ create policy "Administrador gestiona perfiles" on public.perfiles for all to au
 
 -- Después de crear tu primera cuenta, reemplaza tu-correo@ejemplo.com por tu correo y ejecuta esta línea:
 -- update public.perfiles set rol = 'admin' where correo = 'tu-correo@ejemplo.com';
+
+-- Recursos publicados desde el panel Administración.
+create table if not exists public.recursos_personalizados (
+  id bigint generated always as identity primary key,
+  titulo text not null check (char_length(trim(titulo)) >= 3),
+  enlace text not null check (enlace ~ '^https://drive\\.google\\.com/'),
+  categoria text not null default 'General',
+  ciclo text,
+  tipo text not null default 'documento',
+  creado_en timestamptz not null default now(),
+  creado_por uuid references auth.users(id) on delete set null
+);
+
+alter table public.recursos_personalizados enable row level security;
+drop policy if exists "Usuarios autenticados ven recursos" on public.recursos_personalizados;
+create policy "Usuarios autenticados ven recursos" on public.recursos_personalizados
+for select to authenticated using (true);
+drop policy if exists "Administrador gestiona recursos" on public.recursos_personalizados;
+create policy "Administrador gestiona recursos" on public.recursos_personalizados
+for all to authenticated using (public.es_administrador()) with check (public.es_administrador());

@@ -28,6 +28,7 @@
     <section class="library-toolbar" aria-label="Buscar en biblioteca">
         <label class="library-search"><span>🔍</span><input id="buscarBiblioteca" type="search" placeholder="Buscar por título, autor o tema…"></label>
         <div class="library-filters" id="filtrosBiblioteca"><button type="button" class="active" data-filtro="todos">Todos</button><button type="button" data-filtro="pdf">PDF</button><button type="button" data-filtro="word">Word</button><button type="button" data-filtro="archivo">Archivos</button></div>
+        <div class="library-options"><label>Categoría<select id="categoriaBiblioteca"><option value="todas">Todas las categorías</option><option>Biblia</option><option>Teología</option><option>Ministerio</option><option>Historia y sociedad</option><option>Formación</option><option>General</option></select></label><label>Ordenar<select id="ordenBiblioteca"><option value="titulo">Título A–Z</option><option value="recientes">Nuevos primero</option></select></label></div>
     </section>
 
     <section><div class="library-result-head"><h2 id="tituloResultados">Documentos disponibles</h2><span id="contadorResultados"></span></div><div class="library-grid" id="listaBiblioteca"></div><p class="library-empty" id="bibliotecaVacia" hidden>No encontramos documentos con esa búsqueda.</p><button type="button" class="library-more" id="cargarMas" hidden>Ver más documentos</button></section>
