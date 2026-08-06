@@ -137,6 +137,9 @@ alter table public.progreso_lectura enable row level security;
 drop policy if exists "Usuario gestiona su progreso" on public.progreso_lectura;
 create policy "Usuario gestiona su progreso" on public.progreso_lectura
 for all to authenticated using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
+drop policy if exists "Equipo académico consulta actividad" on public.progreso_lectura;
+create policy "Equipo académico consulta actividad" on public.progreso_lectura
+for select to authenticated using (public.puede_gestionar_asistencia());
 
 create table if not exists public.asistencia (
   id bigint generated always as identity primary key,

@@ -232,6 +232,46 @@ const AulaX = (() => {
         else sidebar.appendChild(enlace);
     }
 
+    function organizarNavegacion() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector(".sidebar-navigation")) return;
+        const grupos = [
+            ["Académico", ["index.html", "cursos.html", "progreso.html", "calendario.html", "malla-curricular.html", "asistencia.html", "docentes.html"]],
+            ["Recursos", ["biblioteca.html", "silabos.html", "alabanzas.html"]],
+            ["Comunidad", ["redes.html", "contacto.html"]],
+            ["Administración", ["administracion.html", "equipo.html", "configuracion.html"]]
+        ];
+        const navegacion = document.createElement("nav");
+        navegacion.className = "sidebar-navigation";
+        navegacion.setAttribute("aria-label", "Navegación principal");
+        grupos.forEach(([titulo, rutas]) => {
+            const enlaces = rutas.map((ruta) => sidebar.querySelector(`a[href="${ruta}"]`)).filter(Boolean);
+            if (!enlaces.length) return;
+            const grupo = document.createElement("div");
+            grupo.className = "sidebar-group";
+            grupo.innerHTML = `<span>${titulo}</span>`;
+            enlaces.forEach((enlace) => grupo.appendChild(enlace));
+            navegacion.appendChild(grupo);
+        });
+        sidebar.appendChild(navegacion);
+    }
+
+    function registrarAplicacionInstalable() {
+        if (!document.querySelector('link[rel="manifest"]')) {
+            const manifest = document.createElement("link");
+            manifest.rel = "manifest";
+            manifest.href = "manifest.json";
+            document.head.appendChild(manifest);
+        }
+        if (!document.querySelector('meta[name="theme-color"]')) {
+            const tema = document.createElement("meta");
+            tema.name = "theme-color";
+            tema.content = "#14382f";
+            document.head.appendChild(tema);
+        }
+        if ("serviceWorker" in navigator && window.isSecureContext) navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+
     function mejorarCalendario() {
         const calendario = document.querySelector(".calendar");
         if (!calendario) return;
@@ -666,6 +706,8 @@ const AulaX = (() => {
         agregarEnlaceContacto();
         agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
+        organizarNavegacion();
+        registrarAplicacionInstalable();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
         configurarBusquedaGlobal();

@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const filtros = document.getElementById("filtrosBiblioteca");
     const categoria = document.getElementById("categoriaBiblioteca");
     const orden = document.getElementById("ordenBiblioteca");
+    const ciclo = document.createElement("select");
+    ciclo.id = "cicloBiblioteca";
+    ciclo.innerHTML = '<option value="todos">Todos los ciclos</option><option>Ciclo I</option><option>Ciclo II</option><option>Ciclo III</option><option>Ciclo IV</option><option>Ciclo V</option><option>Ciclo VI</option><option>Ciclo VII</option><option>Ciclo VIII</option>';
+    const etiquetaCiclo = document.createElement("label");
+    etiquetaCiclo.textContent = "Ciclo";
+    etiquetaCiclo.appendChild(ciclo);
+    orden.closest("label").insertAdjacentElement("beforebegin", etiquetaCiclo);
     const contador = document.getElementById("contadorResultados");
     const total = document.getElementById("totalDocumentos");
     const vacio = document.getElementById("bibliotecaVacia");
@@ -71,7 +78,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const coincideTexto = !consulta || normalizar(documento.nombre).includes(consulta);
             const coincideTipo = filtro === "todos" || (filtro === "favoritos" ? favoritos.has(documento.enlaceDrive || documento.nombre) : tipoDocumento(documento.nombre) === filtro);
             const coincideCategoria = categoria.value === "todas" || documento.categoria === categoria.value;
-            return coincideTexto && coincideTipo && coincideCategoria;
+            const coincideCiclo = ciclo.value === "todos" || documento.ciclo === ciclo.value;
+            return coincideTexto && coincideTipo && coincideCategoria && coincideCiclo;
         }).sort((a, b) => orden.value === "recientes"
             ? new Date(b.creadoEn || 0) - new Date(a.creadoEn || 0)
             : a.nombre.localeCompare(b.nombre, "es"));
@@ -139,6 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     buscador.addEventListener("input", () => { limite = 24; renderizar(); });
     categoria.addEventListener("change", () => { limite = 24; renderizar(); });
+    ciclo.addEventListener("change", () => { limite = 24; renderizar(); });
     orden.addEventListener("change", renderizar);
     filtros.addEventListener("click", (evento) => {
         const boton = evento.target.closest("button[data-filtro]");
