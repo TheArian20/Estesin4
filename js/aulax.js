@@ -143,6 +143,7 @@ const AulaX = (() => {
     }
 
     function agregarEnlacesComunidad() {
+        if (localStorage.getItem("rolUsuario") !== "admin") return;
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar) return;
         const crear = (archivo, texto, despuesDe) => {
@@ -564,6 +565,7 @@ const AulaX = (() => {
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
+        agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
@@ -598,6 +600,11 @@ const AulaX = (() => {
         localStorage.setItem("carreraUsuario", perfil.carrera);
         localStorage.setItem("rolUsuario", perfil.rol);
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
+        const paginasSoloAdministrador = ["administracion.html", "asistencia.html", "equipo.html"];
+        if (perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) {
+            window.location.replace("index.html");
+            return;
+        }
         inicializarInterfaz();
     }
 
