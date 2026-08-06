@@ -104,6 +104,21 @@ const AulaX = (() => {
         else sidebar.appendChild(enlace);
     }
 
+    function agregarEnlaceMallaCurricular() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="malla-curricular.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "malla-curricular.html";
+        enlace.textContent = "Malla curricular";
+        if ((window.location.pathname.split("/").pop() || "index.html") === "malla-curricular.html") {
+            enlace.classList.add("active");
+            enlace.setAttribute("aria-current", "page");
+        }
+        const calendario = sidebar.querySelector('a[href="calendario.html"]');
+        if (calendario) calendario.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
     function agregarEnlaceAlabanzas() {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar || sidebar.querySelector('a[href="alabanzas.html"]')) return;
@@ -508,6 +523,7 @@ const AulaX = (() => {
             boton.addEventListener("click", cerrarSesion);
         });
 
+        agregarEnlaceMallaCurricular();
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
