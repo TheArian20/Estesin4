@@ -214,6 +214,29 @@
         renderizar();
     }
 
+    async function cargarAvisosInicio() {
+        const contenedor = $("#listaAvisos");
+        const estadoAvisos = $("#estadoAvisos");
+        if (!contenedor || !estadoAvisos) return;
+        const { data, error } = await cliente.from("avisos").select("id, titulo, mensaje, destacado, creado_en").eq("activo", true).order("destacado", { ascending: false }).order("creado_en", { ascending: false }).limit(4);
+        if (error) {
+            estadoAvisos.textContent = "Sin avisos";
+            return;
+        }
+        estadoAvisos.textContent = data.length ? `${data.length} aviso${data.length === 1 ? "" : "s"}` : "Al día";
+        contenedor.innerHTML = "";
+        if (!data.length) { contenedor.innerHTML = '<p class="announcements-empty">No hay avisos nuevos por el momento.</p>'; return; }
+        data.forEach((aviso) => {
+            const articulo = document.createElement("article");
+            articulo.className = `announcement${aviso.destacado ? " destacado" : ""}`;
+            articulo.innerHTML = '<span class="announcement-icon">📌</span><div><h3></h3><p></p><small></small></div>';
+            articulo.querySelector("h3").textContent = aviso.titulo;
+            articulo.querySelector("p").textContent = aviso.mensaje;
+            articulo.querySelector("small").textContent = new Date(aviso.creado_en).toLocaleDateString("es-ES", { day: "numeric", month: "long" });
+            contenedor.appendChild(articulo);
+        });
+    }
+
     function configurarInterfaz() {
         const perfil = $("#perfil");
         const menuPerfil = $("#menuPerfil");
@@ -384,6 +407,7 @@
     configurarInterfaz();
     configurarCiclosInicio();
     actualizarPanelAcademico();
+    cargarAvisosInicio();
     configurarNavegacion();
     agregarAccesoAdministracion();
     configurarAnimaciones();
