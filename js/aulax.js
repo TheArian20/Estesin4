@@ -183,7 +183,12 @@ const AulaX = (() => {
 
     function agregarEnlaceRedes() {
         const sidebar = document.querySelector(".sidebar");
-        if (!sidebar || sidebar.querySelector('a[href="redes.html"]')) return;
+        if (!sidebar) return;
+        const existente = sidebar.querySelector('a[href="redes.html"]');
+        if (existente) {
+            existente.textContent = "Enlaces";
+            return;
+        }
         const enlace = document.createElement("a");
         enlace.href = "redes.html";
         enlace.textContent = "Enlaces";
