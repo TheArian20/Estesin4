@@ -1,6 +1,6 @@
 window.STESIN_REDES = [
-  { id: "facebook", nombre: "Facebook", icono: "f", descripcion: "Noticias, actividades y comunicados de la comunidad STESIN.", enlace: "https://www.facebook.com/share/1DQufghAm2/" },
-  { id: "youtube", nombre: "YouTube", icono: "▶", descripcion: "Transmisiones, enseñanzas y contenido audiovisual del canal de Oiser Ramos Núñez.", enlace: "https://youtube.com/@oiserramosnunez9178?si=ugXFNWDs3A26Zs1B" },
+  { id: "facebook", nombre: "Facebook", icono: "f", descripcion: "Noticias, actividades y comunicados de la comunidad STESIN.", enlace: "" },
+  { id: "youtube", nombre: "YouTube", icono: "▶", descripcion: "Transmisiones, enseñanzas y contenido audiovisual institucional.", enlace: "" },
   { id: "whatsapp", nombre: "WhatsApp", icono: "◔", descripcion: "Canal de contacto directo y avisos importantes para estudiantes.", enlace: "" }
 ];
 
