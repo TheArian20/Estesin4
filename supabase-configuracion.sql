@@ -3,12 +3,14 @@ create table if not exists public.perfiles (
   correo text not null,
   nombre text not null default 'Estudiante',
   carrera text not null default 'Sin especificar',
-  rol text not null default 'estudiante' check (rol in ('admin', 'estudiante')),
+  rol text not null default 'estudiante' check (rol in ('admin', 'docente', 'estudiante')),
   activo boolean not null default true,
   creado_en timestamptz not null default now()
 );
 
 alter table public.perfiles add column if not exists usuario text;
+alter table public.perfiles drop constraint if exists perfiles_rol_check;
+alter table public.perfiles add constraint perfiles_rol_check check (rol in ('admin', 'docente', 'estudiante'));
 update public.perfiles set usuario = lower(split_part(correo, '@', 1)) where usuario is null;
 alter table public.perfiles alter column usuario set not null;
 create unique index if not exists perfiles_usuario_unico on public.perfiles (lower(usuario));
@@ -39,12 +41,23 @@ as $$ select exists (select 1 from public.perfiles where id = auth.uid() and rol
 
 grant execute on function public.es_administrador() to authenticated;
 
+create or replace function public.puede_gestionar_asistencia()
+returns boolean
+language sql
+stable
+security definer set search_path = public
+as $$ select exists (select 1 from public.perfiles where id = auth.uid() and rol in ('admin', 'docente') and activo = true); $$;
+
+grant execute on function public.puede_gestionar_asistencia() to authenticated;
+
 drop policy if exists "El usuario ve su perfil" on public.perfiles;
 create policy "El usuario ve su perfil" on public.perfiles for select to authenticated using (id = auth.uid());
 drop policy if exists "El usuario actualiza su perfil" on public.perfiles;
 create policy "El usuario actualiza su perfil" on public.perfiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid() and rol = 'estudiante' and activo = true);
 drop policy if exists "Administrador gestiona perfiles" on public.perfiles;
 create policy "Administrador gestiona perfiles" on public.perfiles for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+drop policy if exists "Docente consulta estudiantes" on public.perfiles;
+create policy "Docente consulta estudiantes" on public.perfiles for select to authenticated using (public.puede_gestionar_asistencia());
 
 -- Después de crear tu primera cuenta, reemplaza tu-correo@ejemplo.com por tu correo y ejecuta esta línea:
 -- update public.perfiles set rol = 'admin' where correo = 'tu-correo@ejemplo.com';
@@ -88,7 +101,7 @@ drop policy if exists "Administrador gestiona avisos" on public.avisos;
 create policy "Administrador gestiona avisos" on public.avisos
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
 
--- Lecturas y asistencia: cada estudiante solo puede consultar su propio historial.
+-- Lecturas y asistencia: solo docentes y administrador gestionan el registro.
 create table if not exists public.progreso_lectura (
   usuario_id uuid not null references auth.users(id) on delete cascade,
   recurso_id text not null,
@@ -113,8 +126,7 @@ create table if not exists public.asistencia (
 );
 alter table public.asistencia enable row level security;
 drop policy if exists "Estudiante ve su asistencia" on public.asistencia;
-create policy "Estudiante ve su asistencia" on public.asistencia
-for select to authenticated using (estudiante_id = auth.uid() or public.es_administrador());
 drop policy if exists "Administrador gestiona asistencia" on public.asistencia;
-create policy "Administrador gestiona asistencia" on public.asistencia
-for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+drop policy if exists "Docentes gestionan asistencia" on public.asistencia;
+create policy "Docentes gestionan asistencia" on public.asistencia
+for all to authenticated using (public.puede_gestionar_asistencia()) with check (public.puede_gestionar_asistencia());
