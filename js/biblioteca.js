@@ -55,6 +55,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         enlace.rel = "noopener";
         enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small></small></span>`;
         enlace.querySelector("strong").textContent = documento.nombre;
+        const fecha = documento.creadoEn ? new Date(documento.creadoEn) : null;
+        const esNuevo = fecha && (Date.now() - fecha.getTime()) < 1000 * 60 * 60 * 24 * 21;
+        const etiqueta = document.createElement("span");
+        etiqueta.className = `library-resource-tag${esNuevo ? " new" : ""}`;
+        etiqueta.textContent = esNuevo ? "Nuevo" : documento.materia ? "Material del ciclo" : "Biblioteca";
+        enlace.querySelector(".library-file-data").appendChild(etiqueta);
         enlace.querySelector("small").textContent = `${documento.categoria}${documento.materia ? ` · ${documento.materia}` : ""} · ${tipo.toUpperCase()} · ${documento.enlaceDrive ? "Abrir documento" : "Abrir en Google Drive"}`;
         const favorito = document.createElement("button");
         favorito.type = "button";

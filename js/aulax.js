@@ -587,11 +587,20 @@ const AulaX = (() => {
         const documentos = (documentosPorMateria[nombre] || []).filter(([, sesion]) => !/s[ií]labo|silabus/i.test(sesion));
         const contenedor = document.getElementById("documentosMateria");
         const lista = document.getElementById("listaDocumentos");
+        const totalMateriales = document.getElementById("totalMateriales");
+        const estadoMateria = document.getElementById("estadoMateria");
         if (!contenedor || !lista) return;
         contenedor.querySelector(".icon").textContent = "📚";
         contenedor.querySelector("h2").textContent = "Material disponible";
         contenedor.querySelector("p").textContent = "Descarga los documentos y recursos de esta materia.";
         lista.innerHTML = "";
+        const actualizarResumen = (extras = 0) => {
+            const cantidad = documentos.length + extras;
+            if (totalMateriales) totalMateriales.textContent = `${cantidad} material${cantidad === 1 ? "" : "es"}`;
+            if (estadoMateria) estadoMateria.innerHTML = cantidad
+                ? '<span class="materia-status"><strong>Disponible.</strong> Abre un recurso para registrarlo en tu actividad.</span>'
+                : '<span class="materia-status">Aún no hay material publicado para esta materia.</span>';
+        };
         documentos.forEach(([archivo, sesion, ruta, nombreVisible = archivo]) => {
             const enlace = document.createElement("a");
             enlace.className = "document-link";
@@ -600,12 +609,18 @@ const AulaX = (() => {
             const formato = archivo.split(".").pop().toUpperCase();
             enlace.innerHTML = `<span class="file-icon">📄</span><span><strong></strong><small>${sesion} · ${formato}</small></span>`;
             enlace.querySelector("strong").textContent = nombreVisible;
+            enlace.querySelector("small").insertAdjacentHTML("afterend", '<span class="resource-tag">Material base</span>');
+            enlace.insertAdjacentHTML("beforeend", '<span class="resource-arrow" aria-hidden="true">→</span>');
             enlace.addEventListener("click", () => registrarConsulta(`${ciclo}|${nombre}|${archivo}`, nombreVisible));
             lista.appendChild(enlace);
         });
-        window.STESIN_SUPABASE?.from("recursos_personalizados").select("titulo,enlace,categoria").eq("materia", nombre).then(({ data, error }) => {
+        actualizarResumen();
+        window.STESIN_SUPABASE?.from("recursos_personalizados").select("titulo,enlace,categoria,creado_en").eq("materia", nombre).then(({ data, error }) => {
             if (error || !data?.length) return;
             data.forEach((recurso) => {
+                const fecha = recurso.creado_en ? new Date(recurso.creado_en) : null;
+                const reciente = fecha && (Date.now() - fecha.getTime()) < 1000 * 60 * 60 * 24 * 21;
+                const publicado = fecha ? `Publicado ${fecha.toLocaleDateString("es-PE", { day: "2-digit", month: "short", year: "numeric" })}` : "Recurso adicional";
                 const enlace = document.createElement("a");
                 enlace.className = "document-link";
                 enlace.href = recurso.enlace;
@@ -613,9 +628,13 @@ const AulaX = (() => {
                 enlace.rel = "noopener";
                 enlace.innerHTML = `<span class="file-icon">📎</span><span><strong></strong><small>Material adicional · ${recurso.categoria}</small></span>`;
                 enlace.querySelector("strong").textContent = recurso.titulo;
+                enlace.querySelector("small").textContent = `${recurso.categoria || "General"} · ${publicado}`;
+                enlace.querySelector("small").insertAdjacentHTML("afterend", `<span class="resource-tag${reciente ? " new" : ""}">${reciente ? "Nuevo" : "Complementario"}</span>`);
+                enlace.insertAdjacentHTML("beforeend", '<span class="resource-arrow" aria-hidden="true">↗</span>');
                 enlace.addEventListener("click", () => registrarConsulta(recurso.enlace, recurso.titulo));
                 lista.appendChild(enlace);
             });
+            actualizarResumen(data.length);
         });
     }
 
