@@ -103,8 +103,11 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Asistencia", "Mi registro de asistencia", "asistencia.html"], ["Equipo STESIN", "Equipo académico", "equipo.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"]
         ];
+        if (localStorage.getItem("rolUsuario") === "admin") {
+            opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"], ["Equipo STESIN", "Equipo académico", "equipo.html"]);
+        }
         const abrir = () => { dialogo.hidden = false; campo.value = ""; pintar(); window.setTimeout(() => campo.focus(), 0); };
         const cerrar = () => { dialogo.hidden = true; };
         const pintar = () => { const texto = campo.value.toLocaleLowerCase(); const coincidencias = opciones.filter(([titulo, detalle]) => `${titulo} ${detalle}`.toLocaleLowerCase().includes(texto)); resultados.innerHTML = coincidencias.map(([titulo, detalle, enlace]) => `<a href="${enlace}"><strong>${titulo}</strong><span>${detalle}</span></a>`).join("") || '<p>No encontramos resultados.</p>'; };
