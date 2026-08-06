@@ -53,7 +53,7 @@ create policy "Administrador gestiona perfiles" on public.perfiles for all to au
 create table if not exists public.recursos_personalizados (
   id bigint generated always as identity primary key,
   titulo text not null check (char_length(trim(titulo)) >= 3),
-  enlace text not null check (enlace ~ '^https://drive\\.google\\.com/'),
+  enlace text not null check (enlace ~ '^https://drive\.google\.com/'),
   categoria text not null default 'General',
   ciclo text,
   tipo text not null default 'documento',
