@@ -20,9 +20,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     fecha.type = "date";
     fecha.className = "attendance-date";
     fecha.value = new Date().toISOString().slice(0, 10);
+    const exportar = document.createElement("button");
+    exportar.type = "button";
+    exportar.className = "account-action";
+    exportar.textContent = "Descargar reporte CSV";
     titulo.textContent = "Asistencia por jornada";
     resumen.textContent = "Selecciona una fecha y registra la participación de cada estudiante.";
     resumen.insertAdjacentElement("afterend", fecha);
+    fecha.insertAdjacentElement("afterend", exportar);
+    let estudiantesActuales = [];
+    let registrosActuales = new Map();
 
     async function cargar() {
         lista.innerHTML = '<p class="announcements-empty">Cargando estudiantes…</p>';
@@ -35,6 +42,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
         const porEstudiante = new Map((registros || []).map((registro) => [registro.estudiante_id, registro]));
+        estudiantesActuales = estudiantes || [];
+        registrosActuales = porEstudiante;
         const total = (estudiantes || []).length;
         const presentes = [...porEstudiante.values()].filter((registro) => registro.presente).length;
         titulo.textContent = `${presentes} de ${total} presentes`;
@@ -52,5 +61,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         }));
     }
     fecha.addEventListener("change", cargar);
+    exportar.addEventListener("click", () => {
+        const filas = [["Fecha", "Estudiante", "Estado"]].concat(estudiantesActuales.map((estudiante) => [fecha.value, estudiante.nombre, registrosActuales.get(estudiante.id)?.presente ? "Presente" : "Inasistencia"]));
+        const csv = "\uFEFF" + filas.map((fila) => fila.map((valor) => `"${String(valor).replace(/"/g, '""')}"`).join(",")).join("\n");
+        const enlace = document.createElement("a");
+        enlace.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        enlace.download = `asistencia-${fecha.value}.csv`;
+        enlace.click();
+        URL.revokeObjectURL(enlace.href);
+    });
     cargar();
 });

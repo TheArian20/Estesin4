@@ -82,6 +82,28 @@ drop policy if exists "Administrador gestiona recursos" on public.recursos_perso
 create policy "Administrador gestiona recursos" on public.recursos_personalizados
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
 
+alter table public.recursos_personalizados add column if not exists materia text;
+
+-- Eventos del calendario publicados por Administración.
+create table if not exists public.eventos_calendario (
+  id bigint generated always as identity primary key,
+  fecha date not null,
+  hora text not null,
+  materia text not null check (char_length(trim(materia)) >= 3),
+  detalle text,
+  activo boolean not null default true,
+  creado_en timestamptz not null default now(),
+  creado_por uuid references auth.users(id) on delete set null
+);
+
+alter table public.eventos_calendario enable row level security;
+drop policy if exists "Usuarios ven eventos activos" on public.eventos_calendario;
+create policy "Usuarios ven eventos activos" on public.eventos_calendario
+for select to authenticated using (activo = true or public.es_administrador());
+drop policy if exists "Administrador gestiona eventos" on public.eventos_calendario;
+create policy "Administrador gestiona eventos" on public.eventos_calendario
+for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+
 -- Avisos visibles para todos los estudiantes desde el inicio.
 create table if not exists public.avisos (
   id bigint generated always as identity primary key,
