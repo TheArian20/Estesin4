@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let filtro = "todos";
     let limite = 24;
     const favoritos = new Set(JSON.parse(localStorage.getItem("bibliotecaFavoritos") || "[]"));
+    const busquedaInicial = new URLSearchParams(window.location.search).get("buscar");
+    if (busquedaInicial) buscador.value = busquedaInicial;
 
     const normalizar = (texto = "") => texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const tipoDocumento = (archivo = "") => {
@@ -81,6 +83,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         cargarMas.hidden = visibles.length >= filtrados.length;
     }
 
+    function mostrarContinuidadDeLectura() {
+        const hero = document.querySelector(".library-hero");
+        if (!hero || document.getElementById("continuarLectura")) return;
+        const ultimoNombre = localStorage.getItem("ultimaLectura");
+        const ultimo = documentos.find((documento) => documento.nombre === ultimoNombre);
+        const bloque = document.createElement("aside");
+        bloque.id = "continuarLectura";
+        bloque.className = "library-continue";
+        if (ultimo) {
+            bloque.innerHTML = '<span>CONTINÚA TU LECTURA</span><strong></strong><a target="_blank" rel="noopener">Abrir nuevamente</a>';
+            bloque.querySelector("strong").textContent = ultimo.nombre;
+            bloque.querySelector("a").href = ultimo.enlaceDrive || bibliotecaDrive;
+        } else {
+            bloque.innerHTML = '<span>ESPACIO PERSONAL</span><strong>Guarda tus recursos favoritos</strong><a href="#filtrosBiblioteca">Explorar la biblioteca</a>';
+        }
+        hero.appendChild(bloque);
+    }
+
     async function cargarRecursosAdministrados() {
         const cliente = window.STESIN_SUPABASE;
         if (!cliente) return [];
@@ -109,6 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!Array.isArray(documentos)) throw new Error("No se pudo cargar el catálogo");
         total.textContent = `${documentos.length} documentos disponibles`;
         renderizar();
+        mostrarContinuidadDeLectura();
     } catch {
         total.textContent = "Biblioteca en preparación";
         vacio.hidden = false;

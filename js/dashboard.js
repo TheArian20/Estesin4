@@ -164,7 +164,7 @@
             { fecha: "2026-08-26T18:00:00", nombre: "Psicopedagog?a", detalle: "Mi?rcoles 26 ? 6:00 ? 7:30" }
         ];
         const proxima = clases.find((clase) => new Date(clase.fecha) >= new Date());
-        const notificaciones = [
+        let notificaciones = [
             proxima
                 ? { id: `clase-${proxima.fecha}`, icono: "📅", titulo: `Próxima clase: ${proxima.nombre}`, detalle: proxima.detalle, pagina: "calendario.html#horario-agosto" }
                 : { id: "horario-finalizado", icono: "🗓️", titulo: "Horario de agosto finalizado", detalle: "Consulta el calendario para próximas programaciones.", pagina: "calendario.html" },
@@ -212,6 +212,12 @@
             if (!panel.contains(evento.target) && evento.target !== campana) panel.hidden = true;
         });
         renderizar();
+        cliente.from("avisos").select("id,titulo,mensaje,creado_en").eq("activo", true).order("creado_en", { ascending: false }).limit(3).then(({ data, error }) => {
+            if (error || !data?.length) return;
+            const avisos = data.map((aviso) => ({ id: `aviso-${aviso.id}`, icono: "📌", titulo: aviso.titulo, detalle: aviso.mensaje, pagina: "index.html#tituloAvisos" }));
+            notificaciones = [...avisos, ...notificaciones];
+            renderizar();
+        });
     }
 
     async function cargarAvisosInicio() {
@@ -235,6 +241,20 @@
             articulo.querySelector("small").textContent = new Date(aviso.creado_en).toLocaleDateString("es-ES", { day: "numeric", month: "long" });
             contenedor.appendChild(articulo);
         });
+    }
+
+    function actualizarEspacioEstudio() {
+        const ultima = localStorage.getItem("ultimaLectura");
+        const favoritos = leerJSON("bibliotecaFavoritos", []);
+        const titulo = $("#ultimaLecturaInicio");
+        const abrir = $("#abrirUltimaLectura");
+        const contador = $("#favoritosInicio");
+        if (titulo) titulo.textContent = ultima || "Aún no abriste un documento";
+        if (abrir && ultima) {
+            abrir.href = `biblioteca.html?buscar=${encodeURIComponent(ultima)}`;
+            abrir.textContent = "Continuar leyendo";
+        }
+        if (contador) contador.textContent = `${favoritos.length} recurso${favoritos.length === 1 ? "" : "s"} guardado${favoritos.length === 1 ? "" : "s"}`;
     }
 
     function configurarInterfaz() {
@@ -401,6 +421,7 @@
     window.setInterval(actualizarReloj, 1000);
     actualizarProgreso();
     actualizarPerfil();
+    actualizarEspacioEstudio();
     actualizarLogros();
     configurarBuscador();
     configurarNotificaciones();
