@@ -1,1 +1,40 @@
-document.addEventListener("DOMContentLoaded",async()=>{const c=window.STESIN_SUPABASE,lista=document.getElementById("listaProgreso"),porcentaje=document.getElementById("porcentajeProgreso");if(!c||!lista)return;const{data:{user}}=await c.auth.getUser();if(!user)return;const materias=[["Ciclo I","Introducción a la Teología"],["Ciclo I","Introducción al Antiguo Testamento"],["Ciclo II","Pentateuco"],["Ciclo II","Evangelios Sinópticos"],["Ciclo III","Libros Históricos"],["Ciclo IV","Hermenéutica Bíblica I"],["Ciclo V","Administración Eclesiástica"],["Ciclo V","Teología Bíblica III"],["Ciclo VI","Pneumatología"],["Ciclo VII","Teología del Culto"],["Ciclo VIII","Desarrollo Personal y Discipulado"]];const{data}=await c.from("progreso_materias").select("ciclo,materia,completado").eq("usuario_id",user.id);const estado=new Map((data||[]).map(x=>[`${x.ciclo}|${x.materia}`,x.completado]));const pintar=()=>{const hechos=[...estado.values()].filter(Boolean).length;porcentaje.textContent=`${hechos} de ${materias.length} materias revisadas`;lista.innerHTML=materias.map(([ciclo,materia])=>{const clave=`${ciclo}|${materia}`,listo=estado.get(clave)===true;return `<article class="attendance-row"><div><small>${ciclo}</small><strong>${materia}</strong></div><button class="account-action ${listo?'':'danger'}" data-clave="${clave}">${listo?'Marcada como revisada':'Marcar como revisada'}</button></article>`}).join('');lista.querySelectorAll('button').forEach(b=>b.addEventListener('click',async()=>{const[ciclo,materia]=b.dataset.clave.split('|'),completado=!estado.get(b.dataset.clave);await c.from("progreso_materias").upsert({usuario_id:user.id,ciclo,materia,completado,actualizado_en:new Date().toISOString()});estado.set(b.dataset.clave,completado);pintar();}));};pintar();});
+document.addEventListener("DOMContentLoaded", async () => {
+    const cliente = window.STESIN_SUPABASE;
+    const lista = document.getElementById("listaProgreso");
+    const resumen = document.getElementById("porcentajeProgreso");
+    if (!cliente || !lista || !resumen) return;
+
+    const { data: { user } = {} } = await cliente.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await cliente
+        .from("progreso_lectura")
+        .select("recurso_nombre,ciclo,leido_en")
+        .eq("usuario_id", user.id)
+        .order("leido_en", { ascending: false });
+
+    if (error) {
+        resumen.textContent = "Registro no disponible";
+        lista.innerHTML = '<article class="attendance-row"><div><strong>Aún no se pudo cargar tu actividad.</strong><small>Intenta nuevamente en unos momentos.</small></div></article>';
+        return;
+    }
+
+    const actividad = data || [];
+    resumen.textContent = `${actividad.length} recurso${actividad.length === 1 ? "" : "s"} consultado${actividad.length === 1 ? "" : "s"}`;
+
+    if (!actividad.length) {
+        lista.innerHTML = '<article class="attendance-row"><div><strong>Aún no se registran documentos abiertos.</strong><small>Abre un recurso desde Biblioteca o desde una materia para que aparezca aquí.</small></div></article>';
+        return;
+    }
+
+    lista.innerHTML = actividad.map((recurso) => {
+        const fecha = new Date(recurso.leido_en).toLocaleString("es-PE", {
+            day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+        });
+        return `<article class="attendance-row"><div><small>${recurso.ciclo || "Biblioteca"}</small><strong></strong><small>Abierto el ${fecha}</small></div><span class="present">Consultado</span></article>`;
+    }).join("");
+
+    actividad.forEach((recurso, indice) => {
+        lista.querySelectorAll("strong")[indice].textContent = recurso.recurso_nombre || "Recurso académico";
+    });
+});
