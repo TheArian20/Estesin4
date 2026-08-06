@@ -105,8 +105,12 @@ const AulaX = (() => {
         const opciones = [
             ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"]
         ];
-        if (localStorage.getItem("rolUsuario") === "admin") {
-            opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"], ["Equipo STESIN", "Equipo académico", "equipo.html"]);
+        const rol = localStorage.getItem("rolUsuario");
+        if (["admin", "docente"].includes(rol)) {
+            opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"]);
+        }
+        if (rol === "admin") {
+            opciones.push(["Equipo STESIN", "Equipo académico", "equipo.html"]);
         }
         const abrir = () => { dialogo.hidden = false; campo.value = ""; pintar(); window.setTimeout(() => campo.focus(), 0); };
         const cerrar = () => { dialogo.hidden = true; };
@@ -146,7 +150,8 @@ const AulaX = (() => {
     }
 
     function agregarEnlacesComunidad() {
-        if (localStorage.getItem("rolUsuario") !== "admin") return;
+        const rol = localStorage.getItem("rolUsuario");
+        if (!["admin", "docente"].includes(rol)) return;
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar) return;
         const crear = (archivo, texto, despuesDe) => {
@@ -157,7 +162,7 @@ const AulaX = (() => {
             if (referencia) referencia.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
         };
         crear("asistencia.html", "Asistencia", "malla-curricular.html");
-        crear("equipo.html", "Equipo STESIN", "redes.html");
+        if (rol === "admin") crear("equipo.html", "Equipo STESIN", "redes.html");
     }
 
     function agregarEnlaceAlabanzas() {
@@ -640,8 +645,9 @@ const AulaX = (() => {
         localStorage.setItem("carreraUsuario", perfil.carrera);
         localStorage.setItem("rolUsuario", perfil.rol);
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
-        const paginasSoloAdministrador = ["administracion.html", "asistencia.html", "equipo.html"];
-        if (perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) {
+        const paginasSoloAdministrador = ["administracion.html", "equipo.html"];
+        const paginasDeDocencia = ["asistencia.html"];
+        if ((perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) || (!["admin", "docente"].includes(perfil.rol) && paginasDeDocencia.includes(paginaActual))) {
             window.location.replace("index.html");
             return;
         }
