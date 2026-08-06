@@ -9,6 +9,7 @@ create table if not exists public.perfiles (
 );
 
 alter table public.perfiles add column if not exists usuario text;
+alter table public.perfiles add column if not exists ultimo_acceso timestamptz;
 alter table public.perfiles drop constraint if exists perfiles_rol_check;
 alter table public.perfiles add constraint perfiles_rol_check check (rol in ('admin', 'docente', 'estudiante'));
 update public.perfiles set usuario = lower(split_part(correo, '@', 1)) where usuario is null;
@@ -53,7 +54,7 @@ grant execute on function public.puede_gestionar_asistencia() to authenticated;
 drop policy if exists "El usuario ve su perfil" on public.perfiles;
 create policy "El usuario ve su perfil" on public.perfiles for select to authenticated using (id = auth.uid());
 drop policy if exists "El usuario actualiza su perfil" on public.perfiles;
-create policy "El usuario actualiza su perfil" on public.perfiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid() and rol = 'estudiante' and activo = true);
+create policy "El usuario actualiza su perfil" on public.perfiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid() and rol in ('estudiante', 'docente') and activo = true);
 drop policy if exists "Administrador gestiona perfiles" on public.perfiles;
 create policy "Administrador gestiona perfiles" on public.perfiles for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
 drop policy if exists "Docente consulta estudiantes" on public.perfiles;
@@ -152,3 +153,34 @@ drop policy if exists "Administrador gestiona asistencia" on public.asistencia;
 drop policy if exists "Docentes gestionan asistencia" on public.asistencia;
 create policy "Docentes gestionan asistencia" on public.asistencia
 for all to authenticated using (public.puede_gestionar_asistencia()) with check (public.puede_gestionar_asistencia());
+
+-- Progreso por materia: cada estudiante gestiona su propia ruta.
+create table if not exists public.progreso_materias (
+  usuario_id uuid not null references auth.users(id) on delete cascade,
+  ciclo text not null,
+  materia text not null,
+  completado boolean not null default false,
+  actualizado_en timestamptz not null default now(),
+  primary key (usuario_id, ciclo, materia)
+);
+alter table public.progreso_materias enable row level security;
+drop policy if exists "Estudiante gestiona su progreso por materia" on public.progreso_materias;
+create policy "Estudiante gestiona su progreso por materia" on public.progreso_materias
+for all to authenticated using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
+
+-- Asignación de materias a docentes. Se completa desde Administración cuando se creen sus cuentas.
+create table if not exists public.materias_docentes (
+  id bigint generated always as identity primary key,
+  docente_id uuid not null references auth.users(id) on delete cascade,
+  ciclo text not null,
+  materia text not null,
+  creado_en timestamptz not null default now(),
+  unique(docente_id, ciclo, materia)
+);
+alter table public.materias_docentes enable row level security;
+drop policy if exists "Docente ve sus materias" on public.materias_docentes;
+create policy "Docente ve sus materias" on public.materias_docentes
+for select to authenticated using (docente_id = auth.uid() or public.es_administrador());
+drop policy if exists "Administrador gestiona materias docentes" on public.materias_docentes;
+create policy "Administrador gestiona materias docentes" on public.materias_docentes
+for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
