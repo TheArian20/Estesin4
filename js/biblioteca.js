@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         enlace.rel = "noopener";
         enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small></small></span>`;
         enlace.querySelector("strong").textContent = documento.nombre;
-        enlace.querySelector("small").textContent = `${documento.categoria} · ${tipo.toUpperCase()} · ${documento.enlaceDrive ? "Abrir documento" : "Abrir en Google Drive"}`;
+        enlace.querySelector("small").textContent = `${documento.categoria}${documento.materia ? ` · ${documento.materia}` : ""} · ${tipo.toUpperCase()} · ${documento.enlaceDrive ? "Abrir documento" : "Abrir en Google Drive"}`;
         const favorito = document.createElement("button");
         favorito.type = "button";
         favorito.className = `library-favorite${favoritos.has(id) ? " active" : ""}`;
@@ -105,13 +105,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cliente = window.STESIN_SUPABASE;
         if (!cliente) return [];
         const { data, error } = await cliente.from("recursos_personalizados")
-            .select("titulo, enlace, categoria, ciclo, tipo, creado_en")
+            .select("titulo, enlace, categoria, ciclo, materia, tipo, creado_en")
             .order("creado_en", { ascending: false });
         if (error) return [];
         return (data || []).map((recurso) => ({
             nombre: recurso.titulo,
             enlaceDrive: recurso.enlace,
             categoria: recurso.categoria || "General",
+            materia: recurso.materia || "",
             creadoEn: recurso.creado_en,
             origen: "administracion"
         }));
