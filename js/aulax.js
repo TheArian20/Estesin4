@@ -103,11 +103,11 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi progreso", "Avance por materia", "progreso.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
         if (["admin", "docente"].includes(rol)) {
-            opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"]);
+            opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"], ["Panel docente", "Materias y gestión", "docentes.html"]);
         }
         if (rol === "admin") {
             opciones.push(["Equipo STESIN", "Equipo académico", "equipo.html"]);
@@ -162,6 +162,7 @@ const AulaX = (() => {
             if (referencia) referencia.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
         };
         crear("asistencia.html", "Asistencia", "malla-curricular.html");
+        crear("docentes.html", "Panel docente", "asistencia.html");
         if (rol === "admin") crear("equipo.html", "Equipo STESIN", "redes.html");
     }
 
@@ -204,6 +205,18 @@ const AulaX = (() => {
         if ((window.location.pathname.split("/").pop() || "index.html") === "contacto.html") enlace.classList.add("active");
         const redes = sidebar.querySelector('a[href="redes.html"]');
         if (redes) redes.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
+    function agregarEnlaceProgreso() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="progreso.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "progreso.html";
+        enlace.textContent = "Mi progreso";
+        if ((window.location.pathname.split("/").pop() || "index.html") === "progreso.html") enlace.classList.add("active");
+        const ciclos = sidebar.querySelector('a[href="cursos.html"]');
+        if (ciclos) ciclos.insertAdjacentElement("afterend", enlace);
         else sidebar.appendChild(enlace);
     }
 
@@ -534,7 +547,7 @@ const AulaX = (() => {
         const documentos = (documentosPorMateria[nombre] || []).filter(([, sesion]) => !/s[ií]labo|silabus/i.test(sesion));
         const contenedor = document.getElementById("documentosMateria");
         const lista = document.getElementById("listaDocumentos");
-        if (!contenedor || !lista || !documentos.length) return;
+        if (!contenedor || !lista) return;
         contenedor.querySelector(".icon").textContent = "📚";
         contenedor.querySelector("h2").textContent = "Material disponible";
         contenedor.querySelector("p").textContent = "Descarga los documentos y recursos de esta materia.";
@@ -548,6 +561,19 @@ const AulaX = (() => {
             enlace.innerHTML = `<span class="file-icon">📄</span><span><strong></strong><small>${sesion} · ${formato}</small></span>`;
             enlace.querySelector("strong").textContent = nombreVisible;
             lista.appendChild(enlace);
+        });
+        window.STESIN_SUPABASE?.from("recursos_personalizados").select("titulo,enlace,categoria").eq("materia", nombre).then(({ data, error }) => {
+            if (error || !data?.length) return;
+            data.forEach((recurso) => {
+                const enlace = document.createElement("a");
+                enlace.className = "document-link";
+                enlace.href = recurso.enlace;
+                enlace.target = "_blank";
+                enlace.rel = "noopener";
+                enlace.innerHTML = `<span class="file-icon">📎</span><span><strong></strong><small>Material adicional · ${recurso.categoria}</small></span>`;
+                enlace.querySelector("strong").textContent = recurso.titulo;
+                lista.appendChild(enlace);
+            });
         });
     }
 
@@ -618,6 +644,7 @@ const AulaX = (() => {
         });
 
         agregarEnlaceMallaCurricular();
+        agregarEnlaceProgreso();
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
@@ -658,8 +685,9 @@ const AulaX = (() => {
         localStorage.setItem("carreraUsuario", perfil.carrera);
         localStorage.setItem("rolUsuario", perfil.rol);
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
+        cliente.from("perfiles").update({ ultimo_acceso: new Date().toISOString() }).eq("id", user.id).then(() => {});
         const paginasSoloAdministrador = ["administracion.html", "equipo.html"];
-        const paginasDeDocencia = ["asistencia.html"];
+        const paginasDeDocencia = ["asistencia.html", "docentes.html"];
         if ((perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) || (!["admin", "docente"].includes(perfil.rol) && paginasDeDocencia.includes(paginaActual))) {
             window.location.replace("index.html");
             return;
