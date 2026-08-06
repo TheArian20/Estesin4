@@ -103,7 +103,7 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi progreso", "Avance por materia", "progreso.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Redes STESIN", "Facebook, YouTube y WhatsApp", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
         if (["admin", "docente"].includes(rol)) {
@@ -213,7 +213,7 @@ const AulaX = (() => {
         if (!sidebar || sidebar.querySelector('a[href="progreso.html"]')) return;
         const enlace = document.createElement("a");
         enlace.href = "progreso.html";
-        enlace.textContent = "Mi progreso";
+        enlace.textContent = "Mi actividad";
         if ((window.location.pathname.split("/").pop() || "index.html") === "progreso.html") enlace.classList.add("active");
         const ciclos = sidebar.querySelector('a[href="cursos.html"]');
         if (ciclos) ciclos.insertAdjacentElement("afterend", enlace);
@@ -560,6 +560,7 @@ const AulaX = (() => {
             const formato = archivo.split(".").pop().toUpperCase();
             enlace.innerHTML = `<span class="file-icon">📄</span><span><strong></strong><small>${sesion} · ${formato}</small></span>`;
             enlace.querySelector("strong").textContent = nombreVisible;
+            enlace.addEventListener("click", () => registrarConsulta(`${ciclo}|${nombre}|${archivo}`, nombreVisible));
             lista.appendChild(enlace);
         });
         window.STESIN_SUPABASE?.from("recursos_personalizados").select("titulo,enlace,categoria").eq("materia", nombre).then(({ data, error }) => {
@@ -572,8 +573,22 @@ const AulaX = (() => {
                 enlace.rel = "noopener";
                 enlace.innerHTML = `<span class="file-icon">📎</span><span><strong></strong><small>Material adicional · ${recurso.categoria}</small></span>`;
                 enlace.querySelector("strong").textContent = recurso.titulo;
+                enlace.addEventListener("click", () => registrarConsulta(recurso.enlace, recurso.titulo));
                 lista.appendChild(enlace);
             });
+        });
+    }
+
+    async function registrarConsulta(recursoId, recursoNombre) {
+        const cliente = window.STESIN_SUPABASE;
+        const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
+        if (!user) return;
+        await cliente.from("progreso_lectura").upsert({
+            usuario_id: user.id,
+            recurso_id: recursoId,
+            recurso_nombre: recursoNombre,
+            ciclo: localStorage.getItem("cicloDeSubciclo") || null,
+            leido_en: new Date().toISOString()
         });
     }
 

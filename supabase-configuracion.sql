@@ -124,7 +124,7 @@ drop policy if exists "Administrador gestiona avisos" on public.avisos;
 create policy "Administrador gestiona avisos" on public.avisos
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
 
--- Lecturas y asistencia: solo docentes y administrador gestionan el registro.
+-- Registro automático de recursos abiertos por cada estudiante.
 create table if not exists public.progreso_lectura (
   usuario_id uuid not null references auth.users(id) on delete cascade,
   recurso_id text not null,
@@ -154,7 +154,7 @@ drop policy if exists "Docentes gestionan asistencia" on public.asistencia;
 create policy "Docentes gestionan asistencia" on public.asistencia
 for all to authenticated using (public.puede_gestionar_asistencia()) with check (public.puede_gestionar_asistencia());
 
--- Progreso por materia: cada estudiante gestiona su propia ruta.
+-- Progreso por materia: solo el administrador puede validar una materia como completada.
 create table if not exists public.progreso_materias (
   usuario_id uuid not null references auth.users(id) on delete cascade,
   ciclo text not null,
@@ -165,8 +165,9 @@ create table if not exists public.progreso_materias (
 );
 alter table public.progreso_materias enable row level security;
 drop policy if exists "Estudiante gestiona su progreso por materia" on public.progreso_materias;
-create policy "Estudiante gestiona su progreso por materia" on public.progreso_materias
-for all to authenticated using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
+drop policy if exists "Administrador gestiona progreso por materia" on public.progreso_materias;
+create policy "Administrador gestiona progreso por materia" on public.progreso_materias
+for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
 
 -- Asignación de materias a docentes. Se completa desde Administración cuando se creen sus cuentas.
 create table if not exists public.materias_docentes (
