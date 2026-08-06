@@ -564,7 +564,6 @@ const AulaX = (() => {
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
-        agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
         configurarMenuMovil();
         configurarModoOscuroGlobal();
