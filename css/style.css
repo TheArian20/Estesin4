@@ -40,6 +40,9 @@ border:1px solid #334155;
 color:#e2e8f0;
 }
 
+/* Filtros de organización de la Biblioteca */
+.library-options{display:flex;gap:10px;flex-wrap:wrap}.library-options label{display:grid;gap:4px;color:#5c450a;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.library-options select{min-width:150px;padding:9px 29px 9px 10px;border:1px solid #ded6c7;border-radius:10px;background:#fff;color:#173d34;font:inherit;text-transform:none;letter-spacing:normal}body.dark .library-options label{color:#f1c64d}body.dark .library-options select{background:#081b17;border-color:#42685e;color:#fffaf0}
+
 body.dark.login-body .login-box input{
 background:#0f172a;
 color:#f8fafc;
