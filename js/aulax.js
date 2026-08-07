@@ -109,7 +109,7 @@ const AulaX = (() => {
         if (["admin", "docente"].includes(rol)) {
             opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"], ["Panel docente", "Materias y gestión", "docentes.html"]);
         }
-        if (rol === "admin") {
+        if (["admin", "rector"].includes(rol)) {
             opciones.push(["Equipo STESIN", "Equipo académico", "equipo.html"]);
         }
         const abrir = () => { dialogo.hidden = false; campo.value = ""; pintar(); window.setTimeout(() => campo.focus(), 0); };
@@ -151,7 +151,7 @@ const AulaX = (() => {
 
     function agregarEnlacesComunidad() {
         const rol = localStorage.getItem("rolUsuario");
-        if (!["admin", "docente"].includes(rol)) return;
+        if (!["admin", "rector", "docente"].includes(rol)) return;
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar) return;
         const crear = (archivo, texto, despuesDe) => {
@@ -161,10 +161,14 @@ const AulaX = (() => {
             const referencia = sidebar.querySelector(`a[href="${despuesDe}"]`);
             if (referencia) referencia.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
         };
-        crear("asistencia.html", "Asistencia", "malla-curricular.html");
-        crear("docentes.html", "Panel docente", "asistencia.html");
-        if (rol === "admin") {
+        if (["admin", "docente"].includes(rol)) {
+            crear("asistencia.html", "Asistencia", "malla-curricular.html");
+            crear("docentes.html", "Panel docente", "asistencia.html");
+        }
+        if (["admin", "rector"].includes(rol)) {
             crear("equipo.html", "Equipo STESIN", "redes.html");
+        }
+        if (rol === "admin") {
             crear("estadisticas.html", "Estadísticas", "equipo.html");
         }
     }
@@ -751,6 +755,11 @@ const AulaX = (() => {
             equipo.src = "js/equipo-stesin.js";
             document.head.appendChild(equipo);
         }
+        if (paginaActual === "administracion.html" && localStorage.getItem("rolUsuario") === "admin" && !document.querySelector('script[src="js/admin-rectorado.js"]')) {
+            const rectorado = document.createElement("script");
+            rectorado.src = "js/admin-rectorado.js";
+            document.head.appendChild(rectorado);
+        }
 
         document.querySelectorAll(".sidebar a").forEach((enlace) => {
             const activa = enlace.getAttribute("href") === paginaActual;
@@ -762,7 +771,7 @@ const AulaX = (() => {
             elemento.textContent = obtenerUsuario();
         });
 
-        const etiquetasRol = { admin: "🛡️ Administrador", docente: "👨‍🏫 Docente", estudiante: "🎓 Estudiante" };
+        const etiquetasRol = { admin: "🛡️ Administrador", rector: "🎓 Rector", docente: "👨‍🏫 Docente", estudiante: "🎓 Estudiante" };
         document.querySelectorAll("#rolHeader").forEach((elemento) => {
             elemento.textContent = etiquetasRol[localStorage.getItem("rolUsuario")] || etiquetasRol.estudiante;
         });
@@ -831,9 +840,10 @@ const AulaX = (() => {
         localStorage.setItem("rolUsuario", perfil.rol);
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
         cliente.from("perfiles").update({ ultimo_acceso: new Date().toISOString() }).eq("id", user.id).then(() => {});
-        const paginasSoloAdministrador = ["administracion.html", "equipo.html", "estadisticas.html"];
+        const paginasSoloAdministrador = ["administracion.html", "estadisticas.html"];
+        const paginasDeRectorado = ["equipo.html"];
         const paginasDeDocencia = ["asistencia.html", "docentes.html"];
-        if ((perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) || (!["admin", "docente"].includes(perfil.rol) && paginasDeDocencia.includes(paginaActual))) {
+        if ((perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) || (!['admin', 'rector'].includes(perfil.rol) && paginasDeRectorado.includes(paginaActual)) || (!["admin", "docente"].includes(perfil.rol) && paginasDeDocencia.includes(paginaActual))) {
             window.location.replace("index.html");
             return;
         }

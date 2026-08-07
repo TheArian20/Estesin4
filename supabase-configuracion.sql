@@ -3,7 +3,7 @@ create table if not exists public.perfiles (
   correo text not null,
   nombre text not null default 'Estudiante',
   carrera text not null default 'Sin especificar',
-  rol text not null default 'estudiante' check (rol in ('admin', 'docente', 'estudiante')),
+  rol text not null default 'estudiante' check (rol in ('admin', 'rector', 'docente', 'estudiante')),
   activo boolean not null default true,
   creado_en timestamptz not null default now()
 );
@@ -11,7 +11,7 @@ create table if not exists public.perfiles (
 alter table public.perfiles add column if not exists usuario text;
 alter table public.perfiles add column if not exists ultimo_acceso timestamptz;
 alter table public.perfiles drop constraint if exists perfiles_rol_check;
-alter table public.perfiles add constraint perfiles_rol_check check (rol in ('admin', 'docente', 'estudiante'));
+alter table public.perfiles add constraint perfiles_rol_check check (rol in ('admin', 'rector', 'docente', 'estudiante'));
 update public.perfiles set usuario = lower(split_part(correo, '@', 1)) where usuario is null;
 alter table public.perfiles alter column usuario set not null;
 create unique index if not exists perfiles_usuario_unico on public.perfiles (lower(usuario));
