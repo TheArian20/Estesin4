@@ -738,6 +738,11 @@ const AulaX = (() => {
             elemento.textContent = obtenerUsuario();
         });
 
+        const etiquetasRol = { admin: "🛡️ Administrador", docente: "👨‍🏫 Docente", estudiante: "🎓 Estudiante" };
+        document.querySelectorAll("#rolHeader").forEach((elemento) => {
+            elemento.textContent = etiquetasRol[localStorage.getItem("rolUsuario")] || etiquetasRol.estudiante;
+        });
+
         document.querySelectorAll("#fotoHeader").forEach((imagen) => {
             imagen.src = obtenerFoto();
         });
