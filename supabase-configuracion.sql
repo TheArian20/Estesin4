@@ -350,6 +350,8 @@ grant execute on function public.enviar_evaluacion(bigint,jsonb) to authenticate
 -- Avisos para todos, por rol o por ciclo.
 alter table public.avisos add column if not exists audiencia text not null default 'todos' check (audiencia in ('todos','estudiantes','docentes','administradores'));
 alter table public.avisos add column if not exists ciclo text;
+alter table public.avisos add column if not exists publicar_desde timestamptz not null default now();
+alter table public.avisos add column if not exists publicar_hasta timestamptz;
 drop policy if exists "Usuarios autenticados ven avisos activos" on public.avisos;
 drop policy if exists "Usuarios ven avisos dirigidos" on public.avisos;
 create policy "Usuarios ven avisos dirigidos" on public.avisos for select to authenticated using (activo and (audiencia='todos' or audiencia=(select case rol when 'admin' then 'administradores' when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid())));
@@ -404,9 +406,21 @@ create policy "Equipo gestiona rubricas asignadas" on public.rubricas_tarea for 
 -- Avisos dirigidos también pueden limitarse a un ciclo concreto.
 drop policy if exists "Usuarios ven avisos dirigidos" on public.avisos;
 create policy "Usuarios ven avisos dirigidos" on public.avisos for select to authenticated using (
-  activo and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)) and
+  activo and publicar_desde <= now() and (publicar_hasta is null or publicar_hasta > now()) and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)) and
   (audiencia='todos' or audiencia=(select case rol when 'admin' then 'administradores' when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid()))
 );
+
+-- Actualización segura del perfil propio: no permite cambiar rol, ciclo ni estado de cuenta.
+create or replace function public.actualizar_mi_perfil(nuevo_nombre text, nueva_carrera text)
+returns void language plpgsql security definer set search_path=public as $$
+begin
+  if auth.uid() is null then raise exception 'Debes iniciar sesión'; end if;
+  if char_length(trim(coalesce(nuevo_nombre,''))) < 3 then raise exception 'Ingresa un nombre válido'; end if;
+  if char_length(trim(coalesce(nueva_carrera,''))) < 2 then raise exception 'Ingresa una carrera válida'; end if;
+  update public.perfiles set nombre=trim(nuevo_nombre), carrera=trim(nueva_carrera) where id=auth.uid() and activo=true;
+end;
+$$;
+grant execute on function public.actualizar_mi_perfil(text,text) to authenticated;
 
 
 

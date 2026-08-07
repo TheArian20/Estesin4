@@ -323,7 +323,7 @@ document.getElementById("fotoPerfil").src=fotoGuardada;
 // GUARDAR CAMBIOS
 //=======================
 
-function guardar(){
+async function guardar(){
 
 const nombre=
 
@@ -343,6 +343,16 @@ document.getElementById("estadoGuardado").style.color="crimson";
 document.getElementById("estadoGuardado").textContent="Completa los campos con información válida.";
 return;
 
+}
+
+const cliente=window.STESIN_SUPABASE;
+if(cliente){
+const {error}=await cliente.rpc("actualizar_mi_perfil",{nuevo_nombre:nombre,nueva_carrera:carrera});
+if(error){
+document.getElementById("estadoGuardado").style.color="crimson";
+document.getElementById("estadoGuardado").textContent="No se pudo guardar en tu cuenta: "+error.message;
+return;
+}
 }
 
 localStorage.setItem("usuario",nombre);
