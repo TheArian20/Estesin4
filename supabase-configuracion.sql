@@ -408,16 +408,7 @@ create policy "Usuarios ven avisos dirigidos" on public.avisos for select to aut
   (audiencia='todos' or audiencia=(select case rol when 'admin' then 'administradores' when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid()))
 );
 
--- Administración y el autor deben poder revisar y retirar comunicados publicados.
-drop policy if exists "Usuarios ven mensajes dirigidos" on public.mensajes_internos;
-create policy "Usuarios ven mensajes dirigidos" on public.mensajes_internos for select to authenticated using (
-  public.es_administrador() or creado_por = auth.uid() or (
-    activo and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)) and
-    (audiencia = 'todos' or (audiencia = 'estudiantes' and (select rol from public.perfiles where id=auth.uid()) = 'estudiante'))
-  )
-);
-drop policy if exists "Autor gestiona sus mensajes" on public.mensajes_internos;
-create policy "Autor gestiona sus mensajes" on public.mensajes_internos for update to authenticated using (creado_por = auth.uid()) with check (creado_por = auth.uid());
+
 
 -- Las funciones no permiten abrir ni enviar evaluaciones de otro ciclo.
 create or replace function public.preguntas_para_evaluacion(evaluacion_busqueda bigint)
@@ -553,3 +544,14 @@ create policy "Usuarios ven avisos dirigidos" on public.avisos for select to aut
     (audiencia='todos' or audiencia=(select case rol when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid()))
   )
 );
+
+-- Administración y el autor deben poder revisar y retirar comunicados publicados.
+drop policy if exists "Usuarios ven mensajes dirigidos" on public.mensajes_internos;
+create policy "Usuarios ven mensajes dirigidos" on public.mensajes_internos for select to authenticated using (
+  public.es_administrador() or creado_por = auth.uid() or (
+    activo and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)) and
+    (audiencia = 'todos' or (audiencia = 'estudiantes' and (select rol from public.perfiles where id=auth.uid()) = 'estudiante'))
+  )
+);
+drop policy if exists "Autor gestiona sus mensajes" on public.mensajes_internos;
+create policy "Autor gestiona sus mensajes" on public.mensajes_internos for update to authenticated using (creado_por = auth.uid()) with check (creado_por = auth.uid());
