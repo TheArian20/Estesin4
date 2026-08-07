@@ -436,3 +436,28 @@ $$;
 
 -- La desactivación solo está permitida por la política de administrador existente.
 -- No concedas acceso a administracion.html ni cambies roles a cuentas docentes.
+
+-- ETAPA 4: comunicación interna y solicitudes institucionales.
+create table if not exists public.mensajes_internos (
+ id bigint generated always as identity primary key, titulo text not null, mensaje text not null,
+ audiencia text not null default 'estudiantes' check(audiencia in ('todos','estudiantes')),
+ ciclo text, activo boolean not null default true, creado_por uuid references auth.users(id), creado_en timestamptz not null default now()
+);
+alter table public.mensajes_internos enable row level security;
+drop policy if exists "Usuarios ven mensajes dirigidos" on public.mensajes_internos;
+drop policy if exists "Equipo publica mensajes" on public.mensajes_internos;
+drop policy if exists "Administrador gestiona mensajes" on public.mensajes_internos;
+create policy "Usuarios ven mensajes dirigidos" on public.mensajes_internos for select to authenticated using (activo and (audiencia='todos' or (select rol from public.perfiles where id=auth.uid())='estudiante') and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)));
+create policy "Equipo publica mensajes" on public.mensajes_internos for insert to authenticated with check (public.puede_gestionar_asistencia() and creado_por=auth.uid());
+create policy "Administrador gestiona mensajes" on public.mensajes_internos for all to authenticated using(public.es_administrador()) with check(public.es_administrador());
+
+create table if not exists public.solicitudes_institucionales (
+ id bigint generated always as identity primary key, usuario_id uuid not null references auth.users(id) on delete cascade,
+ tipo text not null, detalle text not null, estado text not null default 'Pendiente' check(estado in ('Pendiente','En proceso','Atendida')),
+ respuesta text, creado_en timestamptz not null default now(), atendido_en timestamptz
+);
+alter table public.solicitudes_institucionales enable row level security;
+drop policy if exists "Usuario gestiona sus solicitudes" on public.solicitudes_institucionales;
+drop policy if exists "Administrador atiende solicitudes" on public.solicitudes_institucionales;
+create policy "Usuario gestiona sus solicitudes" on public.solicitudes_institucionales for all to authenticated using(usuario_id=auth.uid()) with check(usuario_id=auth.uid());
+create policy "Administrador atiende solicitudes" on public.solicitudes_institucionales for all to authenticated using(public.es_administrador()) with check(public.es_administrador());

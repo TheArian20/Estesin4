@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const seccion = document.createElement("section");
     seccion.className = "admin-card";
     seccion.id = "respaldoAdministrativo";
-    seccion.innerHTML = '<h2>Respaldo administrativo</h2><p>Descarga un archivo CSV para conservar una copia de las cuentas, asistencia o actividad registrada.</p><div class="admin-summary"><button class="account-action" data-exportar="usuarios">Usuarios</button><button class="account-action" data-exportar="asistencia">Asistencia</button><button class="account-action" data-exportar="actividad">Actividad</button></div><div class="admin-state" hidden></div>';
+    seccion.innerHTML = '<h2>Respaldo administrativo</h2><p>Descarga una copia CSV de la información registrada.</p><div class="admin-summary"><button class="account-action" data-exportar="usuarios">Usuarios</button><button class="account-action" data-exportar="asistencia">Asistencia</button><button class="account-action" data-exportar="actividad">Actividad</button><button class="account-action" data-exportar="tareas">Tareas</button><button class="account-action" data-exportar="evaluaciones">Evaluaciones</button></div><div class="admin-state" hidden></div>';
     destino.insertAdjacentElement("afterend", seccion);
     const estado = seccion.querySelector(".admin-state");
     const escaparCSV = (valor) => `"${String(valor ?? "").replaceAll('"', '""')}"`;
@@ -22,7 +22,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fuentes = {
         usuarios: ["perfiles", "id,nombre,usuario,correo,carrera,rol,activo,creado_en", "usuarios"],
         asistencia: ["asistencia", "fecha,estudiante_id,presente,nota,registrado_en", "asistencia"],
-        actividad: ["progreso_lectura", "usuario_id,recurso_nombre,ciclo,leido_en", "actividad-academica"]
+        actividad: ["progreso_lectura", "usuario_id,recurso_nombre,ciclo,leido_en", "actividad-academica"],
+        tareas: ["entregas_tareas", "tarea_id,estudiante_id,estado,calificacion,entregado_en,revisado_en", "tareas"],
+        evaluaciones: ["intentos_evaluacion", "evaluacion_id,estudiante_id,puntaje,puntaje_maximo,enviado_en", "evaluaciones"]
     };
     seccion.querySelectorAll("[data-exportar]").forEach((boton) => boton.addEventListener("click", async () => {
         const [tabla, campos, nombre] = fuentes[boton.dataset.exportar];

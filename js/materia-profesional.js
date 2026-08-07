@@ -18,4 +18,8 @@ document.addEventListener("DOMContentLoaded", () => window.setTimeout(() => {
   tarjeta.querySelector("#docenteMateria").textContent = docentes[nombre] || "Equipo académico STESIN";
   tarjeta.querySelector("#detalleDocenteMateria").textContent = `${ciclo} · Docente asignado para la programación vigente`;
   contenedor.appendChild(tarjeta);
+  const acciones = document.createElement("section");
+  acciones.className = "materia-acciones";
+  acciones.innerHTML = '<a class="agenda-open" href="academico.html">Ver tareas y evaluaciones</a><a class="agenda-open" href="silabos.html">Consultar sílabos</a><a class="agenda-open" href="mensajes.html">Ver comunicados</a>';
+  contenedor.insertAdjacentElement("afterend", acciones);
 }, 450));

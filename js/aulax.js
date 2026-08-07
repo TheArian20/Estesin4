@@ -254,7 +254,18 @@ const AulaX = (() => {
         };
         crear("historial.html", "Mi historial", "progreso.html");
         crear("instalar.html", "Instalar STESIN", "contacto.html");
+        crear("mensajes.html", "Comunicados", "alabanzas.html");
+        crear("solicitudes.html", "Solicitudes", "contacto.html");
     }
+
+    function configurarNavegacionInferior() {
+        if (document.getElementById("navegacionInferior")) return;
+        const actual = window.location.pathname.split("/").pop() || "index.html";
+        const nav = document.createElement("nav"); nav.id = "navegacionInferior";
+        nav.innerHTML = [["index.html","⌂","Inicio"],["cursos.html","▦","Ciclos"],["calendario.html","◷","Agenda"],["biblioteca.html","▤","Biblioteca"]].map(([url,icono,texto]) => `<a class="${actual===url?"active":""}" href="${url}"><span>${icono}</span>${texto}</a>`).join("");
+        document.body.appendChild(nav);
+    }
+    function aplicarMarcaInstitucional() { const titulo=document.querySelector(".sidebar h2"); if(titulo&&!titulo.querySelector("img"))titulo.insertAdjacentHTML("afterbegin",'<img src="stesin-icon.svg" alt="">'); }
 
     function agregarEnlaceAdministracion() {
         if (localStorage.getItem("rolUsuario") !== "admin") return;
@@ -777,6 +788,8 @@ const AulaX = (() => {
         mejorarCalendario();
         configurarSubciclos();
         configurarMateria();
+        configurarNavegacionInferior();
+        aplicarMarcaInstitucional();
     }
 
     async function iniciarAplicacion() {
