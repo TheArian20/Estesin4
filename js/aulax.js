@@ -291,6 +291,16 @@ const AulaX = (() => {
     function organizarNavegacion() {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar || sidebar.querySelector(".sidebar-navigation")) return;
+        const detalles = {
+            "index.html": ["⌂", "Inicio"], "cursos.html": ["▦", "Ciclos"], "progreso.html": ["↗", "Mi actividad"],
+            "academico.html": ["◈", "Aula académica"], "calendario.html": ["◷", "Calendario"], "malla-curricular.html": ["▤", "Malla curricular"],
+            "biblioteca.html": ["▣", "Biblioteca"], "silabos.html": ["▧", "Sílabos"], "alabanzas.html": ["♪", "Alabanzas"],
+            "mensajes.html": ["✉", "Comunicados"], "solicitudes.html": ["↳", "Solicitudes"], "redes.html": ["↗", "Enlaces"], "contacto.html": ["◉", "Contacto"],
+            "rectorado.html": ["♛", "Rectorado"], "equipo.html": ["♧", "Equipo STESIN"], "docentes.html": ["♙", "Panel docente"],
+            "estudiantes.html": ["♚", "Estudiantes"], "asistencia.html": ["✓", "Asistencia"], "estadisticas.html": ["▥", "Estadísticas"],
+            "auditoria.html": ["⌕", "Auditoría"], "administracion.html": ["⚙", "Administración"], "historial.html": ["◴", "Mi historial"],
+            "notas.html": ["✎", "Mis notas"], "configuracion.html": ["⚙", "Configuración"], "instalar.html": ["⇩", "Instalar STESIN"], "ayuda.html": ["?", "Ayuda"]
+        };
         const grupos = [
             ["Académico", ["index.html", "cursos.html", "progreso.html", "academico.html", "calendario.html", "malla-curricular.html", "biblioteca.html", "silabos.html", "alabanzas.html"]],
             ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html", "contacto.html"]],
@@ -306,7 +316,12 @@ const AulaX = (() => {
             const grupo = document.createElement("div");
             grupo.className = "sidebar-group";
             grupo.innerHTML = `<span>${titulo}</span>`;
-            enlaces.forEach((enlace) => grupo.appendChild(enlace));
+            enlaces.forEach((enlace) => {
+                const [icono, etiqueta] = detalles[enlace.getAttribute("href")] || ["•", enlace.textContent.trim()];
+                enlace.innerHTML = `<span class="nav-icon" aria-hidden="true">${icono}</span><span>${etiqueta}</span>`;
+                enlace.setAttribute("aria-label", etiqueta);
+                grupo.appendChild(enlace);
+            });
             navegacion.appendChild(grupo);
         });
         sidebar.appendChild(navegacion);
