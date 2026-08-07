@@ -533,3 +533,12 @@ as $$ begin
   );
 end; $$;
 grant execute on function public.resumen_rectorado() to authenticated;
+
+-- El administrador debe poder consultar todos los avisos, incluso los ocultos o dirigidos a otro grupo.
+drop policy if exists "Usuarios ven avisos dirigidos" on public.avisos;
+create policy "Usuarios ven avisos dirigidos" on public.avisos for select to authenticated using (
+  public.es_administrador() or (
+    activo and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)) and
+    (audiencia='todos' or audiencia=(select case rol when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid()))
+  )
+);
