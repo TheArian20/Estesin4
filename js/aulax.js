@@ -103,7 +103,7 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
         if (["admin", "docente"].includes(rol)) {
@@ -163,7 +163,10 @@ const AulaX = (() => {
         };
         crear("asistencia.html", "Asistencia", "malla-curricular.html");
         crear("docentes.html", "Panel docente", "asistencia.html");
-        if (rol === "admin") crear("equipo.html", "Equipo STESIN", "redes.html");
+        if (rol === "admin") {
+            crear("equipo.html", "Equipo STESIN", "redes.html");
+            crear("estadisticas.html", "Estadísticas", "equipo.html");
+        }
     }
 
     function agregarEnlaceAlabanzas() {
@@ -225,6 +228,21 @@ const AulaX = (() => {
         else sidebar.appendChild(enlace);
     }
 
+    function agregarEnlaceAcademico() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar || sidebar.querySelector('a[href="academico.html"]')) return;
+        const enlace = document.createElement("a");
+        enlace.href = "academico.html";
+        enlace.textContent = "Aula académica";
+        if ((window.location.pathname.split("/").pop() || "index.html") === "academico.html") {
+            enlace.classList.add("active");
+            enlace.setAttribute("aria-current", "page");
+        }
+        const progreso = sidebar.querySelector('a[href="progreso.html"]');
+        if (progreso) progreso.insertAdjacentElement("afterend", enlace);
+        else sidebar.appendChild(enlace);
+    }
+
     function agregarEnlaceAdministracion() {
         if (localStorage.getItem("rolUsuario") !== "admin") return;
         const sidebar = document.querySelector(".sidebar");
@@ -241,10 +259,10 @@ const AulaX = (() => {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar || sidebar.querySelector(".sidebar-navigation")) return;
         const grupos = [
-            ["Académico", ["index.html", "cursos.html", "progreso.html", "calendario.html", "malla-curricular.html", "asistencia.html", "docentes.html"]],
+            ["Académico", ["index.html", "cursos.html", "progreso.html", "academico.html", "calendario.html", "malla-curricular.html", "asistencia.html", "docentes.html"]],
             ["Recursos", ["biblioteca.html", "silabos.html", "alabanzas.html"]],
             ["Comunidad", ["redes.html", "contacto.html"]],
-            ["Administración", ["administracion.html", "equipo.html", "configuracion.html"]]
+            ["Administración", ["administracion.html", "equipo.html", "estadisticas.html", "configuracion.html"]]
         ];
         const navegacion = document.createElement("nav");
         navegacion.className = "sidebar-navigation";
@@ -724,6 +742,7 @@ const AulaX = (() => {
 
         agregarEnlaceMallaCurricular();
         agregarEnlaceProgreso();
+        agregarEnlaceAcademico();
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
@@ -767,7 +786,7 @@ const AulaX = (() => {
         localStorage.setItem("rolUsuario", perfil.rol);
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
         cliente.from("perfiles").update({ ultimo_acceso: new Date().toISOString() }).eq("id", user.id).then(() => {});
-        const paginasSoloAdministrador = ["administracion.html", "equipo.html"];
+        const paginasSoloAdministrador = ["administracion.html", "equipo.html", "estadisticas.html"];
         const paginasDeDocencia = ["asistencia.html", "docentes.html"];
         if ((perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) || (!["admin", "docente"].includes(perfil.rol) && paginasDeDocencia.includes(paginaActual))) {
             window.location.replace("index.html");

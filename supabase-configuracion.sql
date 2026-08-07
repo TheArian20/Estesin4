@@ -188,3 +188,163 @@ for select to authenticated using (docente_id = auth.uid() or public.es_administ
 drop policy if exists "Administrador gestiona materias docentes" on public.materias_docentes;
 create policy "Administrador gestiona materias docentes" on public.materias_docentes
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+
+-- ================================================================
+-- ETAPA 2: EVALUACIONES, TAREAS, ASISTENCIA POR MATERIA Y LOGROS.
+-- Ejecuta este bloque completo en Supabase > SQL Editor.
+-- ================================================================
+
+create or replace function public.docente_de_materia(p_ciclo text, p_materia text)
+returns boolean language sql stable security definer set search_path = public as $$
+  select public.es_administrador() or exists (
+    select 1 from public.materias_docentes
+    where docente_id = auth.uid() and ciclo = p_ciclo and materia = p_materia
+  );
+$$;
+grant execute on function public.docente_de_materia(text, text) to authenticated;
+
+-- Asistencia: ahora una persona puede tener asistencia en varias materias el mismo día.
+alter table public.asistencia add column if not exists ciclo text;
+alter table public.asistencia add column if not exists materia text;
+alter table public.asistencia add column if not exists docente_id uuid references auth.users(id) on delete set null;
+alter table public.asistencia drop constraint if exists asistencia_estudiante_id_fecha_key;
+update public.asistencia set materia='General' where materia is null;
+alter table public.asistencia alter column materia set default 'General';
+alter table public.asistencia alter column materia set not null;
+create unique index if not exists asistencia_estudiante_fecha_materia_unica on public.asistencia(estudiante_id, fecha, materia);
+drop policy if exists "Docentes gestionan asistencia" on public.asistencia;
+drop policy if exists "Estudiante ve su asistencia" on public.asistencia;
+drop policy if exists "Equipo gestiona asistencia asignada" on public.asistencia;
+create policy "Estudiante ve su asistencia" on public.asistencia for select to authenticated using (estudiante_id = auth.uid());
+create policy "Equipo gestiona asistencia asignada" on public.asistencia for all to authenticated
+using (public.docente_de_materia(ciclo, materia))
+with check (public.docente_de_materia(ciclo, materia));
+
+create table if not exists public.tareas_academicas (
+  id bigint generated always as identity primary key,
+  ciclo text not null,
+  materia text not null,
+  titulo text not null check (char_length(trim(titulo)) >= 3),
+  instrucciones text not null,
+  fecha_limite timestamptz,
+  enlace_referencia text,
+  activo boolean not null default true,
+  creado_por uuid references auth.users(id) on delete set null,
+  creado_en timestamptz not null default now()
+);
+alter table public.tareas_academicas enable row level security;
+drop policy if exists "Usuarios ven tareas activas" on public.tareas_academicas;
+drop policy if exists "Equipo crea tareas asignadas" on public.tareas_academicas;
+drop policy if exists "Equipo actualiza tareas asignadas" on public.tareas_academicas;
+create policy "Usuarios ven tareas activas" on public.tareas_academicas for select to authenticated using (activo or public.es_administrador() or public.docente_de_materia(ciclo,materia));
+create policy "Equipo crea tareas asignadas" on public.tareas_academicas for insert to authenticated with check (public.docente_de_materia(ciclo,materia));
+create policy "Equipo actualiza tareas asignadas" on public.tareas_academicas for update to authenticated using (public.docente_de_materia(ciclo,materia)) with check (public.docente_de_materia(ciclo,materia));
+
+create table if not exists public.entregas_tareas (
+  id bigint generated always as identity primary key,
+  tarea_id bigint not null references public.tareas_academicas(id) on delete cascade,
+  estudiante_id uuid not null references auth.users(id) on delete cascade,
+  enlace_archivo text,
+  comentario_estudiante text,
+  comentario_docente text,
+  estado text not null default 'entregado' check (estado in ('entregado','revisado','requiere_correccion')),
+  calificacion numeric(5,2) check (calificacion between 0 and 20),
+  entregado_en timestamptz not null default now(),
+  revisado_en timestamptz,
+  unique(tarea_id, estudiante_id)
+);
+alter table public.entregas_tareas enable row level security;
+drop policy if exists "Estudiante ve sus entregas" on public.entregas_tareas;
+drop policy if exists "Estudiante crea su entrega" on public.entregas_tareas;
+drop policy if exists "Estudiante edita entrega pendiente" on public.entregas_tareas;
+drop policy if exists "Docente revisa entregas asignadas" on public.entregas_tareas;
+create policy "Estudiante ve sus entregas" on public.entregas_tareas for select to authenticated using (estudiante_id = auth.uid());
+create policy "Estudiante crea su entrega" on public.entregas_tareas for insert to authenticated with check (estudiante_id = auth.uid());
+create policy "Estudiante edita entrega pendiente" on public.entregas_tareas for update to authenticated using (estudiante_id = auth.uid() and estado = 'entregado') with check (estudiante_id = auth.uid());
+create policy "Docente revisa entregas asignadas" on public.entregas_tareas for all to authenticated using (exists (select 1 from public.tareas_academicas t where t.id=tarea_id and public.docente_de_materia(t.ciclo,t.materia))) with check (exists (select 1 from public.tareas_academicas t where t.id=tarea_id and public.docente_de_materia(t.ciclo,t.materia)));
+
+-- Crea este bucket para que los estudiantes puedan adjuntar sus tareas.
+insert into storage.buckets(id,name,public) values ('entregas-tareas','entregas-tareas',false) on conflict (id) do nothing;
+drop policy if exists "Estudiantes suben tareas" on storage.objects;
+create policy "Estudiantes suben tareas" on storage.objects for insert to authenticated with check (bucket_id='entregas-tareas' and (storage.foldername(name))[1]=auth.uid()::text);
+drop policy if exists "Estudiantes leen tareas propias" on storage.objects;
+create policy "Estudiantes leen tareas propias" on storage.objects for select to authenticated using (bucket_id='entregas-tareas' and ((storage.foldername(name))[1]=auth.uid()::text or public.puede_gestionar_asistencia()));
+
+create table if not exists public.evaluaciones (
+  id bigint generated always as identity primary key,
+  ciclo text not null,
+  materia text not null,
+  titulo text not null,
+  instrucciones text,
+  activo boolean not null default true,
+  creado_por uuid references auth.users(id) on delete set null,
+  creado_en timestamptz not null default now()
+);
+create table if not exists public.preguntas_evaluacion (
+  id bigint generated always as identity primary key,
+  evaluacion_id bigint not null references public.evaluaciones(id) on delete cascade,
+  enunciado text not null,
+  opciones jsonb not null default '[]'::jsonb,
+  respuesta_correcta integer not null default 0,
+  puntos numeric(5,2) not null default 1 check (puntos > 0),
+  orden integer not null default 1
+);
+create table if not exists public.intentos_evaluacion (
+  id bigint generated always as identity primary key,
+  evaluacion_id bigint not null references public.evaluaciones(id) on delete cascade,
+  estudiante_id uuid not null references auth.users(id) on delete cascade,
+  respuestas jsonb not null default '{}'::jsonb,
+  puntaje numeric(6,2) not null default 0,
+  puntaje_maximo numeric(6,2) not null default 0,
+  enviado_en timestamptz not null default now(),
+  unique(evaluacion_id, estudiante_id)
+);
+alter table public.evaluaciones enable row level security;
+alter table public.preguntas_evaluacion enable row level security;
+alter table public.intentos_evaluacion enable row level security;
+drop policy if exists "Usuarios ven evaluaciones activas" on public.evaluaciones;
+drop policy if exists "Equipo gestiona evaluaciones" on public.evaluaciones;
+drop policy if exists "Equipo ve preguntas" on public.preguntas_evaluacion;
+drop policy if exists "Equipo gestiona preguntas" on public.preguntas_evaluacion;
+drop policy if exists "Estudiante ve sus intentos" on public.intentos_evaluacion;
+drop policy if exists "Estudiante registra intento" on public.intentos_evaluacion;
+drop policy if exists "Equipo ve intentos asignados" on public.intentos_evaluacion;
+create policy "Usuarios ven evaluaciones activas" on public.evaluaciones for select to authenticated using (activo or public.docente_de_materia(ciclo,materia));
+create policy "Equipo gestiona evaluaciones" on public.evaluaciones for all to authenticated using (public.docente_de_materia(ciclo,materia)) with check (public.docente_de_materia(ciclo,materia));
+create policy "Equipo ve preguntas" on public.preguntas_evaluacion for select to authenticated using (exists(select 1 from public.evaluaciones e where e.id=evaluacion_id and public.docente_de_materia(e.ciclo,e.materia)));
+create policy "Equipo gestiona preguntas" on public.preguntas_evaluacion for all to authenticated using (exists(select 1 from public.evaluaciones e where e.id=evaluacion_id and public.docente_de_materia(e.ciclo,e.materia))) with check (exists(select 1 from public.evaluaciones e where e.id=evaluacion_id and public.docente_de_materia(e.ciclo,e.materia)));
+create policy "Estudiante ve sus intentos" on public.intentos_evaluacion for select to authenticated using (estudiante_id=auth.uid());
+create policy "Estudiante registra intento" on public.intentos_evaluacion for insert to authenticated with check (estudiante_id=auth.uid());
+create policy "Equipo ve intentos asignados" on public.intentos_evaluacion for select to authenticated using (exists(select 1 from public.evaluaciones e where e.id=evaluacion_id and public.docente_de_materia(e.ciclo,e.materia)));
+create or replace function public.preguntas_para_evaluacion(evaluacion_busqueda bigint)
+returns table(id bigint, enunciado text, opciones jsonb, puntos numeric, orden integer)
+language sql security definer set search_path=public as $$
+  select p.id,p.enunciado,p.opciones,p.puntos,p.orden
+  from public.preguntas_evaluacion p join public.evaluaciones e on e.id=p.evaluacion_id
+  where p.evaluacion_id=evaluacion_busqueda and e.activo
+  order by p.orden,p.id;
+$$;
+grant execute on function public.preguntas_para_evaluacion(bigint) to authenticated;
+create or replace function public.enviar_evaluacion(evaluacion_busqueda bigint, respuestas_enviadas jsonb)
+returns table(puntaje numeric, puntaje_maximo numeric)
+language plpgsql security definer set search_path=public as $$
+declare total numeric := 0; maximo numeric := 0; pregunta record;
+begin
+  if not exists(select 1 from public.evaluaciones where id=evaluacion_busqueda and activo) then raise exception 'Evaluación no disponible'; end if;
+  for pregunta in select * from public.preguntas_evaluacion where evaluacion_id=evaluacion_busqueda loop
+    maximo := maximo + pregunta.puntos;
+    if coalesce((respuestas_enviadas ->> pregunta.id::text)::integer,-1) = pregunta.respuesta_correcta then total := total + pregunta.puntos; end if;
+  end loop;
+  insert into public.intentos_evaluacion(evaluacion_id,estudiante_id,respuestas,puntaje,puntaje_maximo)
+  values(evaluacion_busqueda,auth.uid(),respuestas_enviadas,total,maximo);
+  return query select total,maximo;
+end;
+$$;
+grant execute on function public.enviar_evaluacion(bigint,jsonb) to authenticated;
+
+-- Avisos para todos, por rol o por ciclo.
+alter table public.avisos add column if not exists audiencia text not null default 'todos' check (audiencia in ('todos','estudiantes','docentes','administradores'));
+alter table public.avisos add column if not exists ciclo text;
+drop policy if exists "Usuarios autenticados ven avisos activos" on public.avisos;
+drop policy if exists "Usuarios ven avisos dirigidos" on public.avisos;
+create policy "Usuarios ven avisos dirigidos" on public.avisos for select to authenticated using (activo and (audiencia='todos' or audiencia=(select case rol when 'admin' then 'administradores' when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid())));

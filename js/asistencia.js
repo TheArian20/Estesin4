@@ -1,74 +1,19 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const cliente = window.STESIN_SUPABASE;
-    const lista = document.getElementById("listaAsistencia");
-    const titulo = document.getElementById("asistenciaPorcentaje");
-    const resumen = document.getElementById("asistenciaResumen");
-    if (!cliente || !lista || !titulo || !resumen) return;
-
-    const { data: { user } } = await cliente.auth.getUser();
-    if (!user) return;
-    const { data: perfil } = await cliente.from("perfiles").select("rol,activo").eq("id", user.id).single();
-    if (!perfil?.activo || !["admin", "docente"].includes(perfil.rol)) {
-        window.location.replace("index.html");
-        return;
-    }
-
-    document.title = "Control de asistencia | STESIN";
-    document.querySelector("header h1").textContent = "Control de asistencia";
-    document.querySelector("header p").textContent = "Registra y consulta la asistencia de los estudiantes STESIN.";
-    const fecha = document.createElement("input");
-    fecha.type = "date";
-    fecha.className = "attendance-date";
-    fecha.value = new Date().toISOString().slice(0, 10);
-    const exportar = document.createElement("button");
-    exportar.type = "button";
-    exportar.className = "account-action";
-    exportar.textContent = "Descargar reporte CSV";
-    titulo.textContent = "Asistencia por jornada";
-    resumen.textContent = "Selecciona una fecha y registra la participación de cada estudiante.";
-    resumen.insertAdjacentElement("afterend", fecha);
-    fecha.insertAdjacentElement("afterend", exportar);
-    let estudiantesActuales = [];
-    let registrosActuales = new Map();
-
-    async function cargar() {
-        lista.innerHTML = '<p class="announcements-empty">Cargando estudiantes…</p>';
-        const [{ data: estudiantes, error }, { data: registros }] = await Promise.all([
-            cliente.from("perfiles").select("id,nombre,activo,rol").eq("rol", "estudiante").eq("activo", true).order("nombre"),
-            cliente.from("asistencia").select("estudiante_id,presente,nota").eq("fecha", fecha.value)
-        ]);
-        if (error) {
-            lista.innerHTML = '<p class="announcements-empty">Ejecuta el SQL actualizado para habilitar la asistencia para docentes.</p>';
-            return;
-        }
-        const porEstudiante = new Map((registros || []).map((registro) => [registro.estudiante_id, registro]));
-        estudiantesActuales = estudiantes || [];
-        registrosActuales = porEstudiante;
-        const total = (estudiantes || []).length;
-        const presentes = [...porEstudiante.values()].filter((registro) => registro.presente).length;
-        titulo.textContent = `${presentes} de ${total} presentes`;
-        lista.innerHTML = (estudiantes || []).map((estudiante) => {
-            const registro = porEstudiante.get(estudiante.id);
-            const presente = registro?.presente === true;
-            return `<article class="attendance-row"><div><strong>${estudiante.nombre}</strong><small>${registro ? (presente ? "Presente" : "Inasistencia") : "Sin registrar"}</small></div><button class="account-action ${presente ? "" : "danger"}" type="button" data-estudiante="${estudiante.id}" data-presente="${presente}">${presente ? "Marcar falta" : "Marcar presente"}</button></article>`;
-        }).join("") || '<p class="announcements-empty">No hay estudiantes activos.</p>';
-        lista.querySelectorAll("button[data-estudiante]").forEach((boton) => boton.addEventListener("click", async () => {
-            const presente = boton.dataset.presente !== "true";
-            boton.disabled = true;
-            const { error: errorRegistro } = await cliente.from("asistencia").upsert({ estudiante_id: boton.dataset.estudiante, fecha: fecha.value, presente }, { onConflict: "estudiante_id,fecha" });
-            if (errorRegistro) alert(`No se pudo guardar: ${errorRegistro.message}`);
-            await cargar();
-        }));
-    }
-    fecha.addEventListener("change", cargar);
-    exportar.addEventListener("click", () => {
-        const filas = [["Fecha", "Estudiante", "Estado"]].concat(estudiantesActuales.map((estudiante) => [fecha.value, estudiante.nombre, registrosActuales.get(estudiante.id)?.presente ? "Presente" : "Inasistencia"]));
-        const csv = "\uFEFF" + filas.map((fila) => fila.map((valor) => `"${String(valor).replace(/"/g, '""')}"`).join(",")).join("\n");
-        const enlace = document.createElement("a");
-        enlace.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-        enlace.download = `asistencia-${fecha.value}.csv`;
-        enlace.click();
-        URL.revokeObjectURL(enlace.href);
-    });
-    cargar();
+  const cliente = window.STESIN_SUPABASE, lista = document.getElementById("listaAsistencia"), titulo = document.getElementById("asistenciaPorcentaje"), resumen = document.getElementById("asistenciaResumen");
+  if (!cliente || !lista || !titulo || !resumen) return;
+  const {data:{user}={}}=await cliente.auth.getUser(); if(!user)return;
+  const {data:perfil}=await cliente.from("perfiles").select("rol,activo").eq("id",user.id).single(); if(!perfil?.activo||!["admin","docente"].includes(perfil.rol))return location.replace("index.html");
+  document.title="Asistencia por materia | STESIN"; document.querySelector("header h1").textContent="Asistencia por materia"; document.querySelector("header p").textContent="Registra la participación por fecha, ciclo y materia asignada.";
+  const controles=document.createElement("div"); controles.className="attendance-controls"; controles.innerHTML='<input type="date" class="attendance-date" id="fechaAsistencia"><select class="attendance-date" id="materiaAsistencia"></select><button class="account-action" id="exportarAsistencia" type="button">Descargar CSV</button>';
+  resumen.textContent="Selecciona una materia y registra la participación de tus estudiantes.";resumen.insertAdjacentElement("afterend",controles);
+  const fecha=controles.querySelector("#fechaAsistencia"),materia=controles.querySelector("#materiaAsistencia"),exportar=controles.querySelector("#exportarAsistencia");fecha.value=new Date().toISOString().slice(0,10);let estudiantes=[],registros=new Map(),asignaciones=[];
+  const etiqueta=(a)=>`${a.ciclo} · ${a.materia}`;
+  const {data:datosAsignacion,error:errAsignacion}=await cliente.from("materias_docentes").select("ciclo,materia").eq(perfil.rol==="docente"?"docente_id":"docente_id",perfil.rol==="docente"?user.id:user.id);
+  if(perfil.rol==="admin"){const {data:todos}=await cliente.from("materias_docentes").select("ciclo,materia");asignaciones=todos||[];}else asignaciones=datosAsignacion||[];
+  if(!asignaciones.length&&perfil.rol==="admin")asignaciones=[{ciclo:"Ciclo V",materia:"General"}];
+  if(!asignaciones.length){lista.innerHTML='<p class="announcements-empty">Aún no tienes materias asignadas. Un administrador debe asignártelas en Administración.</p>';return;}
+  materia.innerHTML=asignaciones.map((a,i)=>`<option value="${i}">${etiqueta(a)}</option>`).join("");
+  async function cargar(){lista.innerHTML='<p class="announcements-empty">Cargando estudiantes…</p>';const actual=asignaciones[Number(materia.value)]||asignaciones[0];const [{data:alumnos,error},{data:datos}]=await Promise.all([cliente.from("perfiles").select("id,nombre,activo,rol").eq("rol","estudiante").eq("activo",true).order("nombre"),cliente.from("asistencia").select("estudiante_id,presente,nota").eq("fecha",fecha.value).eq("materia",actual.materia)]);if(error){lista.innerHTML='<p class="announcements-empty">Ejecuta el SQL de la Etapa 2 para habilitar asistencia por materia.</p>';return;}estudiantes=alumnos||[];registros=new Map((datos||[]).map(r=>[r.estudiante_id,r]));const presentes=[...registros.values()].filter(r=>r.presente).length;titulo.textContent=`${presentes} de ${estudiantes.length} presentes · ${actual.materia}`;lista.innerHTML=estudiantes.map(e=>{const r=registros.get(e.id),presente=r?.presente===true;return `<article class="attendance-row"><div><strong>${e.nombre}</strong><small>${r?(presente?"Presente":"Inasistencia"):"Sin registrar"}</small></div><button class="account-action ${presente?"":"danger"}" type="button" data-id="${e.id}" data-presente="${presente}">${presente?"Marcar falta":"Marcar presente"}</button></article>`;}).join("")||'<p class="announcements-empty">No hay estudiantes activos.</p>';lista.querySelectorAll("button[data-id]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;const presente=b.dataset.presente!=="true";const {error:guardar}=await cliente.from("asistencia").upsert({estudiante_id:b.dataset.id,fecha:fecha.value,presente,ciclo:actual.ciclo,materia:actual.materia,docente_id:user.id},{onConflict:"estudiante_id,fecha,materia"});if(guardar)alert("No se pudo guardar: "+guardar.message);cargar();}));}
+  fecha.addEventListener("change",cargar);materia.addEventListener("change",cargar);exportar.addEventListener("click",()=>{const actual=asignaciones[Number(materia.value)]||asignaciones[0],filas=[["Fecha","Ciclo","Materia","Estudiante","Estado"]].concat(estudiantes.map(e=>[fecha.value,actual.ciclo,actual.materia,e.nombre,registros.get(e.id)?.presente?"Presente":"Inasistencia"]));const csv="\uFEFF"+filas.map(f=>f.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download=`asistencia-${fecha.value}-${actual.materia}.csv`;a.click();URL.revokeObjectURL(a.href);});
+  await cargar();
 });
