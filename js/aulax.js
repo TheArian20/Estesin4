@@ -746,6 +746,11 @@ const AulaX = (() => {
             resumen.src = "js/asistencia-mensual.js";
             document.head.appendChild(resumen);
         }
+        if (paginaActual === "equipo.html" && !document.querySelector('script[src="js/equipo-stesin.js"]')) {
+            const equipo = document.createElement("script");
+            equipo.src = "js/equipo-stesin.js";
+            document.head.appendChild(equipo);
+        }
 
         document.querySelectorAll(".sidebar a").forEach((enlace) => {
             const activa = enlace.getAttribute("href") === paginaActual;
