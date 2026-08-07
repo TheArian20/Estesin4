@@ -1,5 +1,5 @@
 const AulaX = (() => {
-    const fotoPredeterminada = "https://i.pravatar.cc/150?img=12";
+    const fotoPredeterminada = "stesin-icon.svg";
 
     function leerJSON(clave, valorPredeterminado) {
         try {
@@ -103,7 +103,7 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Historial", "Actividad descargable", "historial.html"], ["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Instalar STESIN", "Agregar al dispositivo", "instalar.html"], ["Contacto", "Canales institucionales", "contacto.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Historial", "Actividad descargable", "historial.html"], ["Mis notas", "Calificaciones verificadas", "notas.html"], ["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Ayuda", "Guía para estudiantes", "ayuda.html"], ["Instalar STESIN", "Agregar al dispositivo", "instalar.html"], ["Contacto", "Canales institucionales", "contacto.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
         if (["admin", "docente"].includes(rol)) {
@@ -253,9 +253,11 @@ const AulaX = (() => {
             if (despues) despues.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
         };
         crear("historial.html", "Mi historial", "progreso.html");
+        crear("notas.html", "Mis notas", "historial.html");
         crear("instalar.html", "Instalar STESIN", "contacto.html");
         crear("mensajes.html", "Comunicados", "alabanzas.html");
         crear("solicitudes.html", "Solicitudes", "contacto.html");
+        crear("ayuda.html", "Ayuda", "solicitudes.html");
     }
 
     function configurarNavegacionInferior() {
