@@ -438,9 +438,13 @@ create table if not exists public.consultas_academicas (
 );
 alter table public.consultas_academicas enable row level security;
 drop policy if exists "Estudiante gestiona sus consultas" on public.consultas_academicas;
+drop policy if exists "Estudiante ve sus consultas" on public.consultas_academicas;
+drop policy if exists "Estudiante envía sus consultas" on public.consultas_academicas;
 drop policy if exists "Equipo atiende consultas asignadas" on public.consultas_academicas;
-create policy "Estudiante gestiona sus consultas" on public.consultas_academicas
-for all to authenticated using (estudiante_id=auth.uid()) with check (estudiante_id=auth.uid());
+create policy "Estudiante ve sus consultas" on public.consultas_academicas
+for select to authenticated using (estudiante_id=auth.uid());
+create policy "Estudiante envía sus consultas" on public.consultas_academicas
+for insert to authenticated with check (estudiante_id=auth.uid());
 create policy "Equipo atiende consultas asignadas" on public.consultas_academicas
 for all to authenticated using (public.es_administrador() or public.docente_de_materia(ciclo,materia))
 with check (public.es_administrador() or public.docente_de_materia(ciclo,materia));
