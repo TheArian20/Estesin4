@@ -259,12 +259,11 @@ const AulaX = (() => {
             const despues = sidebar.querySelector(`a[href="${referencia}"]`);
             if (despues) despues.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
         };
-        crear("historial.html", "Mi historial", "progreso.html");
+        crear("historial.html", "Mi seguimiento", "cursos.html");
         crear("notas.html", "Mis notas", "historial.html");
         crear("instalar.html", "Instalar STESIN", "contacto.html");
         crear("mensajes.html", "Comunicados", "alabanzas.html");
         crear("solicitudes.html", "Solicitudes", "contacto.html");
-        crear("ayuda.html", "Ayuda", "solicitudes.html");
     }
 
     function configurarNavegacionInferior() {
@@ -292,20 +291,20 @@ const AulaX = (() => {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar || sidebar.querySelector(".sidebar-navigation")) return;
         const detalles = {
-            "index.html": ["⌂", "Inicio"], "cursos.html": ["▦", "Ciclos"], "progreso.html": ["↗", "Mi actividad"],
+            "index.html": ["⌂", "Inicio"], "cursos.html": ["▦", "Ciclos"],
             "academico.html": ["◈", "Aula académica"], "calendario.html": ["◷", "Calendario"], "malla-curricular.html": ["▤", "Malla curricular"],
             "biblioteca.html": ["▣", "Biblioteca"], "silabos.html": ["▧", "Sílabos"], "alabanzas.html": ["♪", "Alabanzas"],
             "mensajes.html": ["✉", "Comunicados"], "solicitudes.html": ["↳", "Solicitudes"], "redes.html": ["↗", "Enlaces"], "contacto.html": ["◉", "Contacto"],
             "rectorado.html": ["♛", "Rectorado"], "equipo.html": ["♧", "Equipo STESIN"], "docentes.html": ["♙", "Panel docente"],
             "estudiantes.html": ["♚", "Estudiantes"], "asistencia.html": ["✓", "Asistencia"], "estadisticas.html": ["▥", "Estadísticas"],
-            "auditoria.html": ["⌕", "Auditoría"], "administracion.html": ["⚙", "Administración"], "historial.html": ["◴", "Mi historial"],
-            "notas.html": ["✎", "Mis notas"], "configuracion.html": ["⚙", "Configuración"], "instalar.html": ["⇩", "Instalar STESIN"], "ayuda.html": ["?", "Ayuda"]
+            "auditoria.html": ["⌕", "Auditoría"], "administracion.html": ["⚙", "Administración"], "historial.html": ["◴", "Mi seguimiento"],
+            "notas.html": ["✎", "Mis notas"], "configuracion.html": ["⚙", "Configuración"], "instalar.html": ["⇩", "Instalar STESIN"]
         };
         const grupos = [
-            ["Académico", ["index.html", "cursos.html", "progreso.html", "academico.html", "calendario.html", "malla-curricular.html", "biblioteca.html", "silabos.html", "alabanzas.html"]],
-            ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html", "contacto.html"]],
+            ["Académico", ["index.html", "cursos.html", "academico.html", "calendario.html", "malla-curricular.html", "biblioteca.html", "silabos.html", "alabanzas.html"]],
+            ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html"]],
             ["Gestión institucional", ["rectorado.html", "equipo.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "administracion.html"]],
-            ["Cuenta", ["historial.html", "notas.html", "configuracion.html", "instalar.html", "ayuda.html"]]
+            ["Cuenta", ["historial.html", "notas.html", "configuracion.html", "instalar.html"]]
         ];
         const navegacion = document.createElement("nav");
         navegacion.className = "sidebar-navigation";
@@ -763,6 +762,17 @@ const AulaX = (() => {
     function inicializarInterfaz() {
         const paginaActual = window.location.pathname.split("/").pop() || "index.html";
 
+        if (paginaActual === "historial.html") {
+            document.title = "Mi seguimiento | STESIN";
+            const titulo = document.querySelector("header h1");
+            if (titulo) titulo.textContent = "Mi seguimiento";
+        }
+        if (paginaActual === "configuracion.html") {
+            document.querySelectorAll(".option p").forEach((texto) => {
+                if (texto.textContent.trim() === "Estado: Próximamente") texto.textContent = "Disponible desde el botón superior";
+            });
+        }
+
         if (paginaActual === "asistencia.html" && !document.querySelector('script[src="js/asistencia-mensual.js"]')) {
             const resumen = document.createElement("script");
             resumen.src = "js/asistencia-mensual.js";
@@ -810,13 +820,11 @@ const AulaX = (() => {
         });
 
         agregarEnlaceMallaCurricular();
-        agregarEnlaceProgreso();
         agregarEnlaceAcademico();
         agregarEnlacesPersonales();
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
-        agregarEnlaceContacto();
         agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
         organizarNavegacion();
