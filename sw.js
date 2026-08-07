@@ -1,4 +1,4 @@
-const CACHE = "stesin-v2";
+const CACHE = "stesin-v3";
 const BASE = ["./", "index.html", "css/style.css", "js/aulax.js", "js/dashboard.js", "manifest.json", "stesin-icon.svg"];
 
 self.addEventListener("install", (event) => event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(BASE)).then(() => self.skipWaiting())));

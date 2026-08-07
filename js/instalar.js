@@ -1,0 +1,1 @@
+let aviso;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();aviso=e;const b=document.getElementById("botonInstalar");b.hidden=false;b.onclick=async()=>{aviso.prompt();await aviso.userChoice;b.hidden=true;};});window.addEventListener("appinstalled",()=>{const e=document.getElementById("estadoInstalacion");if(e)e.textContent="STESIN se instaló correctamente.";});

@@ -103,7 +103,7 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Contacto", "Canales institucionales", "contacto.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi actividad", "Documentos consultados", "progreso.html"], ["Historial", "Actividad descargable", "historial.html"], ["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Instalar STESIN", "Agregar al dispositivo", "instalar.html"], ["Contacto", "Canales institucionales", "contacto.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
         if (["admin", "docente"].includes(rol)) {
@@ -241,6 +241,19 @@ const AulaX = (() => {
         const progreso = sidebar.querySelector('a[href="progreso.html"]');
         if (progreso) progreso.insertAdjacentElement("afterend", enlace);
         else sidebar.appendChild(enlace);
+    }
+
+    function agregarEnlacesPersonales() {
+        const sidebar = document.querySelector(".sidebar");
+        if (!sidebar) return;
+        const crear = (archivo, texto, referencia) => {
+            if (sidebar.querySelector(`a[href="${archivo}"]`)) return;
+            const enlace = document.createElement("a"); enlace.href = archivo; enlace.textContent = texto;
+            const despues = sidebar.querySelector(`a[href="${referencia}"]`);
+            if (despues) despues.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
+        };
+        crear("historial.html", "Mi historial", "progreso.html");
+        crear("instalar.html", "Instalar STESIN", "contacto.html");
     }
 
     function agregarEnlaceAdministracion() {
@@ -743,6 +756,7 @@ const AulaX = (() => {
         agregarEnlaceMallaCurricular();
         agregarEnlaceProgreso();
         agregarEnlaceAcademico();
+        agregarEnlacesPersonales();
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();

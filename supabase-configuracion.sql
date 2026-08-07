@@ -348,3 +348,91 @@ alter table public.avisos add column if not exists ciclo text;
 drop policy if exists "Usuarios autenticados ven avisos activos" on public.avisos;
 drop policy if exists "Usuarios ven avisos dirigidos" on public.avisos;
 create policy "Usuarios ven avisos dirigidos" on public.avisos for select to authenticated using (activo and (audiencia='todos' or audiencia=(select case rol when 'admin' then 'administradores' when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid())));
+
+-- ================================================================
+-- ETAPA 3: CICLOS PERSONALES, RÚBRICAS E HISTORIAL.
+-- Solo el administrador asigna el ciclo y puede desactivar cuentas.
+-- ================================================================
+alter table public.perfiles add column if not exists ciclo_actual text not null default 'Ciclo V';
+update public.perfiles set ciclo_actual='Ciclo V' where ciclo_actual is null;
+
+create or replace function public.usuario_pertenece_a_ciclo(p_ciclo text)
+returns boolean language sql stable security definer set search_path=public as $$
+  select public.es_administrador() or public.docente_de_materia(p_ciclo, '') or exists (
+    select 1 from public.perfiles where id=auth.uid() and rol='estudiante' and ciclo_actual=p_ciclo
+  );
+$$;
+grant execute on function public.usuario_pertenece_a_ciclo(text) to authenticated;
+
+-- Las actividades ya no se muestran a estudiantes de otros ciclos.
+drop policy if exists "Usuarios ven tareas activas" on public.tareas_academicas;
+create policy "Usuarios ven tareas de su ciclo" on public.tareas_academicas for select to authenticated using (
+  (activo and public.usuario_pertenece_a_ciclo(ciclo)) or public.docente_de_materia(ciclo,materia)
+);
+drop policy if exists "Usuarios ven evaluaciones activas" on public.evaluaciones;
+create policy "Usuarios ven evaluaciones de su ciclo" on public.evaluaciones for select to authenticated using (
+  (activo and public.usuario_pertenece_a_ciclo(ciclo)) or public.docente_de_materia(ciclo,materia)
+);
+
+-- Rúbricas publicadas junto a cada tarea.
+create table if not exists public.rubricas_tarea (
+  id bigint generated always as identity primary key,
+  tarea_id bigint not null references public.tareas_academicas(id) on delete cascade,
+  criterio text not null check (char_length(trim(criterio)) >= 2),
+  puntaje_maximo numeric(5,2) not null default 20 check (puntaje_maximo > 0),
+  orden integer not null default 1
+);
+alter table public.rubricas_tarea enable row level security;
+drop policy if exists "Usuarios ven rubricas de tareas visibles" on public.rubricas_tarea;
+create policy "Usuarios ven rubricas de tareas visibles" on public.rubricas_tarea for select to authenticated using (
+  exists(select 1 from public.tareas_academicas t where t.id=tarea_id and ((t.activo and public.usuario_pertenece_a_ciclo(t.ciclo)) or public.docente_de_materia(t.ciclo,t.materia)))
+);
+drop policy if exists "Equipo gestiona rubricas asignadas" on public.rubricas_tarea;
+create policy "Equipo gestiona rubricas asignadas" on public.rubricas_tarea for all to authenticated using (
+  exists(select 1 from public.tareas_academicas t where t.id=tarea_id and public.docente_de_materia(t.ciclo,t.materia))
+) with check (
+  exists(select 1 from public.tareas_academicas t where t.id=tarea_id and public.docente_de_materia(t.ciclo,t.materia))
+);
+
+-- Avisos dirigidos también pueden limitarse a un ciclo concreto.
+drop policy if exists "Usuarios ven avisos dirigidos" on public.avisos;
+create policy "Usuarios ven avisos dirigidos" on public.avisos for select to authenticated using (
+  activo and (ciclo is null or public.usuario_pertenece_a_ciclo(ciclo)) and
+  (audiencia='todos' or audiencia=(select case rol when 'admin' then 'administradores' when 'docente' then 'docentes' else 'estudiantes' end from public.perfiles where id=auth.uid()))
+);
+
+-- Las funciones no permiten abrir ni enviar evaluaciones de otro ciclo.
+create or replace function public.preguntas_para_evaluacion(evaluacion_busqueda bigint)
+returns table(id bigint, enunciado text, opciones jsonb, puntos numeric, orden integer)
+language sql security definer set search_path=public as $$
+  select p.id,p.enunciado,p.opciones,p.puntos,p.orden
+  from public.preguntas_evaluacion p join public.evaluaciones e on e.id=p.evaluacion_id
+  where p.evaluacion_id=evaluacion_busqueda and e.activo and public.usuario_pertenece_a_ciclo(e.ciclo)
+  order by p.orden,p.id;
+$$;
+
+-- Una entrega solo puede corresponder a una tarea disponible en el ciclo del estudiante.
+drop policy if exists "Estudiante crea su entrega" on public.entregas_tareas;
+create policy "Estudiante crea su entrega" on public.entregas_tareas for insert to authenticated with check (
+  estudiante_id=auth.uid() and exists(
+    select 1 from public.tareas_academicas t where t.id=tarea_id and t.activo and public.usuario_pertenece_a_ciclo(t.ciclo)
+  )
+);
+create or replace function public.enviar_evaluacion(evaluacion_busqueda bigint, respuestas_enviadas jsonb)
+returns table(puntaje numeric, puntaje_maximo numeric)
+language plpgsql security definer set search_path=public as $$
+declare total numeric := 0; maximo numeric := 0; pregunta record;
+begin
+  if not exists(select 1 from public.evaluaciones where id=evaluacion_busqueda and activo and public.usuario_pertenece_a_ciclo(ciclo)) then raise exception 'Evaluación no disponible para tu ciclo'; end if;
+  for pregunta in select * from public.preguntas_evaluacion where evaluacion_id=evaluacion_busqueda loop
+    maximo := maximo + pregunta.puntos;
+    if coalesce((respuestas_enviadas ->> pregunta.id::text)::integer,-1) = pregunta.respuesta_correcta then total := total + pregunta.puntos; end if;
+  end loop;
+  insert into public.intentos_evaluacion(evaluacion_id,estudiante_id,respuestas,puntaje,puntaje_maximo)
+  values(evaluacion_busqueda,auth.uid(),respuestas_enviadas,total,maximo);
+  return query select total,maximo;
+end;
+$$;
+
+-- La desactivación solo está permitida por la política de administrador existente.
+-- No concedas acceso a administracion.html ni cambies roles a cuentas docentes.
