@@ -310,15 +310,17 @@ localStorage.getItem("carreraUsuario") || "";
 // CARGAR FOTO
 //=======================
 
-const fotoGuardada=
-
-localStorage.getItem("fotoPerfil");
+const obtenerClaveFoto=()=>"fotoPerfil:"+(localStorage.getItem("usuarioId")||"");
+const cargarFotoPersonal=()=>{
+const fotoGuardada=localStorage.getItem(obtenerClaveFoto());
 
 if(fotoGuardada){
 
 document.getElementById("fotoPerfil").src=fotoGuardada;
 
 }
+
+};
 
 //=======================
 // GUARDAR CAMBIOS
@@ -375,6 +377,9 @@ document.getElementById("estadoGuardado").textContent="Cambios guardados correct
 
 }
 
+ cargarFotoPersonal();
+ window.addEventListener("stesin-user-ready",cargarFotoPersonal);
+
 //==================================
 // FOTO DE PERFIL
 //==================================
@@ -393,7 +398,7 @@ lector.onload=function(e){
 
 const imagen=e.target.result;
 
-localStorage.setItem("fotoPerfil",imagen);
+localStorage.setItem(obtenerClaveFoto(),imagen);
 
 document.getElementById("fotoPerfil").src=imagen;
 

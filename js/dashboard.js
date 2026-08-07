@@ -36,10 +36,14 @@
     localStorage.setItem("correoUsuario", perfil.correo);
     localStorage.setItem("carreraUsuario", perfil.carrera);
     localStorage.setItem("rolUsuario", perfil.rol);
+    localStorage.setItem("usuarioId", user.id);
+    const fotoAntigua = localStorage.getItem("fotoPerfil"), claveFoto = `fotoPerfil:${user.id}`;
+    if (fotoAntigua && perfil.rol === "admin" && !localStorage.getItem(claveFoto)) localStorage.setItem(claveFoto, fotoAntigua);
+    localStorage.removeItem("fotoPerfil");
 
     const estado = {
         usuario: localStorage.getItem("usuario") || "Estudiante",
-        foto: localStorage.getItem("fotoPerfil") || "stesin-icon.svg",
+        foto: localStorage.getItem(`fotoPerfil:${user.id}`) || "stesin-icon.svg",
         clases: leerJSON("clasesCompletadas", []),
         tareas: leerJSON("tareasEntregadas", []),
         progreso: limitar(Number(localStorage.getItem("progresoCurso")) || 0, 0, 100)

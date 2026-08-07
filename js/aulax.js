@@ -15,7 +15,8 @@ const AulaX = (() => {
     }
 
     function obtenerFoto() {
-        return localStorage.getItem("fotoPerfil") || fotoPredeterminada;
+        const id = localStorage.getItem("usuarioId");
+        return (id && localStorage.getItem(`fotoPerfil:${id}`)) || fotoPredeterminada;
     }
 
     async function cerrarSesion() {
@@ -23,6 +24,7 @@ const AulaX = (() => {
         localStorage.removeItem("login");
         localStorage.removeItem("usuario");
         localStorage.removeItem("rolUsuario");
+        localStorage.removeItem("usuarioId");
         window.location.replace("login.html");
     }
 
@@ -881,7 +883,13 @@ const AulaX = (() => {
         localStorage.setItem("correoUsuario", perfil.correo);
         localStorage.setItem("carreraUsuario", perfil.carrera);
         localStorage.setItem("rolUsuario", perfil.rol);
+        localStorage.setItem("usuarioId", user.id);
+        const fotoAntigua = localStorage.getItem("fotoPerfil");
+        const claveFoto = `fotoPerfil:${user.id}`;
+        if (fotoAntigua && perfil.rol === "admin" && !localStorage.getItem(claveFoto)) localStorage.setItem(claveFoto, fotoAntigua);
+        localStorage.removeItem("fotoPerfil");
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
+        window.dispatchEvent(new CustomEvent("stesin-user-ready", { detail: { id: user.id } }));
         cliente.from("perfiles").update({ ultimo_acceso: new Date().toISOString() }).eq("id", user.id).then(() => {});
         const paginasSoloAdministrador = ["administracion.html", "estadisticas.html", "auditoria.html"];
         const paginasDeRectorado = ["equipo.html", "rectorado.html"];
