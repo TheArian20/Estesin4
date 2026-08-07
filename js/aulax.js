@@ -274,7 +274,7 @@ const AulaX = (() => {
         nav.innerHTML = [["index.html","⌂","Inicio"],["cursos.html","▦","Ciclos"],["calendario.html","◷","Agenda"],["biblioteca.html","▤","Biblioteca"]].map(([url,icono,texto]) => `<a class="${actual===url?"active":""}" href="${url}"><span>${icono}</span>${texto}</a>`).join("");
         document.body.appendChild(nav);
     }
-    function aplicarMarcaInstitucional() { const titulo=document.querySelector(".sidebar h2"); if(titulo&&!titulo.querySelector("img"))titulo.insertAdjacentHTML("afterbegin",'<img src="stesin-icon.svg" alt="">'); }
+    function aplicarMarcaInstitucional() { /* El escudo institucional se muestra desde la hoja de estilos. */ }
 
     function agregarEnlaceAdministracion() {
         if (localStorage.getItem("rolUsuario") !== "admin") return;
