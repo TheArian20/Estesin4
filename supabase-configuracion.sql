@@ -366,10 +366,12 @@ grant execute on function public.usuario_pertenece_a_ciclo(text) to authenticate
 
 -- Las actividades ya no se muestran a estudiantes de otros ciclos.
 drop policy if exists "Usuarios ven tareas activas" on public.tareas_academicas;
+drop policy if exists "Usuarios ven tareas de su ciclo" on public.tareas_academicas;
 create policy "Usuarios ven tareas de su ciclo" on public.tareas_academicas for select to authenticated using (
   (activo and public.usuario_pertenece_a_ciclo(ciclo)) or public.docente_de_materia(ciclo,materia)
 );
 drop policy if exists "Usuarios ven evaluaciones activas" on public.evaluaciones;
+drop policy if exists "Usuarios ven evaluaciones de su ciclo" on public.evaluaciones;
 create policy "Usuarios ven evaluaciones de su ciclo" on public.evaluaciones for select to authenticated using (
   (activo and public.usuario_pertenece_a_ciclo(ciclo)) or public.docente_de_materia(ciclo,materia)
 );
