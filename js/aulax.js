@@ -292,10 +292,10 @@ const AulaX = (() => {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar || sidebar.querySelector(".sidebar-navigation")) return;
         const grupos = [
-            ["Académico", ["index.html", "cursos.html", "progreso.html", "academico.html", "calendario.html", "malla-curricular.html", "asistencia.html", "docentes.html"]],
-            ["Recursos", ["biblioteca.html", "silabos.html", "alabanzas.html"]],
-            ["Comunidad", ["redes.html", "contacto.html"]],
-            ["Administración", ["administracion.html", "equipo.html", "estadisticas.html", "configuracion.html"]]
+            ["Académico", ["index.html", "cursos.html", "progreso.html", "academico.html", "calendario.html", "malla-curricular.html", "biblioteca.html", "silabos.html", "alabanzas.html"]],
+            ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html", "contacto.html"]],
+            ["Gestión institucional", ["rectorado.html", "equipo.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "administracion.html"]],
+            ["Cuenta", ["historial.html", "notas.html", "configuracion.html", "instalar.html", "ayuda.html"]]
         ];
         const navegacion = document.createElement("nav");
         navegacion.className = "sidebar-navigation";
