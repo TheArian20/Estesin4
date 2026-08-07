@@ -110,7 +110,7 @@ const AulaX = (() => {
             opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"], ["Panel docente", "Materias y gestión", "docentes.html"]);
         }
         if (["admin", "rector"].includes(rol)) {
-            opciones.push(["Equipo STESIN", "Equipo académico", "equipo.html"]);
+            opciones.push(["Rectorado", "Indicadores institucionales", "rectorado.html"], ["Equipo STESIN", "Equipo académico", "equipo.html"]);
         }
         const abrir = () => { dialogo.hidden = false; campo.value = ""; pintar(); window.setTimeout(() => campo.focus(), 0); };
         const cerrar = () => { dialogo.hidden = true; };
@@ -164,12 +164,15 @@ const AulaX = (() => {
         if (["admin", "docente"].includes(rol)) {
             crear("asistencia.html", "Asistencia", "malla-curricular.html");
             crear("docentes.html", "Panel docente", "asistencia.html");
+            crear("estudiantes.html", "Estudiantes", "docentes.html");
         }
         if (["admin", "rector"].includes(rol)) {
+            crear("rectorado.html", "Rectorado", "redes.html");
             crear("equipo.html", "Equipo STESIN", "redes.html");
         }
         if (rol === "admin") {
             crear("estadisticas.html", "Estadísticas", "equipo.html");
+            crear("auditoria.html", "Auditoría", "estadisticas.html");
         }
     }
 
@@ -840,9 +843,9 @@ const AulaX = (() => {
         localStorage.setItem("rolUsuario", perfil.rol);
         localStorage.setItem("fechaRegistro", new Date(perfil.creado_en).toLocaleDateString());
         cliente.from("perfiles").update({ ultimo_acceso: new Date().toISOString() }).eq("id", user.id).then(() => {});
-        const paginasSoloAdministrador = ["administracion.html", "estadisticas.html"];
-        const paginasDeRectorado = ["equipo.html"];
-        const paginasDeDocencia = ["asistencia.html", "docentes.html"];
+        const paginasSoloAdministrador = ["administracion.html", "estadisticas.html", "auditoria.html"];
+        const paginasDeRectorado = ["equipo.html", "rectorado.html"];
+        const paginasDeDocencia = ["asistencia.html", "docentes.html", "estudiantes.html"];
         if ((perfil.rol !== "admin" && paginasSoloAdministrador.includes(paginaActual)) || (!['admin', 'rector'].includes(perfil.rol) && paginasDeRectorado.includes(paginaActual)) || (!["admin", "docente"].includes(perfil.rol) && paginasDeDocencia.includes(paginaActual))) {
             window.location.replace("index.html");
             return;

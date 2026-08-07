@@ -468,3 +468,68 @@ drop policy if exists "Usuario gestiona sus solicitudes" on public.solicitudes_i
 drop policy if exists "Administrador atiende solicitudes" on public.solicitudes_institucionales;
 create policy "Usuario gestiona sus solicitudes" on public.solicitudes_institucionales for all to authenticated using(usuario_id=auth.uid()) with check(usuario_id=auth.uid());
 create policy "Administrador atiende solicitudes" on public.solicitudes_institucionales for all to authenticated using(public.es_administrador()) with check(public.es_administrador());
+
+-- Etapa 6: rectorado, observaciones privadas y auditoría.
+create or replace function public.puede_ver_rectorado()
+returns boolean language sql stable security definer set search_path = public
+as $$ select exists (select 1 from public.perfiles where id = auth.uid() and rol in ('admin','rector') and activo = true); $$;
+grant execute on function public.puede_ver_rectorado() to authenticated;
+
+create table if not exists public.observaciones_estudiantes (
+  id bigint generated always as identity primary key,
+  estudiante_id uuid not null references auth.users(id) on delete cascade,
+  materia text,
+  contenido text not null check (char_length(trim(contenido)) >= 5),
+  creado_por uuid not null references auth.users(id) on delete cascade,
+  creado_en timestamptz not null default now()
+);
+alter table public.observaciones_estudiantes enable row level security;
+drop policy if exists "Equipo ve observaciones privadas" on public.observaciones_estudiantes;
+create policy "Equipo ve observaciones privadas" on public.observaciones_estudiantes for select to authenticated using (creado_por = auth.uid() or public.es_administrador());
+drop policy if exists "Equipo crea observaciones privadas" on public.observaciones_estudiantes;
+create policy "Equipo crea observaciones privadas" on public.observaciones_estudiantes for insert to authenticated with check (creado_por = auth.uid() and public.puede_gestionar_asistencia());
+drop policy if exists "Administrador gestiona observaciones" on public.observaciones_estudiantes;
+create policy "Administrador gestiona observaciones" on public.observaciones_estudiantes for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+
+create table if not exists public.auditoria_acciones (
+  id bigint generated always as identity primary key,
+  actor_id uuid references auth.users(id) on delete set null,
+  tabla text not null,
+  accion text not null,
+  creado_en timestamptz not null default now()
+);
+alter table public.auditoria_acciones enable row level security;
+drop policy if exists "Administrador ve auditoria" on public.auditoria_acciones;
+create policy "Administrador ve auditoria" on public.auditoria_acciones for select to authenticated using (public.es_administrador());
+
+create or replace function public.registrar_auditoria()
+returns trigger language plpgsql security definer set search_path = public
+as $$ begin
+  if auth.uid() is not null then insert into public.auditoria_acciones(actor_id,tabla,accion) values(auth.uid(),TG_TABLE_NAME,TG_OP); end if;
+  if TG_OP = 'DELETE' then return OLD; end if;
+  return NEW;
+end; $$;
+drop trigger if exists auditar_asistencia on public.asistencia;
+create trigger auditar_asistencia after insert or update or delete on public.asistencia for each row execute procedure public.registrar_auditoria();
+drop trigger if exists auditar_avisos on public.avisos;
+create trigger auditar_avisos after insert or update or delete on public.avisos for each row execute procedure public.registrar_auditoria();
+drop trigger if exists auditar_recursos on public.recursos_personalizados;
+create trigger auditar_recursos after insert or update or delete on public.recursos_personalizados for each row execute procedure public.registrar_auditoria();
+drop trigger if exists auditar_tareas on public.tareas_academicas;
+create trigger auditar_tareas after insert or update or delete on public.tareas_academicas for each row execute procedure public.registrar_auditoria();
+drop trigger if exists auditar_perfiles on public.perfiles;
+create trigger auditar_perfiles after update on public.perfiles for each row execute procedure public.registrar_auditoria();
+
+create or replace function public.resumen_rectorado()
+returns jsonb language plpgsql security definer set search_path = public
+as $$ begin
+  if not public.puede_ver_rectorado() then raise exception 'Sin permiso para consultar rectorado'; end if;
+  return jsonb_build_object(
+    'estudiantes_activos',(select count(*) from public.perfiles where rol='estudiante' and activo),
+    'docentes_activos',(select count(*) from public.perfiles where rol='docente' and activo),
+    'asistencia_mensual',coalesce((select round(100.0 * count(*) filter(where presente) / nullif(count(*),0)) from public.asistencia where fecha >= date_trunc('month',current_date)::date),0),
+    'actividades_pendientes',(select count(*) from public.tareas_academicas where activo and fecha_limite >= current_date),
+    'comunicados_activos',(select count(*) from public.avisos where activo)
+  );
+end; $$;
+grant execute on function public.resumen_rectorado() to authenticated;
