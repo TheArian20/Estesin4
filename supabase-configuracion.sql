@@ -82,10 +82,6 @@ for select to authenticated using (true);
 drop policy if exists "Administrador gestiona recursos" on public.recursos_personalizados;
 create policy "Administrador gestiona recursos" on public.recursos_personalizados
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
-drop policy if exists "Docente publica recursos asignados" on public.recursos_personalizados;
-create policy "Docente publica recursos asignados" on public.recursos_personalizados for insert to authenticated with check (
-  creado_por=auth.uid() and public.docente_de_materia(ciclo,materia)
-);
 
 alter table public.recursos_personalizados add column if not exists materia text;
 
@@ -206,6 +202,11 @@ returns boolean language sql stable security definer set search_path = public as
   );
 $$;
 grant execute on function public.docente_de_materia(text, text) to authenticated;
+
+drop policy if exists "Docente publica recursos asignados" on public.recursos_personalizados;
+create policy "Docente publica recursos asignados" on public.recursos_personalizados for insert to authenticated with check (
+  creado_por=auth.uid() and public.docente_de_materia(ciclo,materia)
+);
 
 -- Asistencia: ahora una persona puede tener asistencia en varias materias el mismo día.
 alter table public.asistencia add column if not exists ciclo text;
