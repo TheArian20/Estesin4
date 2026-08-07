@@ -1,1 +1,21 @@
-document.addEventListener("DOMContentLoaded",async()=>{const c=window.STESIN_SUPABASE,lista=document.getElementById("listaNotificaciones"),contador=document.getElementById("contadorNotificaciones");if(!c||!lista)return;const{data:{user}}=await c.auth.getUser();if(!user)return;const[{data:t},{data:e},{data:v},{data:i}]=await Promise.all([c.from("tareas_academicas").select("id,titulo,materia").eq("activo",true),c.from("entregas_tareas").select("tarea_id").eq("estudiante_id",user.id),c.from("evaluaciones").select("id,titulo,materia").eq("activo",true),c.from("intentos_evaluacion").select("evaluacion_id").eq("estudiante_id",user.id)]),entregadas=new Set((e||[]).map(x=>x.tarea_id)),rendidas=new Set((i||[]).map(x=>x.evaluacion_id)),avisos=[...(t||[]).filter(x=>!entregadas.has(x.id)).slice(0,3).map(x=>({t:`Tarea pendiente: ${x.titulo}`,d:x.materia})),...(v||[]).filter(x=>!rendidas.has(x.id)).slice(0,2).map(x=>({t:`Evaluación disponible: ${x.titulo}`,d:x.materia}))];if(!avisos.length)return;const host=document.createElement("div");host.className="notificaciones-academicas";host.innerHTML=avisos.map(x=>`<button type="button"><strong>${x.t}</strong><small>${x.d}</small></button>`).join("");host.querySelectorAll("button").forEach(b=>b.onclick=()=>location.href="academico.html");lista.prepend(host);if(contador)contador.textContent=String(Number(contador.textContent||0)+avisos.length);});
+document.addEventListener("DOMContentLoaded", async () => {
+  const c = window.STESIN_SUPABASE, lista = document.getElementById("listaNotificaciones"), contador = document.getElementById("contadorNotificaciones");
+  if (!c || !lista) return;
+  const { data: { user } = {} } = await c.auth.getUser(); if (!user) return;
+  const [{data:t},{data:e},{data:v},{data:i},{data:consultas}] = await Promise.all([
+    c.from("tareas_academicas").select("id,titulo,materia").eq("activo",true), c.from("entregas_tareas").select("tarea_id").eq("estudiante_id",user.id),
+    c.from("evaluaciones").select("id,titulo,materia").eq("activo",true), c.from("intentos_evaluacion").select("evaluacion_id").eq("estudiante_id",user.id),
+    c.from("consultas_academicas").select("id,materia,respuesta,respondido_en").eq("estudiante_id",user.id).not("respuesta","is",null).order("respondido_en",{ascending:false}).limit(3)
+  ]);
+  const entregadas = new Set((e||[]).map(x=>x.tarea_id)), rendidas = new Set((i||[]).map(x=>x.evaluacion_id));
+  const avisos = [
+    ...(t||[]).filter(x=>!entregadas.has(x.id)).slice(0,3).map(x=>({t:`Tarea pendiente: ${x.titulo}`,d:x.materia,p:"academico.html"})),
+    ...(v||[]).filter(x=>!rendidas.has(x.id)).slice(0,2).map(x=>({t:`Evaluación disponible: ${x.titulo}`,d:x.materia,p:"academico.html"})),
+    ...(consultas||[]).map(x=>({t:`Respuesta en ${x.materia}`,d:x.respuesta,p:"academico.html"}))
+  ];
+  if (!avisos.length) return;
+  const host = document.createElement("div"); host.className = "notificaciones-academicas";
+  host.innerHTML = avisos.map(x=>`<button type="button" data-pagina="${x.p}"><strong>${x.t}</strong><small>${x.d}</small></button>`).join("");
+  host.querySelectorAll("button").forEach(b=>b.onclick=()=>location.href=b.dataset.pagina);
+  lista.prepend(host); if(contador) contador.textContent=String(Number(contador.textContent||0)+avisos.length);
+});

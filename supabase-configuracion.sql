@@ -97,6 +97,7 @@ create table if not exists public.eventos_calendario (
   creado_en timestamptz not null default now(),
   creado_por uuid references auth.users(id) on delete set null
 );
+alter table public.eventos_calendario add column if not exists ciclo text;
 
 alter table public.eventos_calendario enable row level security;
 drop policy if exists "Usuarios ven eventos activos" on public.eventos_calendario;
@@ -172,6 +173,11 @@ drop policy if exists "Estudiante gestiona su progreso por materia" on public.pr
 drop policy if exists "Administrador gestiona progreso por materia" on public.progreso_materias;
 create policy "Administrador gestiona progreso por materia" on public.progreso_materias
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
+drop policy if exists "Usuario ve su progreso validado" on public.progreso_materias;
+create policy "Usuario ve su progreso validado" on public.progreso_materias
+for select to authenticated using (
+  usuario_id = auth.uid() or public.es_administrador() or public.puede_gestionar_asistencia()
+);
 
 -- Asignación de materias a docentes. Se completa desde Administración cuando se creen sus cuentas.
 create table if not exists public.materias_docentes (
