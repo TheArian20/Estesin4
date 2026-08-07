@@ -3004,6 +3004,7 @@ html{scroll-behavior:smooth}::selection{background:rgba(221,169,30,.38);color:#1
 
 /* Etiquetas de recursos: dan contexto sin recargar la biblioteca. */
 .library-resource-tag{display:inline-flex;width:max-content;margin-top:8px;padding:3px 8px;border-radius:999px;background:#edf3ee;color:#315646;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}.library-resource-tag.new{background:#e5c55d;color:#102b25}.library-entry .library-open{align-items:flex-start}.library-entry .library-file-data{padding-right:24px}body.dark .library-resource-tag{background:#264b41;color:#d7e5df}body.dark .library-resource-tag.new{background:#dca91b;color:#102b25}
+.library-report{margin:0 14px 13px;padding:6px 0;border:0;background:transparent;color:#766031;font-size:12px;font-weight:800;text-align:left;box-shadow:none}.library-report:hover{text-decoration:underline}.update-app{position:fixed;z-index:6000;right:16px;bottom:18px;padding:12px 15px;border:0;border-radius:12px;background:#dca91b;color:#102b25;font-weight:800;box-shadow:0 14px 30px rgba(0,0,0,.24)}
 
 /* Acciones breves para conectar agenda y materia sin perder el contexto. */
 .agenda-open{width:max-content;margin-top:7px;padding:7px 10px;border:1px solid #d8c06a;border-radius:9px;background:#fffaf0;color:#315646;font-size:12px;font-weight:800;box-shadow:none}.agenda-open:hover{background:#dca91b;color:#102b25}body.dark .agenda-open{background:#173d34;border-color:#6a835f;color:#fff5ca}body.dark .agenda-open:hover{background:#dca91b;color:#102b25}

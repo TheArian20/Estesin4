@@ -58,8 +58,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const fecha = documento.creadoEn ? new Date(documento.creadoEn) : null;
         const esNuevo = fecha && (Date.now() - fecha.getTime()) < 1000 * 60 * 60 * 24 * 21;
         const etiqueta = document.createElement("span");
-        etiqueta.className = `library-resource-tag${esNuevo ? " new" : ""}`;
-        etiqueta.textContent = esNuevo ? "Nuevo" : documento.materia ? "Material del ciclo" : "Biblioteca";
+        etiqueta.className = `library-resource-tag${esNuevo || documento.destacado ? " new" : ""}`;
+        etiqueta.textContent = documento.destacado ? "Destacado" : esNuevo ? "Nuevo" : documento.materia ? "Material del ciclo" : "Biblioteca";
         enlace.querySelector(".library-file-data").appendChild(etiqueta);
         enlace.querySelector("small").textContent = `${documento.categoria}${documento.materia ? ` · ${documento.materia}` : ""} · ${tipo.toUpperCase()} · ${documento.enlaceDrive ? "Abrir documento" : "Abrir en Google Drive"}`;
         const favorito = document.createElement("button");
@@ -74,7 +74,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
             if (user) await cliente.from("progreso_lectura").upsert({ usuario_id: user.id, recurso_id: id, recurso_nombre: documento.nombre, ciclo: documento.ciclo || null, leido_en: new Date().toISOString() });
         });
-        tarjeta.append(enlace, favorito);
+        const reportar = document.createElement("button");
+        reportar.type = "button";
+        reportar.className = "library-report";
+        reportar.textContent = "Reportar enlace";
+        reportar.addEventListener("click", async () => {
+            const cliente = window.STESIN_SUPABASE;
+            const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
+            if (!user) return;
+            reportar.disabled = true;
+            const { error } = await cliente.from("solicitudes_institucionales").insert({ usuario_id: user.id, tipo: "Enlace con problema", detalle: `Revisar enlace de Biblioteca: ${documento.nombre}` });
+            reportar.textContent = error ? "No se pudo reportar" : "Reportado";
+        });
+        tarjeta.append(enlace, favorito, reportar);
         return tarjeta;
     }
 
@@ -119,7 +131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cliente = window.STESIN_SUPABASE;
         if (!cliente) return [];
         const { data, error } = await cliente.from("recursos_personalizados")
-            .select("titulo, enlace, categoria, ciclo, materia, tipo, creado_en")
+            .select("titulo, enlace, categoria, ciclo, materia, tipo, destacado, creado_en")
             .order("creado_en", { ascending: false });
         if (error) return [];
         return (data || []).map((recurso) => ({
@@ -128,6 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             categoria: recurso.categoria || "General",
             materia: recurso.materia || "",
             creadoEn: recurso.creado_en,
+            destacado: Boolean(recurso.destacado),
             origen: "administracion"
         }));
     }

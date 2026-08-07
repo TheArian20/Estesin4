@@ -84,6 +84,7 @@ create policy "Administrador gestiona recursos" on public.recursos_personalizado
 for all to authenticated using (public.es_administrador()) with check (public.es_administrador());
 
 alter table public.recursos_personalizados add column if not exists materia text;
+alter table public.recursos_personalizados add column if not exists destacado boolean not null default false;
 
 -- Eventos del calendario publicados por Administración.
 create table if not exists public.eventos_calendario (
@@ -421,6 +422,28 @@ begin
 end;
 $$;
 grant execute on function public.actualizar_mi_perfil(text,text) to authenticated;
+
+-- Consultas directas entre estudiantes y el equipo académico.
+create table if not exists public.consultas_academicas (
+  id bigint generated always as identity primary key,
+  estudiante_id uuid not null references auth.users(id) on delete cascade,
+  ciclo text not null,
+  materia text not null check (char_length(trim(materia)) >= 3),
+  mensaje text not null check (char_length(trim(mensaje)) >= 5),
+  respuesta text,
+  estado text not null default 'Pendiente' check (estado in ('Pendiente','En proceso','Respondida')),
+  creado_en timestamptz not null default now(),
+  respondido_en timestamptz,
+  respondido_por uuid references auth.users(id) on delete set null
+);
+alter table public.consultas_academicas enable row level security;
+drop policy if exists "Estudiante gestiona sus consultas" on public.consultas_academicas;
+drop policy if exists "Equipo atiende consultas asignadas" on public.consultas_academicas;
+create policy "Estudiante gestiona sus consultas" on public.consultas_academicas
+for all to authenticated using (estudiante_id=auth.uid()) with check (estudiante_id=auth.uid());
+create policy "Equipo atiende consultas asignadas" on public.consultas_academicas
+for all to authenticated using (public.es_administrador() or public.docente_de_materia(ciclo,materia))
+with check (public.es_administrador() or public.docente_de_materia(ciclo,materia));
 
 
 

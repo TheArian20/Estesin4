@@ -339,7 +339,24 @@ const AulaX = (() => {
             tema.content = "#14382f";
             document.head.appendChild(tema);
         }
-        if ("serviceWorker" in navigator && window.isSecureContext) navigator.serviceWorker.register("sw.js").catch(() => {});
+        if ("serviceWorker" in navigator && window.isSecureContext) {
+            navigator.serviceWorker.register("sw.js").then((registro) => {
+                const avisar = () => {
+                    if (!registro.waiting || document.getElementById("actualizacionSTESIN")) return;
+                    const boton = document.createElement("button");
+                    boton.id = "actualizacionSTESIN";
+                    boton.className = "update-app";
+                    boton.textContent = "Actualización disponible · Actualizar";
+                    boton.addEventListener("click", () => { registro.waiting.postMessage({ tipo: "ACTUALIZAR" }); window.location.reload(); });
+                    document.body.appendChild(boton);
+                };
+                avisar();
+                registro.addEventListener("updatefound", () => {
+                    const instalando = registro.installing;
+                    instalando?.addEventListener("statechange", () => { if (instalando.state === "installed" && navigator.serviceWorker.controller) avisar(); });
+                });
+            }).catch(() => {});
+        }
     }
 
     function mejorarCalendario() {

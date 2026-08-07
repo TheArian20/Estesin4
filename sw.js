@@ -1,8 +1,9 @@
-const CACHE = "stesin-v3";
+const CACHE = "stesin-v4";
 const BASE = ["./", "index.html", "css/style.css", "js/aulax.js", "js/dashboard.js", "manifest.json", "stesin-icon.svg"];
 
 self.addEventListener("install", (event) => event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(BASE)).then(() => self.skipWaiting())));
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+self.addEventListener("message", (event) => { if (event.data?.tipo === "ACTUALIZAR") self.skipWaiting(); });
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(fetch(event.request).then((response) => {
