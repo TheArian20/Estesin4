@@ -741,6 +741,12 @@ const AulaX = (() => {
     function inicializarInterfaz() {
         const paginaActual = window.location.pathname.split("/").pop() || "index.html";
 
+        if (paginaActual === "asistencia.html" && !document.querySelector('script[src="js/asistencia-mensual.js"]')) {
+            const resumen = document.createElement("script");
+            resumen.src = "js/asistencia-mensual.js";
+            document.head.appendChild(resumen);
+        }
+
         document.querySelectorAll(".sidebar a").forEach((enlace) => {
             const activa = enlace.getAttribute("href") === paginaActual;
             enlace.classList.toggle("active", activa);
