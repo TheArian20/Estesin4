@@ -851,6 +851,7 @@ const AulaX = (() => {
         agregarEnlaceSilabos();
         agregarEnlaceAlabanzas();
         agregarEnlaceRedes();
+        agregarEnlaceContacto();
         agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
         organizarNavegacion();
