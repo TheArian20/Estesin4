@@ -304,7 +304,7 @@ const AulaX = (() => {
         };
         const grupos = [
             ["Académico", ["index.html", "cursos.html", "academico.html", "calendario.html", "malla-curricular.html", "biblioteca.html", "silabos.html", "alabanzas.html"]],
-            ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html"]],
+            ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html", "contacto.html"]],
             ["Gestión institucional", ["rectorado.html", "equipo.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "administracion.html"]],
             ["Cuenta", ["historial.html", "notas.html", "configuracion.html", "instalar.html"]]
         ];
