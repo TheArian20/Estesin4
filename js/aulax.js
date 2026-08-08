@@ -342,14 +342,21 @@ const AulaX = (() => {
             document.head.appendChild(tema);
         }
         if ("serviceWorker" in navigator && window.isSecureContext) {
+            sessionStorage.removeItem("stesin-recargando");
             navigator.serviceWorker.register("sw.js").then((registro) => {
+                registro.update().catch(() => {});
+                navigator.serviceWorker.addEventListener("controllerchange", () => {
+                    if (sessionStorage.getItem("stesin-recargando") === "si") return;
+                    sessionStorage.setItem("stesin-recargando", "si");
+                    window.location.reload();
+                }, { once: true });
                 const avisar = () => {
                     if (!registro.waiting || document.getElementById("actualizacionSTESIN")) return;
                     const boton = document.createElement("button");
                     boton.id = "actualizacionSTESIN";
                     boton.className = "update-app";
                     boton.textContent = "Actualización disponible · Actualizar";
-                    boton.addEventListener("click", () => { registro.waiting.postMessage({ tipo: "ACTUALIZAR" }); window.location.reload(); });
+                    boton.addEventListener("click", () => { registro.waiting.postMessage({ tipo: "ACTUALIZAR" }); });
                     document.body.appendChild(boton);
                 };
                 avisar();
