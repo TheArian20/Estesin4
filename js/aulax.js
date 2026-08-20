@@ -981,7 +981,8 @@ const AulaX = (() => {
         }
         let user;
         try {
-            ({ data: { user } } = await cliente.auth.getUser());
+            const esperaMaxima = new Promise((_, rechazar) => window.setTimeout(() => rechazar(new Error("Tiempo de espera agotado")), 2500));
+            ({ data: { user } } = await Promise.race([cliente.auth.getUser(), esperaMaxima]));
         } catch (error) {
             console.warn("No se pudo consultar la sesión; se cargará la navegación pública.", error);
             iniciarComoVisitante();
