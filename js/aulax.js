@@ -21,7 +21,7 @@ const AulaX = (() => {
 
     async function cerrarSesion() {
         await window.STESIN_AUTH?.signOut();
-        await window.STESIN_SUPABASE?.auth.signOut();
+        await window.STESIN_DATOS?.auth.signOut();
         localStorage.removeItem("login");
         localStorage.removeItem("usuario");
         localStorage.removeItem("rolUsuario");
@@ -106,9 +106,12 @@ const AulaX = (() => {
         document.body.appendChild(dialogo);
         const campo = dialogo.querySelector("input"), resultados = dialogo.querySelector(".global-search-results");
         const opciones = [
-            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Mi seguimiento", "Actividad académica descargable", "historial.html"], ["Mis notas", "Calificaciones verificadas", "notas.html"], ["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Instalar STESIN", "Agregar al dispositivo", "instalar.html"]
+            ["Inicio", "Panel principal", "index.html"], ["Ciclos", "Plan académico y subciclos", "cursos.html"], ["Biblioteca", "Libros y documentos", "biblioteca.html"], ["Calendario", "Horario y agenda", "calendario.html"], ["Malla curricular", "Ruta de formación", "malla-curricular.html"], ["Sílabos", "Programas de cursos", "silabos.html"], ["Alabanzas", "Música y adoración", "alabanzas.html"], ["Comunicados", "Información institucional", "mensajes.html"], ["Enlaces", "Canales y recursos externos", "redes.html"], ["Instalar STESIN", "Agregar al dispositivo", "instalar.html"]
         ];
         const rol = localStorage.getItem("rolUsuario");
+        if (rol === "admin") {
+            opciones.push(["Aula académica", "Tareas y evaluaciones", "academico.html"], ["Mi seguimiento", "Actividad académica descargable", "historial.html"], ["Mis notas", "Calificaciones verificadas", "notas.html"], ["Solicitudes", "Atención institucional", "solicitudes.html"]);
+        }
         if (["admin", "docente"].includes(rol)) {
             opciones.push(["Asistencia", "Control de asistencia", "asistencia.html"], ["Panel docente", "Materias y gestión", "docentes.html"]);
         }
@@ -256,17 +259,20 @@ const AulaX = (() => {
     function agregarEnlacesPersonales() {
         const sidebar = document.querySelector(".sidebar");
         if (!sidebar) return;
+        const esAdministrador = localStorage.getItem("rolUsuario") === "admin";
         const crear = (archivo, texto, referencia) => {
             if (sidebar.querySelector(`a[href="${archivo}"]`)) return;
             const enlace = document.createElement("a"); enlace.href = archivo; enlace.textContent = texto;
             const despues = sidebar.querySelector(`a[href="${referencia}"]`);
             if (despues) despues.insertAdjacentElement("afterend", enlace); else sidebar.appendChild(enlace);
         };
-        crear("historial.html", "Mi seguimiento", "cursos.html");
-        crear("notas.html", "Mis notas", "historial.html");
+        if (esAdministrador) {
+            crear("historial.html", "Mi seguimiento", "cursos.html");
+            crear("notas.html", "Mis notas", "historial.html");
+            crear("solicitudes.html", "Solicitudes", "contacto.html");
+        }
         crear("instalar.html", "Instalar STESIN", "contacto.html");
         crear("mensajes.html", "Comunicados", "alabanzas.html");
-        crear("solicitudes.html", "Solicitudes", "contacto.html");
     }
 
     function configurarNavegacionInferior() {
@@ -712,7 +718,7 @@ const AulaX = (() => {
             lista.appendChild(enlace);
         });
         actualizarResumen();
-        window.STESIN_SUPABASE?.from("recursos_personalizados").select("titulo,enlace,categoria,creado_en").eq("materia", nombre).then(({ data, error }) => {
+        window.STESIN_DATOS?.from("recursos_personalizados").select("titulo,enlace,categoria,creado_en").eq("materia", nombre).then(({ data, error }) => {
             if (error || !data?.length) return;
             data.forEach((recurso) => {
                 const fecha = recurso.creado_en ? new Date(recurso.creado_en) : null;
@@ -736,7 +742,7 @@ const AulaX = (() => {
     }
 
     async function registrarConsulta(recursoId, recursoNombre) {
-        const cliente = window.STESIN_SUPABASE;
+        const cliente = window.STESIN_DATOS;
         const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
         if (!user) return;
         await cliente.from("progreso_lectura").upsert({
@@ -886,9 +892,9 @@ const AulaX = (() => {
             inicializarInterfaz();
             return;
         }
-        const cliente = window.STESIN_SUPABASE;
+        const cliente = window.STESIN_DATOS;
         const { data: { user } } = await cliente.auth.getUser();
-        const paginasRestringidas = ["administracion.html", "equipo.html", "rectorado.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "configuracion.html"];
+        const paginasRestringidas = ["administracion.html", "equipo.html", "rectorado.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "configuracion.html", "academico.html", "historial.html", "notas.html", "progreso.html", "solicitudes.html"];
         if (!user) {
             if (paginasRestringidas.includes(paginaActual)) {
                 window.location.replace("login.html");

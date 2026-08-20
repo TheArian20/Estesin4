@@ -10,8 +10,8 @@
 <title>Configuración | STESIN</title>
 
 <link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
+
+<script src="js/firebase-inicio.js"></script>
 <script src="js/aulax.js" defer></script>
 
 <style>
@@ -348,7 +348,7 @@ return;
 
 }
 
-const cliente=window.STESIN_SUPABASE;
+const cliente=window.STESIN_DATOS;
 if(cliente){
 const {error}=await cliente.rpc("actualizar_mi_perfil",{nuevo_nombre:nombre,nueva_carrera:carrera});
 if(error){

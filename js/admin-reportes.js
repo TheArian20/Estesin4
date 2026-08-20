@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE;
+  const cliente = window.STESIN_DATOS;
   if (!cliente || localStorage.getItem("rolUsuario") !== "admin") return;
   const csv = (filas) => "\ufeff" + filas.map(f => f.map(v => `"${String(v ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
   const descargar = (nombre, filas) => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv(filas)], { type:"text/csv;charset=utf-8" })); a.download = nombre; a.click(); URL.revokeObjectURL(a.href); };

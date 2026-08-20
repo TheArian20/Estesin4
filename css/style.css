@@ -2977,10 +2977,21 @@ button,.btn-clase,.btn-curso,.btn-navegacion,.btn-continuar{min-height:44px;}
 .visit-position{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#e9f2ed;color:#174438;font-weight:900;}
 .visit-total{padding:5px 9px;border-radius:999px;background:#fff4cc;color:#745b07;font-size:12px;font-weight:800;white-space:nowrap;}
 
+.admin-shortcuts .section-heading{margin-bottom:16px;}
+.admin-shortcuts .section-heading>span{padding:7px 10px;border-radius:999px;background:#e9f2ed;color:#174438;font-size:12px;font-weight:800;}
+.admin-shortcut-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.admin-shortcut-grid a{display:grid;grid-template-columns:auto 1fr;gap:2px 11px;align-items:center;padding:16px;border:1px solid #dce8e1;border-radius:14px;background:#fbfdfb;color:#173b32;text-decoration:none;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.admin-shortcut-grid a:hover{transform:translateY(-2px);border-color:#dca91b;box-shadow:0 10px 24px rgba(18,58,49,.09);}
+.admin-shortcut-grid a>span{grid-row:1/3;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#174438;color:#fff;font-size:12px;font-weight:900;}
+.admin-shortcut-grid strong{font-size:15px;}.admin-shortcut-grid small{color:#66766e;}
+
 @media(max-width:520px){
     .visit-rank-row{grid-template-columns:30px 1fr;}
     .visit-total{grid-column:2;justify-self:start;}
 }
+
+@media(max-width:760px){.admin-shortcut-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.admin-shortcut-grid{grid-template-columns:1fr;}.admin-shortcuts .section-heading>span{display:none;}}
 .profile-card > .perfil-estudiante > .eyebrow,
 #perfilRendimiento > .eyebrow{margin:0 0 8px;}
 .profile-card > .perfil-estudiante > h2,

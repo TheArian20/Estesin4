@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE, destino = document.querySelector(".academic-grid") || document.querySelector("main");
+  const cliente = window.STESIN_DATOS, destino = document.querySelector(".academic-grid") || document.querySelector("main");
   if (!cliente || !destino || document.getElementById("consultasAcademicas")) return;
   const { data: { user } = {} } = await cliente.auth.getUser();
   if (!user) return;

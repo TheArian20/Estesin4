@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const c = window.STESIN_SUPABASE, selector = document.getElementById("selectorEstudiante"), ficha = document.getElementById("fichaEstudiante"), lista = document.getElementById("listaObservaciones");
+  const c = window.STESIN_DATOS, selector = document.getElementById("selectorEstudiante"), ficha = document.getElementById("fichaEstudiante"), lista = document.getElementById("listaObservaciones");
   if (!c || !selector) return;
   const { data: { user } } = await c.auth.getUser();
   const { data: perfil } = await c.from("perfiles").select("rol").eq("id", user?.id).single();

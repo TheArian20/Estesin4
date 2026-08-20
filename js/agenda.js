@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ];
   const select = document.getElementById("filtroAgenda"), chips = document.getElementById("agendaChips"), lista = document.getElementById("agendaLista"), grid = document.getElementById("mesAgosto");
   if (!select || !chips || !lista || !grid) return;
-  const cliente = window.STESIN_SUPABASE, ymd = d => d.toISOString().slice(0,10), mesNombre = d => new Intl.DateTimeFormat("es-ES", { month:"long", year:"numeric" }).format(d).replace(/^./, c => c.toUpperCase()), diaTexto = f => new Date(`${f}T12:00:00`).toLocaleDateString("es-ES", {weekday:"long",day:"2-digit"}).replace(/^./,c=>c.toUpperCase());
+  const cliente = window.STESIN_DATOS, ymd = d => d.toISOString().slice(0,10), mesNombre = d => new Intl.DateTimeFormat("es-ES", { month:"long", year:"numeric" }).format(d).replace(/^./, c => c.toUpperCase()), diaTexto = f => new Date(`${f}T12:00:00`).toLocaleDateString("es-ES", {weekday:"long",day:"2-digit"}).replace(/^./,c=>c.toUpperCase());
   let ciclo = "Ciclo V", visible = new Date(2026,7,1), sesiones = base.map(([fecha,hora,materia]) => ({fecha,hora,materia,detalle:"",ciclo:"Ciclo V"}));
   if (cliente) {
     const { data: { user } = {} } = await cliente.auth.getUser();

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE;
+  const cliente = window.STESIN_DATOS;
   const perfil = document.querySelector(".profile-card");
   if (!cliente || !perfil) return;
   const { data: { user } = {} } = await cliente.auth.getUser();

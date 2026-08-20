@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         favorito.addEventListener("click", () => { favoritos.has(id) ? favoritos.delete(id) : favoritos.add(id); localStorage.setItem("bibliotecaFavoritos", JSON.stringify([...favoritos])); renderizar(); });
         enlace.addEventListener("click", async () => {
             localStorage.setItem("ultimaLectura", documento.nombre);
-            const cliente = window.STESIN_SUPABASE;
+            const cliente = window.STESIN_DATOS;
             const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
             if (user) await cliente.from("progreso_lectura").upsert({ usuario_id: user.id, recurso_id: id, recurso_nombre: documento.nombre, ciclo: documento.ciclo || null, leido_en: new Date().toISOString() });
         });
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         reportar.className = "library-report";
         reportar.textContent = "Reportar enlace";
         reportar.addEventListener("click", async () => {
-            const cliente = window.STESIN_SUPABASE;
+            const cliente = window.STESIN_DATOS;
             const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
             if (!user) return;
             reportar.disabled = true;
@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function cargarRecursosAdministrados() {
-        const cliente = window.STESIN_SUPABASE;
+        const cliente = window.STESIN_DATOS;
         if (!cliente) return [];
         const { data, error } = await cliente.from("recursos_personalizados")
             .select("titulo, enlace, categoria, ciclo, materia, tipo, destacado, creado_en")

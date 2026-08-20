@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE;
+  const cliente = window.STESIN_DATOS;
   const form = document.getElementById("formAviso"), lista = document.getElementById("listaAvisosAdmin"), resultado = document.getElementById("resultadoAviso");
   if (!cliente || !form || !lista || localStorage.getItem("rolUsuario") !== "admin") return;
   if (!document.getElementById("avisoAudiencia")) {

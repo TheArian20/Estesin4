@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE, panel = document.getElementById("panelRedaccion"), lista = document.getElementById("listaMensajes");
+  const cliente = window.STESIN_DATOS, panel = document.getElementById("panelRedaccion"), lista = document.getElementById("listaMensajes");
   if (!cliente || !lista) return;
   const { data: { user } } = await cliente.auth.getUser();
   if (!user) return;

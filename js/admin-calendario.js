@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE;
+  const cliente = window.STESIN_DATOS;
   const hero = document.querySelector(".admin-hero");
   if (!cliente || !hero || localStorage.getItem("rolUsuario") !== "admin") return;
   const { data: { user } = {} } = await cliente.auth.getUser();

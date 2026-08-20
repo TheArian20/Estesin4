@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const c = window.STESIN_SUPABASE; if (!c) return;
+  const c = window.STESIN_DATOS; if (!c) return;
   const { data: { user } = {} } = await c.auth.getUser(); if (!user) return;
   const lista = document.getElementById("listaSolicitudes"), form = document.getElementById("formSolicitud"), tipo = form.tipo, fecha = document.getElementById("fechaJustificacion"), estado = document.getElementById("estadoSolicitud");
   const esc = v => String(v || "").replace(/[&<>'"]/g, x => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[x]));

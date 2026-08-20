@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const c = window.STESIN_SUPABASE, destino = document.getElementById("resumenAdministrativo");
+  const c = window.STESIN_DATOS, destino = document.getElementById("resumenAdministrativo");
   if (!c || !destino || localStorage.getItem("rolUsuario") !== "admin") return;
   const seccion = document.createElement("section"); seccion.className = "admin-card";
   seccion.innerHTML = '<h2>Progreso validado por materia</h2><p>Solo la administración puede marcar una materia como completada. El estudiante no puede modificar este registro.</p><form class="resource-form"><label class="wide">Estudiante<select name="estudiante" required></select></label><label>Ciclo<select name="ciclo"><option>Ciclo I</option><option>Ciclo II</option><option>Ciclo III</option><option>Ciclo IV</option><option selected>Ciclo V</option><option>Ciclo VI</option><option>Ciclo VII</option><option>Ciclo VIII</option></select></label><label>Materia<input name="materia" required minlength="3" placeholder="Ej.: Psicopedagogía"></label><button class="account-action">Marcar completada</button></form><div class="admin-state" hidden></div>';

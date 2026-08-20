@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const cliente = window.STESIN_SUPABASE;
+    const cliente = window.STESIN_DATOS;
     const lista = document.getElementById("listaProgreso");
     const resumen = document.getElementById("porcentajeProgreso");
     if (!cliente || !lista || !resumen) return;

@@ -1,7 +1,7 @@
 /* Resumen del inicio basado en datos del servidor, no en avances locales editables. */
 document.addEventListener("DOMContentLoaded", () => window.setTimeout(configurarInicioProfesional, 350));
 async function configurarInicioProfesional() {
-  const cliente = window.STESIN_SUPABASE; if (!cliente) return;
+  const cliente = window.STESIN_DATOS; if (!cliente) return;
   const { data: { user } = {} } = await cliente.auth.getUser(); if (!user) return;
   const { data: perfil } = await cliente.from("perfiles").select("rol").eq("id", user.id).single(); if (!perfil) return;
   const $ = (selector) => document.querySelector(selector);

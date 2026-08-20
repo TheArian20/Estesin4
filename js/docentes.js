@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE;
+  const cliente = window.STESIN_DATOS;
   const $ = (selector) => document.querySelector(selector);
   const host = $("#materiasDocente");
   if (!cliente || !host) return;
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("#estadoDocente").textContent = perfil.activo ? "Cuenta activa" : "Sin acceso";
   $("#resumenDocente").textContent = perfil.rol === "admin" ? "Revisa asignaciones, asistencia y actividad académica registrada en STESIN." : materias.length ? `Tienes ${materias.length} materia${materias.length === 1 ? "" : "s"} asignada${materias.length === 1 ? "" : "s"}.` : "Aún no tienes materias asignadas por administración.";
   $("#metricMaterias").textContent = String(materias.length); $("#metricActividad").textContent = respuestaActividad.error ? "—" : String(respuestaActividad.count || actividad.length); $("#metricAsistencia").textContent = respuestaAsistencia.error ? "—" : String(respuestaAsistencia.count || 0); $("#estadoMaterias").textContent = respuestaMaterias.error ? "Configuración pendiente" : `${materias.length} asignación${materias.length === 1 ? "" : "es"}`;
-  if (respuestaMaterias.error) host.innerHTML = '<p class="announcements-empty">No se pudieron cargar las asignaciones. Verifica que el SQL actualizado esté aplicado en Supabase.</p>';
+  if (respuestaMaterias.error) host.innerHTML = '<p class="announcements-empty">No se pudieron cargar las asignaciones desde Firebase.</p>';
   else if (!materias.length) host.innerHTML = '<p class="announcements-empty">No hay materias asignadas todavía. Un administrador puede agregarlas desde Administración.</p>';
   else { host.innerHTML = materias.map((item) => `<article class="teacher-subject"><span>${escapar(cicloTexto(item.ciclo))}</span><h3>${escapar(item.materia)}</h3><p>Accede a los recursos publicados de esta materia o abre el control de asistencia.</p><button type="button" class="btn-materia" data-materia="${escapar(item.materia)}" data-ciclo="${escapar(cicloTexto(item.ciclo))}">Ver recursos</button><a class="text-link" href="asistencia.html">Tomar asistencia →</a></article>`).join(""); host.querySelectorAll(".btn-materia").forEach((boton) => boton.addEventListener("click", () => { localStorage.setItem("subcicloSeleccionado", boton.dataset.materia || ""); localStorage.setItem("cicloDeSubciclo", boton.dataset.ciclo || "Ciclo V"); location.href = "materia.html"; })); }
   const lista = $("#actividadDocente");

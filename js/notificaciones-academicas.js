@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const c = window.STESIN_SUPABASE, lista = document.getElementById("listaNotificaciones"), contador = document.getElementById("contadorNotificaciones");
+  const c = window.STESIN_DATOS, lista = document.getElementById("listaNotificaciones"), contador = document.getElementById("contadorNotificaciones");
   if (!c || !lista) return;
   const { data: { user } = {} } = await c.auth.getUser(); if (!user) return;
   const [{data:t},{data:e},{data:v},{data:i},{data:consultas}] = await Promise.all([

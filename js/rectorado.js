@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const cliente = window.STESIN_SUPABASE, host = document.getElementById("metricasRector");
+  const cliente = window.STESIN_DATOS, host = document.getElementById("metricasRector");
   if (!cliente || !host) return;
   const { data: { user } } = await cliente.auth.getUser();
   if (!user) return;

@@ -14,7 +14,7 @@
     };
     const limitar = (valor, minimo, maximo) => Math.min(Math.max(valor, minimo), maximo);
 
-    const cliente = window.STESIN_SUPABASE;
+    const cliente = window.STESIN_DATOS;
     if (!cliente) return;
 
     const { data: { user } } = await cliente.auth.getUser();

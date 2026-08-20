@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const c = window.STESIN_SUPABASE, lista = document.getElementById("listaAuditoria"); if (!c || !lista) return;
+  const c = window.STESIN_DATOS, lista = document.getElementById("listaAuditoria"); if (!c || !lista) return;
   const { data: { user } } = await c.auth.getUser(); const { data: p } = await c.from("perfiles").select("rol").eq("id", user?.id).single();
   if (p?.rol !== "admin") return location.replace("index.html");
   const { data, error } = await c.from("auditoria_acciones").select("tabla,accion,creado_en").order("creado_en", { ascending: false }).limit(100);

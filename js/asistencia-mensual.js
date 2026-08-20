@@ -1,10 +1,10 @@
 const iniciarResumenMensualAsistencia = async () => {
-  const supabase = window.STESIN_SUPABASE;
+  const datos = window.STESIN_DATOS;
   const historial = document.querySelector("#listaAsistencia");
-  if (!supabase || !historial) return;
-  const { data: { user } } = await supabase.auth.getUser();
+  if (!datos || !historial) return;
+  const { data: { user } } = await datos.auth.getUser();
   if (!user) return;
-  const { data: perfil } = await supabase.from("perfiles").select("rol").eq("id", user.id).single();
+  const { data: perfil } = await datos.from("perfiles").select("rol").eq("id", user.id).single();
   if (!['admin', 'docente'].includes(perfil?.rol)) return;
 
   const panel = document.createElement("section");
@@ -17,8 +17,8 @@ const iniciarResumenMensualAsistencia = async () => {
   const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().slice(0, 10);
   const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).toISOString().slice(0, 10);
   const [{ data: registros, error }, { data: estudiantes }] = await Promise.all([
-    supabase.from("asistencia").select("estudiante_id,presente").gte("fecha", inicio).lte("fecha", fin),
-    supabase.from("perfiles").select("id,nombre").eq("rol", "estudiante")
+    datos.from("asistencia").select("estudiante_id,presente").gte("fecha", inicio).lte("fecha", fin),
+    datos.from("perfiles").select("id,nombre").eq("rol", "estudiante")
   ]);
   if (error) { panel.remove(); return; }
 
