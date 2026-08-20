@@ -923,10 +923,8 @@ const AulaX = (() => {
             inicializarInterfaz();
             return;
         }
-        const cliente = window.STESIN_DATOS;
-        const { data: { user } } = await cliente.auth.getUser();
         const paginasRestringidas = ["administracion.html", "equipo.html", "rectorado.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "configuracion.html", "academico.html", "historial.html", "notas.html", "progreso.html", "solicitudes.html"];
-        if (!user) {
+        const iniciarComoVisitante = () => {
             if (paginasRestringidas.includes(paginaActual)) {
                 window.location.replace("login.html");
                 return;
@@ -939,6 +937,22 @@ const AulaX = (() => {
             localStorage.removeItem("carreraUsuario");
             localStorage.removeItem("usuarioId");
             inicializarInterfaz();
+        };
+        const cliente = window.STESIN_DATOS;
+        if (!cliente?.auth?.getUser) {
+            iniciarComoVisitante();
+            return;
+        }
+        let user;
+        try {
+            ({ data: { user } } = await cliente.auth.getUser());
+        } catch (error) {
+            console.warn("No se pudo consultar la sesión; se cargará la navegación pública.", error);
+            iniciarComoVisitante();
+            return;
+        }
+        if (!user) {
+            iniciarComoVisitante();
             return;
         }
         const { data: perfil, error } = await cliente.from("perfiles").select("nombre, correo, carrera, rol, activo, creado_en").eq("id", user.id).single();
