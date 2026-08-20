@@ -28,6 +28,25 @@ service cloud.firestore {
       allow write: if esAdministrador();
     }
 
+    // Registro anonimo: los visitantes solo pueden crear eventos con los
+    // campos previstos. Unicamente el administrador puede leerlos.
+    match /visitas/{documento} {
+      allow create: if request.resource.data.keys().hasOnly([
+          'visitante_id', 'sesion_id', 'pagina', 'dispositivo', 'origen', 'creado_en'
+        ])
+        && request.resource.data.visitante_id is string
+        && request.resource.data.visitante_id.size() <= 80
+        && request.resource.data.sesion_id is string
+        && request.resource.data.sesion_id.size() <= 80
+        && request.resource.data.pagina is string
+        && request.resource.data.pagina.size() <= 100
+        && request.resource.data.dispositivo in ['movil', 'escritorio']
+        && request.resource.data.origen is string
+        && request.resource.data.origen.size() <= 120
+        && request.resource.data.creado_en == request.time;
+      allow read, update, delete: if esAdministrador();
+    }
+
     // Todo lo demas contiene informacion administrativa o personal.
     match /{documento=**} {
       allow read, write: if esAdministrador();
