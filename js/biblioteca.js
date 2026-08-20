@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const catalogoAdicional = Array.isArray(window.BIBLIOTECA_ADICIONALES) ? window.BIBLIOTECA_ADICIONALES : [];
         const recursosAdministrados = await cargarRecursosAdministrados();
         documentos = [...catalogoPrincipal, ...catalogoAdicional]
-            .filter((documento) => documento.grupo !== "SILABOS")
+            .filter((documento) => documento.grupo !== "SILABOS" && !/s[ií]labo|silabus|syllabus/i.test(documento.nombre || ""))
             .map((documento) => ({ ...documento, categoria: categoriaDocumento(documento), creadoEn: documento.creadoEn || "" }))
             .concat(recursosAdministrados);
         if (!Array.isArray(documentos)) throw new Error("No se pudo cargar el catálogo");

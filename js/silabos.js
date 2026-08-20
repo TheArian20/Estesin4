@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (conteo) {
       conteo.textContent = consulta || ciclo !== "todos"
         ? `${visibles} ${visibles === 1 ? "resultado" : "resultados"}`
-        : "5 sílabos verificados · 1 pendiente";
+        : "5 sílabos disponibles";
     }
   };
 
