@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Acceso administrativo | STESIN</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/login.css">
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -12,15 +13,32 @@
   <script src="js/aulax.js" defer></script>
 </head>
 <body class="login-body">
-  <main class="login-box">
-    <h1>STESIN</h1>
-    <p>Acceso administrativo</p>
-    <input type="email" id="usuario" placeholder="Correo del administrador" autocomplete="username">
-    <input type="password" id="password" placeholder="Contraseña" autocomplete="current-password">
-    <button type="button" id="btnIngresar">Ingresar al panel administrativo</button>
-    <button type="button" id="btnEstudiante">Ingresar como estudiante</button>
-    <p>Los estudiantes pueden consultar la plataforma sin usuario ni contrasena.</p>
-    <p id="mensaje" aria-live="polite"></p>
+  <main class="login-shell">
+    <section class="login-brand" aria-label="STESIN">
+      <div>
+        <img src="assets/stesin-logo.svg" alt="Escudo de STESIN">
+        <h1>STESIN</h1>
+        <p>Formación, servicio y gestión académica en un solo espacio.</p>
+      </div>
+      <small>Seminario Teológico de las Iglesias del Nombre</small>
+    </section>
+    <section class="login-box">
+      <h2>Acceso administrativo</h2>
+      <p class="login-intro">Ingresa con la cuenta autorizada para gestionar la plataforma.</p>
+      <form class="login-form" id="formLogin">
+        <label class="login-field" for="usuario">Correo electrónico
+          <input type="email" id="usuario" placeholder="administracion@ejemplo.com" autocomplete="username" required>
+        </label>
+        <label class="login-field" for="password">Contraseña
+          <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
+        </label>
+        <button type="submit" id="btnIngresar">Ingresar al panel</button>
+        <div class="login-divider"><span>o continúa como visitante</span></div>
+        <button type="button" id="btnEstudiante">Entrar como estudiante</button>
+        <p class="student-note">El contenido público puede consultarse sin usuario ni contraseña.</p>
+        <p id="mensaje" role="status" aria-live="polite"></p>
+      </form>
+    </section>
   </main>
   <script>
     const mensaje = document.getElementById('mensaje');
@@ -50,9 +68,8 @@
         mensaje.textContent = mensajes[error.code] || 'No fue posible ingresar.';
       }
     }
-    document.getElementById('btnIngresar').addEventListener('click', login);
+    document.getElementById('formLogin').addEventListener('submit', (evento) => { evento.preventDefault(); login(); });
     document.getElementById('btnEstudiante').addEventListener('click', () => window.location.replace('index.html'));
-    document.addEventListener('keydown', (evento) => { if (evento.key === 'Enter') login(); });
     if (new URLSearchParams(location.search).get('estado') === 'inactivo') mensaje.textContent = 'La cuenta esta desactivada.';
   </script>
 </body>
