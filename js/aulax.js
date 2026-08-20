@@ -849,10 +849,10 @@ const AulaX = (() => {
         if (localStorage.getItem("accesoPublico") === "true") {
             document.querySelectorAll('a[href="configuracion.html"]').forEach((enlace) => {
                 enlace.href = "login.html";
-                enlace.textContent = "Acceso de docentes";
+                enlace.textContent = "Acceso administrativo";
             });
             document.querySelectorAll("[data-cerrar-sesion]").forEach((boton) => {
-                boton.textContent = "Acceso de docentes";
+                boton.textContent = "Acceso administrativo";
                 boton.onclick = () => { window.location.href = "login.html"; };
             });
         }

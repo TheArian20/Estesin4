@@ -8,3 +8,7 @@ biblioteca-importacion*.estado
 # Credenciales entregadas únicamente por el administrador.
 credenciales-*.csv
 *credenciales*.csv
+
+# Configuracion local del editor y repositorio auxiliar local.
+.vscode/
+Stesin/

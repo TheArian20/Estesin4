@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acceso institucional | STESIN</title>
+  <title>Acceso administrativo | STESIN</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -14,10 +14,10 @@
 <body class="login-body">
   <main class="login-box">
     <h1>STESIN</h1>
-    <p>Acceso para docentes, rector y administracion</p>
-    <input type="text" id="usuario" placeholder="Correo o usuario institucional" autocomplete="username">
-    <input type="password" id="password" placeholder="Contrasena" autocomplete="current-password">
-    <button type="button" id="btnIngresar">Ingresar</button>
+    <p>Acceso administrativo</p>
+    <input type="email" id="usuario" placeholder="Correo del administrador" autocomplete="username">
+    <input type="password" id="password" placeholder="Contraseña" autocomplete="current-password">
+    <button type="button" id="btnIngresar">Ingresar al panel administrativo</button>
     <button type="button" id="btnEstudiante">Ingresar como estudiante</button>
     <p>Los estudiantes pueden consultar la plataforma sin usuario ni contrasena.</p>
     <p id="mensaje" aria-live="polite"></p>
