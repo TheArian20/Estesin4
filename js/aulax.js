@@ -290,7 +290,41 @@ const AulaX = (() => {
         const actual = window.location.pathname.split("/").pop() || "index.html";
         const nav = document.createElement("nav"); nav.id = "navegacionInferior";
         nav.innerHTML = [["index.html","⌂","Inicio"],["cursos.html","▦","Ciclos"],["calendario.html","◷","Agenda"],["biblioteca.html","▤","Biblioteca"]].map(([url,icono,texto]) => `<a class="${actual===url?"active":""}" href="${url}"><span>${icono}</span>${texto}</a>`).join("");
+        const mas = document.createElement("button");
+        mas.type = "button";
+        mas.innerHTML = "<span>•••</span>Más";
+        mas.setAttribute("aria-label", "Abrir menú completo");
+        mas.addEventListener("click", () => document.querySelector(".sidebar")?.classList.toggle("mostrar"));
+        nav.appendChild(mas);
         document.body.appendChild(nav);
+    }
+
+    function configurarContextoPagina() {
+        const encabezado = document.querySelector(".main > header, main > header");
+        const titulo = encabezado?.querySelector("h1");
+        if (!encabezado || !titulo || encabezado.querySelector(".page-breadcrumb")) return;
+        const actual = window.location.pathname.split("/").pop() || "index.html";
+        if (actual === "index.html") return;
+        const ruta = document.createElement("nav");
+        ruta.className = "page-breadcrumb";
+        ruta.setAttribute("aria-label", "Ruta de navegación");
+        ruta.innerHTML = `<a href="index.html">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">${titulo.textContent.trim()}</span>`;
+        encabezado.insertBefore(ruta, encabezado.firstChild);
+    }
+
+    function configurarNotificacionesInterfaz() {
+        if (window.STESIN_UI) return;
+        window.STESIN_UI = {
+            notificar(mensaje, tipo = "exito") {
+                const aviso = document.createElement("div");
+                aviso.className = `ui-toast ${tipo}`;
+                aviso.setAttribute("role", tipo === "error" ? "alert" : "status");
+                aviso.textContent = mensaje;
+                document.body.appendChild(aviso);
+                requestAnimationFrame(() => aviso.classList.add("visible"));
+                window.setTimeout(() => { aviso.classList.remove("visible"); window.setTimeout(() => aviso.remove(), 220); }, 3800);
+            }
+        };
     }
     function aplicarMarcaInstitucional() { /* El escudo institucional se muestra desde la hoja de estilos. */ }
 
@@ -904,6 +938,8 @@ const AulaX = (() => {
         agregarEnlacesComunidad();
         agregarEnlaceAdministracion();
         organizarNavegacion();
+        configurarContextoPagina();
+        configurarNotificacionesInterfaz();
         registrarAplicacionInstalable();
         configurarMenuMovil();
         configurarModoOscuroGlobal();

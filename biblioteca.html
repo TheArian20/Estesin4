@@ -23,10 +23,10 @@
 <main class="main">
     <header><div><p class="eyebrow">BIBLIOTECA DIGITAL</p><h1>Recursos STESIN</h1><p>Consulta y abre los libros y documentos académicos disponibles.</p></div></header>
 
-    <section class="library-hero"><div><span class="library-kicker">COLECCIÓN ACADÉMICA</span><h2 id="totalDocumentos">Cargando biblioteca…</h2><p>Una colección de recursos teológicos, bíblicos, ministeriales y de formación.</p><a class="library-drive-link" href="https://drive.google.com/drive/folders/1QtFg2Ab1HdRdZqQDN5fkV4Al5Q2ilDnt?usp=sharing" target="_blank" rel="noopener">Abrir Biblioteca en Google Drive ↗</a></div><span class="library-hero-icon">📖</span></section>
+    <section class="library-hero"><div><span class="library-kicker">COLECCIÓN ACADÉMICA</span><h2 id="totalDocumentos">Cargando biblioteca…</h2><p>Busca por título, autor o tema y utiliza los filtros para encontrar rápidamente el material que necesitas.</p><a class="library-drive-link" href="https://drive.google.com/drive/folders/1QtFg2Ab1HdRdZqQDN5fkV4Al5Q2ilDnt?usp=sharing" target="_blank" rel="noopener">Abrir colección completa</a></div><span class="library-hero-mark" aria-hidden="true">BIB</span></section>
 
     <section class="library-toolbar" aria-label="Buscar en biblioteca">
-        <label class="library-search"><span>🔍</span><input id="buscarBiblioteca" type="search" placeholder="Buscar por título, autor o tema…"></label>
+        <label class="library-search"><span aria-hidden="true">⌕</span><input id="buscarBiblioteca" type="search" placeholder="Buscar por título, autor o tema…" aria-label="Buscar documentos en la biblioteca"></label>
         <div class="library-filters" id="filtrosBiblioteca"><button type="button" class="active" data-filtro="todos">Todos</button><button type="button" data-filtro="pdf">PDF</button><button type="button" data-filtro="word">Word</button><button type="button" data-filtro="archivo">Archivos</button><button type="button" data-filtro="favoritos">Favoritos</button></div>
         <div class="library-options"><label>Categoría<select id="categoriaBiblioteca"><option value="todas">Todas las categorías</option><option>Biblia</option><option>Teología</option><option>Ministerio</option><option>Historia y sociedad</option><option>Formación</option><option>General</option></select></label><label>Ordenar<select id="ordenBiblioteca"><option value="titulo">Título A–Z</option><option value="recientes">Nuevos primero</option></select></label></div>
     </section>

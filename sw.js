@@ -1,5 +1,5 @@
-const CACHE = "stesin-v10";
-const BASE = ["./", "index.html", "login.html", "silabos.html", "css/style.css", "css/login.css", "js/aulax.js", "js/dashboard.js", "js/silabos.js", "js/firebase-inicio.js", "js/firebase.js", "js/firebase-datos.js", "js/visitas.js", "manifest.json", "stesin-icon.svg"];
+const CACHE = "stesin-v11";
+const BASE = ["./", "index.html", "404.html", "login.html", "silabos.html", "css/style.css", "css/login.css", "js/aulax.js", "js/dashboard.js", "js/silabos.js", "js/firebase-inicio.js", "js/firebase.js", "js/firebase-datos.js", "js/visitas.js", "manifest.json", "stesin-icon.svg"];
 
 self.addEventListener("install", (event) => event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(BASE)).then(() => self.skipWaiting())));
 self.addEventListener("activate", (event) => event.waitUntil(Promise.all([

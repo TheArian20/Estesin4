@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         enlace.href = documento.enlaceDrive || bibliotecaDrive;
         enlace.target = "_blank";
         enlace.rel = "noopener";
-        enlace.innerHTML = `<span class="library-file-icon">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small></small></span>`;
+        enlace.innerHTML = `<span class="library-file-icon ${tipo}">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small></small></span>`;
         enlace.querySelector("strong").textContent = documento.nombre;
         const fecha = documento.creadoEn ? new Date(documento.creadoEn) : null;
         const esNuevo = fecha && (Date.now() - fecha.getTime()) < 1000 * 60 * 60 * 24 * 21;
@@ -67,7 +67,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         favorito.className = `library-favorite${favoritos.has(id) ? " active" : ""}`;
         favorito.setAttribute("aria-label", "Guardar en favoritos");
         favorito.textContent = favoritos.has(id) ? "★" : "☆";
-        favorito.addEventListener("click", () => { favoritos.has(id) ? favoritos.delete(id) : favoritos.add(id); localStorage.setItem("bibliotecaFavoritos", JSON.stringify([...favoritos])); renderizar(); });
+        favorito.addEventListener("click", () => {
+            const estabaGuardado = favoritos.has(id);
+            estabaGuardado ? favoritos.delete(id) : favoritos.add(id);
+            localStorage.setItem("bibliotecaFavoritos", JSON.stringify([...favoritos]));
+            window.STESIN_UI?.notificar(estabaGuardado ? "Recurso eliminado de favoritos" : "Recurso guardado en favoritos", "info");
+            renderizar();
+        });
         enlace.addEventListener("click", async () => {
             localStorage.setItem("ultimaLectura", documento.nombre);
             const cliente = window.STESIN_DATOS;
@@ -81,7 +87,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         reportar.addEventListener("click", async () => {
             const cliente = window.STESIN_DATOS;
             const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
-            if (!user) return;
+            if (!user) {
+                window.STESIN_UI?.notificar("Puedes informar el problema desde la sección Contacto", "info");
+                return;
+            }
             reportar.disabled = true;
             const { error } = await cliente.from("solicitudes_institucionales").insert({ usuario_id: user.id, tipo: "Enlace con problema", detalle: `Revisar enlace de Biblioteca: ${documento.nombre}` });
             reportar.textContent = error ? "No se pudo reportar" : "Reportado";
