@@ -25,7 +25,7 @@ const AulaX = (() => {
         localStorage.removeItem("usuario");
         localStorage.removeItem("rolUsuario");
         localStorage.removeItem("usuarioId");
-        window.location.replace("login.html");
+        window.location.replace("index.html");
     }
 
     function configurarModoOscuroGlobal() {
@@ -845,6 +845,17 @@ const AulaX = (() => {
             boton.addEventListener("click", cerrarSesion);
         });
 
+        if (localStorage.getItem("accesoPublico") === "true") {
+            document.querySelectorAll('a[href="configuracion.html"]').forEach((enlace) => {
+                enlace.href = "login.html";
+                enlace.textContent = "Acceso de docentes";
+            });
+            document.querySelectorAll("[data-cerrar-sesion]").forEach((boton) => {
+                boton.textContent = "Acceso de docentes";
+                boton.onclick = () => { window.location.href = "login.html"; };
+            });
+        }
+
         agregarEnlaceMallaCurricular();
         agregarEnlaceAcademico();
         agregarEnlacesPersonales();
@@ -876,8 +887,20 @@ const AulaX = (() => {
         }
         const cliente = window.STESIN_SUPABASE;
         const { data: { user } } = await cliente.auth.getUser();
+        const paginasRestringidas = ["administracion.html", "equipo.html", "rectorado.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "configuracion.html"];
         if (!user) {
-            window.location.replace("login.html");
+            if (paginasRestringidas.includes(paginaActual)) {
+                window.location.replace("login.html");
+                return;
+            }
+            localStorage.setItem("accesoPublico", "true");
+            localStorage.setItem("login", "publico");
+            localStorage.setItem("usuario", "Estudiante");
+            localStorage.setItem("rolUsuario", "estudiante");
+            localStorage.removeItem("correoUsuario");
+            localStorage.removeItem("carreraUsuario");
+            localStorage.removeItem("usuarioId");
+            inicializarInterfaz();
             return;
         }
         const { data: perfil, error } = await cliente.from("perfiles").select("nombre, correo, carrera, rol, activo, creado_en").eq("id", user.id).single();
@@ -891,6 +914,7 @@ const AulaX = (() => {
         localStorage.setItem("correoUsuario", perfil.correo);
         localStorage.setItem("carreraUsuario", perfil.carrera);
         localStorage.setItem("rolUsuario", perfil.rol);
+        localStorage.removeItem("accesoPublico");
         localStorage.setItem("usuarioId", user.id);
         const fotoAntigua = localStorage.getItem("fotoPerfil");
         const claveFoto = `fotoPerfil:${user.id}`;

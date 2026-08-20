@@ -15,35 +15,40 @@
     const limitar = (valor, minimo, maximo) => Math.min(Math.max(valor, minimo), maximo);
 
     const cliente = window.STESIN_SUPABASE;
-    if (!cliente) {
-        window.location.replace("login.html");
-        return;
-    }
+    if (!cliente) return;
 
     const { data: { user } } = await cliente.auth.getUser();
+    let perfil;
     if (!user) {
-        window.location.replace("login.html");
-        return;
+        perfil = { nombre: "Estudiante", rol: "estudiante", activo: true };
+        localStorage.setItem("accesoPublico", "true");
+        localStorage.setItem("login", "publico");
+        localStorage.setItem("usuario", perfil.nombre);
+        localStorage.setItem("rolUsuario", perfil.rol);
+        localStorage.removeItem("usuarioId");
+    } else {
+        const { data, error: errorPerfil } = await cliente.from("perfiles").select("nombre, correo, carrera, rol, activo, creado_en").eq("id", user.id).single();
+        perfil = data;
+        if (errorPerfil || !perfil?.activo) {
+            await cliente.auth.signOut();
+            window.location.replace("login.html?estado=inactivo");
+            return;
+        }
+        localStorage.setItem("login", "true");
+        localStorage.setItem("usuario", perfil.nombre);
+        localStorage.setItem("correoUsuario", perfil.correo);
+        localStorage.setItem("carreraUsuario", perfil.carrera);
+        localStorage.setItem("rolUsuario", perfil.rol);
+        localStorage.setItem("usuarioId", user.id);
+        const fotoAntigua = localStorage.getItem("fotoPerfil"), claveFoto = `fotoPerfil:${user.id}`;
+        if (fotoAntigua && perfil.rol === "admin" && !localStorage.getItem(claveFoto)) localStorage.setItem(claveFoto, fotoAntigua);
+        localStorage.removeItem("fotoPerfil");
+        localStorage.removeItem("accesoPublico");
     }
-    const { data: perfil, error: errorPerfil } = await cliente.from("perfiles").select("nombre, correo, carrera, rol, activo, creado_en").eq("id", user.id).single();
-    if (errorPerfil || !perfil?.activo) {
-        await cliente.auth.signOut();
-        window.location.replace("login.html?estado=inactivo");
-        return;
-    }
-    localStorage.setItem("login", "true");
-    localStorage.setItem("usuario", perfil.nombre);
-    localStorage.setItem("correoUsuario", perfil.correo);
-    localStorage.setItem("carreraUsuario", perfil.carrera);
-    localStorage.setItem("rolUsuario", perfil.rol);
-    localStorage.setItem("usuarioId", user.id);
-    const fotoAntigua = localStorage.getItem("fotoPerfil"), claveFoto = `fotoPerfil:${user.id}`;
-    if (fotoAntigua && perfil.rol === "admin" && !localStorage.getItem(claveFoto)) localStorage.setItem(claveFoto, fotoAntigua);
-    localStorage.removeItem("fotoPerfil");
 
     const estado = {
         usuario: localStorage.getItem("usuario") || "Estudiante",
-        foto: localStorage.getItem(`fotoPerfil:${user.id}`) || "stesin-icon.svg",
+        foto: user ? (localStorage.getItem(`fotoPerfil:${user.id}`) || "stesin-icon.svg") : "stesin-icon.svg",
         clases: leerJSON("clasesCompletadas", []),
         tareas: leerJSON("tareasEntregadas", []),
         progreso: limitar(Number(localStorage.getItem("progresoCurso")) || 0, 0, 100)
@@ -414,7 +419,9 @@
         await cliente.auth.signOut();
         localStorage.removeItem("login");
         localStorage.removeItem("usuario");
-        window.location.replace("login.html");
+        localStorage.removeItem("rolUsuario");
+        localStorage.removeItem("usuarioId");
+        window.location.replace("index.html");
     };
 
     actualizarFechaYSaludo();
