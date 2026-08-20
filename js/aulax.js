@@ -20,6 +20,7 @@ const AulaX = (() => {
     }
 
     async function cerrarSesion() {
+        await window.STESIN_AUTH?.signOut();
         await window.STESIN_SUPABASE?.auth.signOut();
         localStorage.removeItem("login");
         localStorage.removeItem("usuario");

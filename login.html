@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Acceso institucional | STESIN</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
   <script src="js/aulax.js" defer></script>
 </head>
 <body class="login-body">
@@ -22,30 +24,31 @@
   </main>
   <script>
     const mensaje = document.getElementById('mensaje');
-    function usuarioInterno(valor) {
-      const limpio = valor.trim().toLowerCase();
-      const clave = limpio.replace(/\s+/g, '');
-      if (['arianch', 'arianchujutalli', 'arianalejandro'].includes(clave)) return 'arianchujutalli18@gmail.com';
-      return limpio.includes('@') ? limpio : `${limpio}@stestin-interno.com`;
-    }
     async function login() {
-      const usuario = document.getElementById('usuario').value.trim();
+      const usuario = document.getElementById('usuario').value.trim().toLowerCase();
       const password = document.getElementById('password').value;
-      if (!usuario || !password) { mensaje.textContent = 'Ingresa tu correo institucional y contrasena.'; return; }
-      const { data, error } = await STESIN_SUPABASE.auth.signInWithPassword({ email: usuarioInterno(usuario), password });
-      if (error) { mensaje.textContent = `No fue posible ingresar: ${error.message}`; return; }
-      const { data: perfil, error: errorPerfil } = await STESIN_SUPABASE.from('perfiles').select('activo,rol').eq('id', data.user.id).single();
-      if (errorPerfil || !perfil?.activo) {
-        await STESIN_SUPABASE.auth.signOut();
-        mensaje.textContent = 'La cuenta no esta activa. Contacta a administracion.';
-        return;
-      }
-      if (perfil.rol === 'estudiante') {
-        await STESIN_SUPABASE.auth.signOut();
+      if (!usuario || !password) { mensaje.textContent = 'Ingresa el correo y la contrasena del administrador.'; return; }
+      mensaje.textContent = 'Comprobando acceso...';
+      try {
+        const credencial = await window.STESIN_AUTH.signInWithEmailAndPassword(usuario, password);
+        if (!window.STESIN_ES_ADMIN(credencial.user)) {
+          await window.STESIN_AUTH.signOut();
+          mensaje.textContent = 'Esta cuenta no tiene permiso de administrador.';
+          return;
+        }
+        localStorage.setItem('login', 'true');
+        localStorage.setItem('usuario', credencial.user.email || 'Administrador');
+        localStorage.setItem('rolUsuario', 'admin');
+        localStorage.setItem('usuarioId', credencial.user.uid);
         window.location.replace('index.html');
-        return;
+      } catch (error) {
+        const mensajes = {
+          'auth/invalid-credential': 'Correo o contrasena incorrectos.',
+          'auth/invalid-email': 'El correo no es valido.',
+          'auth/too-many-requests': 'Demasiados intentos. Espera unos minutos.'
+        };
+        mensaje.textContent = mensajes[error.code] || 'No fue posible ingresar.';
       }
-      window.location.replace('index.html');
     }
     document.getElementById('btnIngresar').addEventListener('click', login);
     document.getElementById('btnEstudiante').addEventListener('click', () => window.location.replace('index.html'));

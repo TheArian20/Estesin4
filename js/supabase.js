@@ -1,10 +1,6 @@
-window.STESIN_SUPABASE_URL = "https://sllalwueqogysuovsntx.supabase.co";
-window.STESIN_SUPABASE_KEY = "sb_publishable_LU7fTFxErYUrmzoq6Fxl-w_g08a7n4W";
-window.STESIN_SUPABASE = window.supabase.createClient(window.STESIN_SUPABASE_URL, window.STESIN_SUPABASE_KEY, {
-    auth: {
-        storage: window.sessionStorage,
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-    }
-});
+// Carga Firebase de forma sincronica para conservar las etiquetas existentes.
+document.write('<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>');
+document.write('<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>');
+document.write('<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"><\/script>');
+document.write('<script src="js/firebase.js"><\/script>');
+document.write('<script src="js/firebase-datos.js"><\/script>');

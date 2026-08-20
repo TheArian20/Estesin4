@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function esAdministrador() {
+      return request.auth != null
+        && request.auth.uid == 'eeKKifjIAmXICHCQua6s2fmTVnl1';
+    }
+
+    // Contenido institucional que puede consultar cualquier visitante.
+    match /recursos_personalizados/{documento} {
+      allow read: if true;
+      allow write: if esAdministrador();
+    }
+
+    match /eventos_calendario/{documento} {
+      allow read: if true;
+      allow write: if esAdministrador();
+    }
+
+    match /avisos/{documento} {
+      allow read: if true;
+      allow write: if esAdministrador();
+    }
+
+    match /mensajes_internos/{documento} {
+      allow read: if true;
+      allow write: if esAdministrador();
+    }
+
+    // Todo lo demas contiene informacion administrativa o personal.
+    match /{documento=**} {
+      allow read, write: if esAdministrador();
+    }
+  }
+}
