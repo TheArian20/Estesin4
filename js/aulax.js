@@ -805,6 +805,17 @@ const AulaX = (() => {
 
     function inicializarInterfaz() {
         const paginaActual = window.location.pathname.split("/").pop() || "index.html";
+        const rolActual = localStorage.getItem("rolUsuario") || "estudiante";
+        document.body.classList.add(rolActual === "admin" ? "vista-administrativa" : "vista-publica");
+        const contenidoPrincipal = document.querySelector("main, .main");
+        if (contenidoPrincipal && !contenidoPrincipal.id) contenidoPrincipal.id = "contenidoPrincipal";
+        if (contenidoPrincipal && !document.querySelector(".skip-link")) {
+            const salto = document.createElement("a");
+            salto.className = "skip-link";
+            salto.href = "#contenidoPrincipal";
+            salto.textContent = "Saltar al contenido";
+            document.body.prepend(salto);
+        }
 
         if (paginaActual === "historial.html") {
             document.title = "Mi seguimiento | STESIN";
@@ -872,7 +883,16 @@ const AulaX = (() => {
                 boton.textContent = "Acceso administrativo";
                 boton.onclick = () => { window.location.href = "login.html"; };
             });
+            document.querySelectorAll("#usuarioHeader").forEach((elemento) => { elemento.textContent = "Visitante"; });
+            document.querySelectorAll("#rolHeader").forEach((elemento) => { elemento.textContent = "Acceso público"; });
+            const menuPerfil = document.getElementById("menuPerfil");
+            if (menuPerfil) menuPerfil.innerHTML = '<a href="login.html">Acceso administrativo</a>';
         }
+
+        document.querySelectorAll("img:not([alt])").forEach((imagen) => { imagen.alt = ""; });
+        document.querySelectorAll('a[target="_blank"]').forEach((enlace) => {
+            enlace.rel = "noopener noreferrer";
+        });
 
         agregarEnlaceMallaCurricular();
         agregarEnlaceAcademico();

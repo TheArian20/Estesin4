@@ -3036,6 +3036,42 @@ html{scroll-behavior:smooth}::selection{background:rgba(221,169,30,.38);color:#1
 .library-resource-tag{display:inline-flex;width:max-content;margin-top:8px;padding:3px 8px;border-radius:999px;background:#edf3ee;color:#315646;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}.library-resource-tag.new{background:#e5c55d;color:#102b25}.library-entry .library-open{align-items:flex-start}.library-entry .library-file-data{padding-right:24px}body.dark .library-resource-tag{background:#264b41;color:#d7e5df}body.dark .library-resource-tag.new{background:#dca91b;color:#102b25}
 .library-report{margin:0 14px 13px;padding:6px 0;border:0;background:transparent;color:#766031;font-size:12px;font-weight:800;text-align:left;box-shadow:none}.library-report:hover{text-decoration:underline}.update-app{position:fixed;z-index:6000;right:16px;bottom:18px;padding:12px 15px;border:0;border-radius:12px;background:#dca91b;color:#102b25;font-weight:800;box-shadow:0 14px 30px rgba(0,0,0,.24)}
 
+/* Experiencia integral STESIN: interfaz pública y administrativa */
+:root{--stesin-ink:#102f27;--stesin-muted:#61716a;--stesin-surface:#fffefa;--stesin-line:#e2e8e3;--stesin-gold:#f1c644;--stesin-green:#0c392f;--stesin-shadow:0 16px 42px rgba(12,47,39,.08)}
+.skip-link{position:fixed;z-index:10000;left:18px;top:-60px;padding:11px 15px;border-radius:10px;background:#fff;color:#102f27;font-weight:800;transition:top .2s}.skip-link:focus{top:14px}
+.sidebar{padding-top:24px;background:linear-gradient(180deg,#06271f 0%,#0d3a30 100%)}
+.sidebar h2{margin:0 24px 24px;color:#fff}.sidebar h2::after{content:"PORTAL ACADÉMICO";display:block;margin-left:2px;color:#d9b93f;font-size:8px;line-height:1.2;letter-spacing:.17em}
+.vista-administrativa .sidebar h2::after{content:"PANEL ADMINISTRATIVO"}
+.sidebar-group>span{display:block;margin:22px 25px 8px;color:#f1c644;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.sidebar-navigation .nav-icon{display:grid;place-items:center;width:23px;height:23px;color:#f1c644;font-size:14px}
+.sidebar-navigation a{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 14px;color:#dbe7e2;font-size:13px}
+.sidebar-navigation a.active{background:linear-gradient(135deg,#f4ca45,#eebc2c);color:#14382f;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.sidebar-navigation a.active .nav-icon{color:#14382f}
+.main{padding:26px clamp(18px,3vw,42px) 46px}
+.main>header{min-height:88px;margin-bottom:28px;padding:18px 22px;border:1px solid rgba(226,232,227,.9);border-radius:20px}
+.main>header h1{margin:2px 0;color:var(--stesin-ink);font-size:clamp(24px,3vw,34px);letter-spacing:-.04em}
+.main>header p{color:var(--stesin-muted)}
+.banner,.admin-hero,.stats-hero,.attendance-hero,.team-hero,.contact-hero{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.13);box-shadow:0 22px 55px rgba(8,41,33,.17)}
+.banner::after,.admin-hero::after,.stats-hero::after{content:"";position:absolute;right:-65px;bottom:-85px;width:240px;height:240px;border:38px solid rgba(241,198,68,.17);border-radius:50%;pointer-events:none}
+.banner-info,.admin-hero>*{position:relative;z-index:1}
+.banner-info h2{font-size:clamp(26px,4vw,43px);line-height:1.08;letter-spacing:-.045em}.banner-info p{max-width:620px;line-height:1.65}
+.badge{display:inline-flex;align-items:center;padding:7px 11px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(255,255,255,.1);font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+.study-overview,.announcements-section,.admin-card,.stats-section{box-shadow:var(--stesin-shadow)}
+.section-heading{padding-bottom:4px}.section-heading h2{color:var(--stesin-ink)}
+.dashboard,.cards,.activity-grid{gap:16px}.stat-card,.card,.activity-card,.study-card,.admin-dashboard article{border:1px solid var(--stesin-line);border-radius:18px;background:var(--stesin-surface)}
+.stat-card{position:relative;overflow:hidden;padding:22px}.stat-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#e2b82f}.stat-card h1{color:var(--stesin-ink);font-size:34px}.stat-card p,.card p,.activity-card p{color:var(--stesin-muted);line-height:1.55}
+.cards .card{display:flex;flex-direction:column;min-height:190px;padding:23px}.cards .card h3{margin:0 0 9px;color:var(--stesin-ink)}.cards .card button{margin-top:auto}
+.btn-navegacion,.card button,.account-action{min-height:43px;border-radius:11px;transition:transform .18s,box-shadow .18s}.btn-navegacion:hover,.card button:hover,.account-action:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(12,47,39,.16)}
+.admin-shortcut-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.admin-shortcut-grid a{display:grid;grid-template-columns:auto 1fr;column-gap:12px;padding:17px;border:1px solid var(--stesin-line);border-radius:15px;background:#f8faf8;color:var(--stesin-ink);text-decoration:none}.admin-shortcut-grid a>span{grid-row:1/3;display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#14382f;color:#f1c644;font-size:11px;font-weight:800}.admin-shortcut-grid strong{font-size:15px}.admin-shortcut-grid small{color:var(--stesin-muted)}.admin-shortcut-grid a:hover{border-color:#dca91b;background:#fff9e8;transform:translateY(-2px)}
+.admin-card{overflow:hidden}.admin-card h2{font-size:21px}.account-row,.resource-row{transition:border-color .18s,box-shadow .18s}.account-row:hover,.resource-row:hover{border-color:#d7bd62;box-shadow:0 9px 24px rgba(12,47,39,.07)}
+.admin-state{display:flex;align-items:center;gap:9px;border:1px dashed #cfdad4}.admin-state::before{content:"i";display:grid;place-items:center;flex:0 0 25px;height:25px;border-radius:50%;background:#dbe9e2;color:#174438;font-weight:800}.admin-state.error::before{content:"!";background:#f3c9c3;color:#8c3228}
+.resource-form label{position:relative}.resource-form input,.resource-form select,.resource-form textarea{min-height:45px;background:#fffefa}.resource-form input[type="checkbox"]{width:18px;min-height:18px;accent-color:#14382f}
+.visit-ranking{width:100%;padding:4px}.visit-rank-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid var(--stesin-line)}.visit-position{display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#edf3ef;color:#315646;font-weight:800}.visit-total{color:var(--stesin-muted);font-size:13px}
+footer{margin-top:54px;padding:28px 0 12px;color:var(--stesin-muted)}footer h3{color:var(--stesin-ink)}
+body.dark{--stesin-ink:#fffaf0;--stesin-muted:#c5d4ce;--stesin-surface:#102b25;--stesin-line:#31564c}.dark .main>header h1,.dark .section-heading h2,.dark .stat-card h1,.dark .cards .card h3{color:var(--stesin-ink)}.dark .admin-shortcut-grid a{background:#102b25;color:#fffaf0;border-color:#31564c}.dark .admin-shortcut-grid small{color:#c5d4ce}
+@media(max-width:1050px){.admin-shortcut-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.main{padding:18px 14px 92px}.main>header{min-height:70px;padding:14px 16px;border-radius:16px}.banner,.admin-hero,.stats-hero,.attendance-hero,.team-hero,.contact-hero{padding:22px!important;border-radius:18px}.banner-info h2{font-size:29px}.admin-shortcut-grid{grid-template-columns:1fr}.cards,.dashboard,.activity-grid{grid-template-columns:1fr!important}.cards .card{min-height:155px}.sidebar{padding-top:17px}.sidebar h2{margin-bottom:16px}.visit-rank-row{grid-template-columns:28px minmax(0,1fr)}.visit-total{grid-column:2}.resource-form button,.btn-navegacion{width:100%}}
+
 /* Acciones breves para conectar agenda y materia sin perder el contexto. */
 .agenda-open{width:max-content;margin-top:7px;padding:7px 10px;border:1px solid #d8c06a;border-radius:9px;background:#fffaf0;color:#315646;font-size:12px;font-weight:800;box-shadow:none}.agenda-open:hover{background:#dca91b;color:#102b25}body.dark .agenda-open{background:#173d34;border-color:#6a835f;color:#fff5ca}body.dark .agenda-open:hover{background:#dca91b;color:#102b25}
 
