@@ -2962,6 +2962,25 @@ button,.btn-clase,.btn-curso,.btn-navegacion,.btn-continuar{min-height:44px;}
     text-align:left;
     margin-top:24px;
 }
+
+.visit-ranking{
+    width:100%;
+    padding:18px;
+    border:1px solid #dce8e1;
+    border-radius:16px;
+    background:#fbfdfb;
+}
+
+.visit-ranking h3{margin:0 0 12px;color:#173b32;}
+.visit-rank-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #e5ece8;}
+.visit-rank-row:last-child{border-bottom:0;}
+.visit-position{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#e9f2ed;color:#174438;font-weight:900;}
+.visit-total{padding:5px 9px;border-radius:999px;background:#fff4cc;color:#745b07;font-size:12px;font-weight:800;white-space:nowrap;}
+
+@media(max-width:520px){
+    .visit-rank-row{grid-template-columns:30px 1fr;}
+    .visit-total{grid-column:2;justify-self:start;}
+}
 .profile-card > .perfil-estudiante > .eyebrow,
 #perfilRendimiento > .eyebrow{margin:0 0 8px;}
 .profile-card > .perfil-estudiante > h2,

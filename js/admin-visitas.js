@@ -23,11 +23,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       <article><strong>${visitantes}</strong><span>Visitantes aproximados</span></article>
       <article><strong>${sesiones}</strong><span>Sesiones</span></article>`;
 
+    const nombresPaginas = {
+      "index.html": "Página de inicio",
+      "login.html": "Acceso administrativo",
+      "administracion.html": "Panel de administración",
+      "academico.html": "Aula académica",
+      "biblioteca.html": "Biblioteca",
+      "calendario.html": "Calendario académico",
+      "cursos.html": "Ciclos académicos",
+      "malla-curricular.html": "Malla curricular",
+      "materia.html": "Recursos de materia",
+      "contacto.html": "Contacto",
+      "equipo.html": "Equipo STESIN",
+      "alabanzas.html": "Alabanzas",
+      "silabos.html": "Sílabos",
+      "redes.html": "Enlaces y redes",
+      "ayuda.html": "Centro de ayuda"
+    };
+    const tituloPagina = pagina => nombresPaginas[pagina] || pagina.replace(/\.html$/i, "").replaceAll("-", " ").replace(/^./, letra => letra.toUpperCase());
     const paginas = {};
     visitas.forEach(v => paginas[v.pagina] = (paginas[v.pagina] || 0) + 1);
     const populares = Object.entries(paginas).sort((a,b) => b[1] - a[1]).slice(0, 8);
     document.getElementById("paginasVisitadas").innerHTML = populares.length
-      ? `<article class="resource-row"><div><h3>Páginas más consultadas</h3>${populares.map(([pagina,total]) => `<p>${pagina} · ${total} visitas</p>`).join("")}</div></article>`
+      ? `<article class="visit-ranking"><h3>Páginas más consultadas</h3>${populares.map(([pagina,total], posicion) => `<div class="visit-rank-row"><span class="visit-position">${posicion + 1}</span><strong>${tituloPagina(pagina)}</strong><span class="visit-total">${total} ${total === 1 ? "visita" : "visitas"}</span></div>`).join("")}</article>`
       : '<div class="admin-state">Todavía no hay visitas registradas.</div>';
   } catch (error) {
     document.getElementById("metricasVisitas").innerHTML = '<div class="admin-state error">No se pudieron consultar las visitas. Publica las reglas actualizadas de Firestore.</div>';
