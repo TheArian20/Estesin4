@@ -243,10 +243,20 @@ const AulaX = (() => {
 
     function agregarEnlaceAcademico() {
         const sidebar = document.querySelector(".sidebar");
-        if (!sidebar || sidebar.querySelector('a[href="academico.html"]')) return;
+        if (!sidebar) return;
+        const esAdministrador = localStorage.getItem("rolUsuario") === "admin";
+        const enlacesExistentes = sidebar.querySelectorAll('a[href="academico.html"]');
+        if (!esAdministrador) {
+            enlacesExistentes.forEach((enlace) => enlace.remove());
+            return;
+        }
+        if (enlacesExistentes.length) {
+            enlacesExistentes.forEach((enlace) => { enlace.textContent = "Gestión académica"; });
+            return;
+        }
         const enlace = document.createElement("a");
         enlace.href = "academico.html";
-        enlace.textContent = "Aula académica";
+        enlace.textContent = "Gestión académica";
         if ((window.location.pathname.split("/").pop() || "index.html") === "academico.html") {
             enlace.classList.add("active");
             enlace.setAttribute("aria-current", "page");
@@ -301,19 +311,20 @@ const AulaX = (() => {
         if (!sidebar || sidebar.querySelector(".sidebar-navigation")) return;
         const detalles = {
             "index.html": ["⌂", "Inicio"], "cursos.html": ["▦", "Ciclos"],
-            "academico.html": ["◈", "Aula académica"], "calendario.html": ["◷", "Calendario"], "malla-curricular.html": ["▤", "Malla curricular"],
+            "academico.html": ["◈", "Gestión académica"], "calendario.html": ["◷", "Calendario"], "malla-curricular.html": ["▤", "Malla curricular"],
             "biblioteca.html": ["▣", "Biblioteca"], "silabos.html": ["▧", "Sílabos"], "alabanzas.html": ["♪", "Alabanzas"],
             "mensajes.html": ["✉", "Comunicados"], "solicitudes.html": ["↳", "Solicitudes"], "redes.html": ["↗", "Enlaces"], "contacto.html": ["◉", "Contacto"],
             "rectorado.html": ["♛", "Rectorado"], "equipo.html": ["♧", "Equipo STESIN"], "docentes.html": ["♙", "Panel docente"],
             "estudiantes.html": ["♚", "Estudiantes"], "asistencia.html": ["✓", "Asistencia"], "estadisticas.html": ["▥", "Estadísticas"],
             "auditoria.html": ["⌕", "Auditoría"], "administracion.html": ["⚙", "Administración"], "historial.html": ["◴", "Mi seguimiento"],
-            "notas.html": ["✎", "Mis notas"], "configuracion.html": ["⚙", "Configuración"], "instalar.html": ["⇩", "Instalar STESIN"]
+            "notas.html": ["✎", "Mis notas"], "configuracion.html": ["⚙", "Configuración"], "instalar.html": ["⇩", "Instalar STESIN"],
+            "login.html": ["→", "Acceso administrativo"]
         };
         const grupos = [
             ["Académico", ["index.html", "cursos.html", "academico.html", "calendario.html", "malla-curricular.html", "biblioteca.html", "silabos.html", "alabanzas.html"]],
             ["Comunidad", ["mensajes.html", "solicitudes.html", "redes.html", "contacto.html"]],
             ["Gestión institucional", ["rectorado.html", "equipo.html", "docentes.html", "estudiantes.html", "asistencia.html", "estadisticas.html", "auditoria.html", "administracion.html"]],
-            ["Cuenta", ["historial.html", "notas.html", "configuracion.html", "instalar.html"]]
+            ["Cuenta", ["historial.html", "notas.html", "configuracion.html", "instalar.html", "login.html"]]
         ];
         const navegacion = document.createElement("nav");
         navegacion.className = "sidebar-navigation";
