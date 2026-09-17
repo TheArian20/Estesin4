@@ -439,8 +439,13 @@ const AulaX = (() => {
         }
         if ("serviceWorker" in navigator && window.isSecureContext) {
             sessionStorage.removeItem("stesin-recargando");
-            navigator.serviceWorker.register("sw.js").then((registro) => {
-                registro.update().catch(() => {});
+            navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((registro) => {
+                const comprobarActualizacion = () => registro.update().catch(() => {});
+                comprobarActualizacion();
+                window.addEventListener("online", comprobarActualizacion);
+                document.addEventListener("visibilitychange", () => {
+                    if (document.visibilityState === "visible") comprobarActualizacion();
+                });
                 navigator.serviceWorker.addEventListener("controllerchange", () => {
                     if (sessionStorage.getItem("stesin-recargando") === "si") return;
                     sessionStorage.setItem("stesin-recargando", "si");
