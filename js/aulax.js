@@ -106,6 +106,7 @@ const AulaX = (() => {
             boton.setAttribute("aria-expanded", String(abrir));
             boton.setAttribute("aria-label", abrir ? "Cerrar menú" : "Abrir menú");
             fondo.hidden = !abrir;
+            document.querySelector("#navegacionInferior [data-menu-movil]")?.classList.toggle("menu-open", abrir);
         };
         window.STESIN_MENU_MOVIL = {
             abrir: () => cambiarEstado(true),
@@ -317,10 +318,14 @@ const AulaX = (() => {
         if (document.getElementById("navegacionInferior")) return;
         const actual = window.location.pathname.split("/").pop() || "index.html";
         const nav = document.createElement("nav"); nav.id = "navegacionInferior";
-        nav.innerHTML = [["index.html","⌂","Inicio"],["cursos.html","▦","Ciclos"],["calendario.html","◷","Agenda"],["biblioteca.html","▤","Biblioteca"]].map(([url,icono,texto]) => `<a class="${actual===url?"active":""}" href="${url}"><span>${icono}</span>${texto}</a>`).join("");
+        nav.setAttribute("aria-label", "Navegación rápida");
+        const accesosPrincipales = [["index.html","⌂","Inicio"],["calendario.html","◷","Agenda"],["biblioteca.html","▤","Biblioteca"]];
+        nav.innerHTML = accesosPrincipales.map(([url,icono,texto]) => `<a class="${actual===url?"active":""}" href="${url}"><span aria-hidden="true">${icono}</span>${texto}</a>`).join("");
         const mas = document.createElement("button");
         mas.type = "button";
-        mas.innerHTML = "<span>•••</span>Más";
+        mas.dataset.menuMovil = "true";
+        mas.classList.toggle("active", !accesosPrincipales.some(([url]) => url === actual));
+        mas.innerHTML = '<span aria-hidden="true">•••</span>Más';
         mas.setAttribute("aria-label", "Abrir menú completo");
         mas.addEventListener("click", (evento) => {
             evento.stopPropagation();

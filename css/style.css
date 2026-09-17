@@ -3136,3 +3136,46 @@ body.dark{--stesin-ink:#fffaf0;--stesin-muted:#c5d4ce;--stesin-surface:#102b25;-
     #navegacionInferior a,#navegacionInferior button{font-size:9px}
     .month-weekdays,.month-grid{gap:2px}
 }
+
+/* Barra inferior compacta: cuatro acciones claras sin duplicar navegación. */
+@media(max-width:700px){
+    .menu-mobile{display:none!important}
+    #navegacionInferior{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        width:min(460px,calc(100vw - 20px));
+        min-height:0;
+        left:50%;
+        right:auto;
+        bottom:calc(8px + env(safe-area-inset-bottom));
+        transform:translateX(-50%);
+        gap:3px;
+        padding:6px;
+        border-radius:20px;
+    }
+    #navegacionInferior a,#navegacionInferior button{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:3px;
+        width:100%;
+        min-width:0;
+        min-height:54px;
+        margin:0;
+        padding:5px 2px;
+        border:0;
+        border-radius:14px;
+        background:transparent;
+        color:#eaf2ed;
+        font-size:11px;
+        line-height:1.1;
+        box-shadow:none;
+        transform:none;
+    }
+    #navegacionInferior a span,#navegacionInferior button span{display:block;font-size:20px;line-height:1}
+    #navegacionInferior a.active,#navegacionInferior button.active,#navegacionInferior button.menu-open{background:#e5b51f;color:#102b25}
+}
+@media(max-width:350px){
+    #navegacionInferior{width:calc(100vw - 12px);gap:1px;padding:5px}
+    #navegacionInferior a,#navegacionInferior button{font-size:10px}
+}
