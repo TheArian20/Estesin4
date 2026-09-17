@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const base = [
-    ["2026-08-03","6:00 – 7:30","Homilética Bíblica II"],["2026-08-03","7:30 – 9:00","Hermenéutica Bíblica II"],
-    ["2026-08-10","6:00 – 8:15","Administración Eclesiástica"],["2026-08-11","6:00 – 8:15","Teología Bíblica III (Cristología)"],
-    ["2026-08-11","8:15 – 9:45","Introducción a la Sociología"],["2026-08-17","6:00 – 8:15","Administración Eclesiástica"],
-    ["2026-08-18","6:00 – 7:30","Consejería Pastoral"],["2026-08-18","7:30 – 9:45","Teología Bíblica III (Cristología)"],["2026-08-26","6:00 – 7:30","Psicopedagogía"]
+    ["2026-09-07","6:00 – 7:30","Homilética Bíblica II"],["2026-09-07","7:30 – 9:00","Hermenéutica Bíblica II"],
+    ["2026-09-14","6:00 – 8:15","Administración Eclesiástica"],["2026-09-15","6:00 – 8:15","Teología Bíblica III (Cristología)"],
+    ["2026-09-15","8:15 – 9:45","Introducción a la Sociología"],["2026-09-21","6:00 – 7:30","Homilética Bíblica II"],
+    ["2026-09-21","7:30 – 9:00","Hermenéutica Bíblica II"],["2026-09-22","6:00 – 7:30","Consejería Pastoral"],["2026-09-30","6:00 – 7:30","Psicopedagogía"]
   ];
-  const select = document.getElementById("filtroAgenda"), chips = document.getElementById("agendaChips"), lista = document.getElementById("agendaLista"), grid = document.getElementById("mesAgosto");
+  const select = document.getElementById("filtroAgenda"), chips = document.getElementById("agendaChips"), lista = document.getElementById("agendaLista"), grid = document.getElementById("mesAgenda");
   if (!select || !chips || !lista || !grid) return;
   const cliente = window.STESIN_DATOS, ymd = d => d.toISOString().slice(0,10), mesNombre = d => new Intl.DateTimeFormat("es-ES", { month:"long", year:"numeric" }).format(d).replace(/^./, c => c.toUpperCase()), diaTexto = f => new Date(`${f}T12:00:00`).toLocaleDateString("es-ES", {weekday:"long",day:"2-digit"}).replace(/^./,c=>c.toUpperCase());
-  let ciclo = "Ciclo V", visible = new Date(2026,7,1), sesiones = base.map(([fecha,hora,materia]) => ({fecha,hora,materia,detalle:"",ciclo:"Ciclo V"}));
+  let ciclo = "Ciclo V", visible = new Date(2026,8,1), sesiones = base.map(([fecha,hora,materia]) => ({fecha,hora,materia,detalle:"",ciclo:"Ciclo V"}));
   if (cliente) {
     const { data: { user } = {} } = await cliente.auth.getUser();
     if (user) { const { data } = await cliente.from("perfiles").select("ciclo_actual").eq("id",user.id).single(); ciclo = data?.ciclo_actual || ciclo; }

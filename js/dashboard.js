@@ -163,20 +163,21 @@
         if (!campana || !panel || !lista || !contador) return;
 
         const clases = [
-            { fecha: "2026-08-03T18:00:00", nombre: "Homil?tica B?blica II", detalle: "Lunes 03 ? 6:00 ? 7:30" },
-            { fecha: "2026-08-10T18:00:00", nombre: "Administraci?n Eclesi?stica", detalle: "Lunes 10 ? 6:00 ? 8:15" },
-            { fecha: "2026-08-11T18:00:00", nombre: "Teolog?a B?blica III (Cristolog?a)", detalle: "Martes 11 ? 6:00 ? 8:15" },
-            { fecha: "2026-08-11T20:15:00", nombre: "Introducci?n a la Sociolog?a", detalle: "Martes 11 ? 8:15 ? 9:45" },
-            { fecha: "2026-08-17T18:00:00", nombre: "Administraci?n Eclesi?stica", detalle: "Lunes 17 ? 6:00 ? 8:15" },
-            { fecha: "2026-08-18T18:00:00", nombre: "Consejer?a Pastoral", detalle: "Martes 18 ? 6:00 ? 7:30" },
-            { fecha: "2026-08-18T19:30:00", nombre: "Teolog?a B?blica III (Cristolog?a)", detalle: "Martes 18 ? 7:30 ? 9:45" },
-            { fecha: "2026-08-26T18:00:00", nombre: "Psicopedagog?a", detalle: "Mi?rcoles 26 ? 6:00 ? 7:30" }
+            { fecha: "2026-09-07T18:00:00", nombre: "Homilética Bíblica II", detalle: "Lunes 07 · 6:00 – 7:30" },
+            { fecha: "2026-09-07T19:30:00", nombre: "Hermenéutica Bíblica II", detalle: "Lunes 07 · 7:30 – 9:00" },
+            { fecha: "2026-09-14T18:00:00", nombre: "Administración Eclesiástica", detalle: "Lunes 14 · 6:00 – 8:15" },
+            { fecha: "2026-09-15T18:00:00", nombre: "Teología Bíblica III (Cristología)", detalle: "Martes 15 · 6:00 – 8:15" },
+            { fecha: "2026-09-15T20:15:00", nombre: "Introducción a la Sociología", detalle: "Martes 15 · 8:15 – 9:45" },
+            { fecha: "2026-09-21T18:00:00", nombre: "Homilética Bíblica II", detalle: "Lunes 21 · 6:00 – 7:30" },
+            { fecha: "2026-09-21T19:30:00", nombre: "Hermenéutica Bíblica II", detalle: "Lunes 21 · 7:30 – 9:00" },
+            { fecha: "2026-09-22T18:00:00", nombre: "Consejería Pastoral", detalle: "Martes 22 · 6:00 – 7:30" },
+            { fecha: "2026-09-30T18:00:00", nombre: "Psicopedagogía", detalle: "Miércoles 30 · 6:00 – 7:30" }
         ];
         const proxima = clases.find((clase) => new Date(clase.fecha) >= new Date());
         let notificaciones = [
             proxima
-                ? { id: `clase-${proxima.fecha}`, icono: "📅", titulo: `Próxima clase: ${proxima.nombre}`, detalle: proxima.detalle, pagina: "calendario.html#horario-agosto" }
-                : { id: "horario-finalizado", icono: "🗓️", titulo: "Horario de agosto finalizado", detalle: "Consulta el calendario para próximas programaciones.", pagina: "calendario.html" },
+                ? { id: `clase-${proxima.fecha}`, icono: "📅", titulo: `Próxima clase: ${proxima.nombre}`, detalle: proxima.detalle, pagina: "calendario.html#horario-septiembre" }
+                : { id: "horario-finalizado", icono: "🗓️", titulo: "Horario de septiembre finalizado", detalle: "Consulta el calendario para próximas programaciones.", pagina: "calendario.html" },
             { id: "material-psicopedagogia", icono: "📄", titulo: "Nuevo material de Psicopedagogía", detalle: "Hay 2 documentos disponibles para consulta.", pagina: "materia.html", materia: "Psicopedagogía", ciclo: "Ciclo V" }
         ];
         const leidas = new Set(leerJSON("notificacionesLeidas", []));
@@ -287,18 +288,7 @@
             aplicarModo(oscuro);
         });
 
-        const menuMobile = $("#menuMobile");
-        const sidebar = $(".sidebar");
-        menuMobile?.addEventListener("click", (evento) => {
-            evento.stopPropagation();
-            sidebar?.classList.toggle("mostrar");
-        });
-        document.addEventListener("click", (evento) => {
-            if (sidebar && menuMobile && !sidebar.contains(evento.target) && !menuMobile.contains(evento.target)) {
-                sidebar.classList.remove("mostrar");
-            }
-        });
-        $$(".sidebar a").forEach((enlace) => enlace.addEventListener("click", () => sidebar?.classList.remove("mostrar")));
+        // La navegación móvil se controla de forma centralizada desde aulax.js.
     }
 
     function configurarCiclosInicio() {
@@ -336,14 +326,15 @@
 
     function actualizarPanelAcademico() {
         const clases = [
-            { fecha: "2026-08-03T18:00:00", nombre: "Homil?tica B?blica II", detalle: "Lunes 03 ? 6:00 ? 7:30" },
-            { fecha: "2026-08-10T18:00:00", nombre: "Administraci?n Eclesi?stica", detalle: "Lunes 10 ? 6:00 ? 8:15" },
-            { fecha: "2026-08-11T18:00:00", nombre: "Teolog?a B?blica III (Cristolog?a)", detalle: "Martes 11 ? 6:00 ? 8:15" },
-            { fecha: "2026-08-11T20:15:00", nombre: "Introducci?n a la Sociolog?a", detalle: "Martes 11 ? 8:15 ? 9:45" },
-            { fecha: "2026-08-17T18:00:00", nombre: "Administraci?n Eclesi?stica", detalle: "Lunes 17 ? 6:00 ? 8:15" },
-            { fecha: "2026-08-18T18:00:00", nombre: "Consejer?a Pastoral", detalle: "Martes 18 ? 6:00 ? 7:30" },
-            { fecha: "2026-08-18T19:30:00", nombre: "Teolog?a B?blica III (Cristolog?a)", detalle: "Martes 18 ? 7:30 ? 9:45" },
-            { fecha: "2026-08-26T18:00:00", nombre: "Psicopedagog?a", detalle: "Mi?rcoles 26 ? 6:00 ? 7:30" }
+            { fecha: "2026-09-07T18:00:00", nombre: "Homilética Bíblica II", detalle: "Lunes 07 · 6:00 – 7:30" },
+            { fecha: "2026-09-07T19:30:00", nombre: "Hermenéutica Bíblica II", detalle: "Lunes 07 · 7:30 – 9:00" },
+            { fecha: "2026-09-14T18:00:00", nombre: "Administración Eclesiástica", detalle: "Lunes 14 · 6:00 – 8:15" },
+            { fecha: "2026-09-15T18:00:00", nombre: "Teología Bíblica III (Cristología)", detalle: "Martes 15 · 6:00 – 8:15" },
+            { fecha: "2026-09-15T20:15:00", nombre: "Introducción a la Sociología", detalle: "Martes 15 · 8:15 – 9:45" },
+            { fecha: "2026-09-21T18:00:00", nombre: "Homilética Bíblica II", detalle: "Lunes 21 · 6:00 – 7:30" },
+            { fecha: "2026-09-21T19:30:00", nombre: "Hermenéutica Bíblica II", detalle: "Lunes 21 · 7:30 – 9:00" },
+            { fecha: "2026-09-22T18:00:00", nombre: "Consejería Pastoral", detalle: "Martes 22 · 6:00 – 7:30" },
+            { fecha: "2026-09-30T18:00:00", nombre: "Psicopedagogía", detalle: "Miércoles 30 · 6:00 – 7:30" }
         ];
         const ahora = new Date();
         const proxima = clases.find((clase) => new Date(clase.fecha) >= ahora) || clases.at(-1);

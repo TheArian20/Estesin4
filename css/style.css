@@ -3094,3 +3094,45 @@ body.dark{--stesin-ink:#fffaf0;--stesin-muted:#c5d4ce;--stesin-surface:#102b25;-
 .stats-hero{padding:28px;border-radius:22px;background:linear-gradient(135deg,#14382f,#1f604b,#dca91b);color:#fff}.stats-hero h2{margin:7px 0;color:#fff}.stats-hero p{color:#fff8db}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}.stats-grid article,.stats-section{padding:20px;border:1px solid #e6dcc8;border-radius:18px;background:#fffdf8}.stats-grid strong{display:block;color:#14382f;font-size:30px}.stats-grid span{color:#607169;font-size:13px}.stats-columns{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}.stats-section h2{margin:0 0 12px}.stats-section label,.stats-section select{display:block;margin:0 0 9px}.stats-section select{width:100%;max-width:420px;padding:11px;border:1px solid #d7e1dc;border-radius:10px;background:#fff;font:inherit}.stats-section textarea{min-height:94px;padding:10px;border:1px solid #d7e1dc;border-radius:10px;font:inherit}.stats-section .resource-form{margin-top:12px}.resource-row small{color:#89640c;font-weight:700}body.dark .stats-grid article,body.dark .stats-section{background:#102b25;border-color:#2c5148;color:#fffaf0}body.dark .stats-grid strong{color:#fffaf0}body.dark .stats-grid span{color:#d7e5df}body.dark .stats-section select,body.dark .stats-section textarea{background:#081b17;border-color:#42685e;color:#fffaf0}@media(max-width:800px){.stats-grid,.stats-columns{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.stats-grid,.stats-columns{grid-template-columns:1fr}}
 
 @media(max-width:700px){#navegacionInferior{grid-template-columns:repeat(5,1fr)}}
+
+/* Correcciones táctiles y de navegación para teléfonos. */
+.menu-mobile-backdrop{display:none}
+@media(max-width:900px){
+    html{scroll-padding-bottom:110px}
+    body.menu-movil-abierto{overflow:hidden;touch-action:none}
+    .menu-mobile-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:4400;width:100%;height:100%;padding:0;border:0;border-radius:0;background:rgba(3,20,16,.56);box-shadow:none}
+    .sidebar{z-index:4500}
+    .menu-mobile{z-index:4600;touch-action:manipulation}
+    .sidebar a{touch-action:manipulation}
+}
+@media(max-width:700px){
+    body{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+    .main{padding:76px 14px calc(112px + env(safe-area-inset-bottom))}
+    button,a,.btn,.btn-clase,.btn-curso,.btn-navegacion,.btn-continuar,.account-action,.agenda-open{touch-action:manipulation;-webkit-tap-highlight-color:rgba(220,169,27,.2)}
+    main a:not(.library-open):not(.library-item),main button{min-height:44px}
+    input,select,textarea{max-width:100%;font-size:16px!important}
+    .section-heading{width:100%}
+    .section-heading>select,.section-heading>button,.section-heading>.agenda-chip{width:100%}
+    .agenda-chips{margin-right:-4px;padding:2px 4px 8px 0;scroll-snap-type:x proximity}
+    .agenda-chip{min-height:44px;scroll-snap-align:start}
+    .agenda-card .agenda-open{width:100%;margin-top:10px;text-align:center}
+    .schedule-wrap{position:relative;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;touch-action:pan-x pan-y}
+    .schedule{min-width:760px}
+    .schedule th,.schedule td{padding:12px 9px}
+    .month-view{padding:16px 11px}
+    .month-weekdays,.month-grid{gap:4px}
+    .month-grid button,.month-empty{min-width:0;min-height:42px;padding:4px}
+    .resource-form,.staff-form{width:100%}
+    .resource-form button,.staff-form button,.contact-grid a,.silabo-card a{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;text-align:center}
+    .cards .card,.activity-card,.contact-grid article,.silabo-card,.library-item{overflow-wrap:anywhere}
+    #navegacionInferior{z-index:4000;min-height:66px;padding:6px}
+    #navegacionInferior a,#navegacionInferior button{min-width:0;min-height:52px;padding:5px 1px;touch-action:manipulation}
+    #navegacionInferior a span,#navegacionInferior button span{pointer-events:none}
+    .update-app{right:12px;bottom:calc(92px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px)}
+}
+@media(max-width:370px){
+    .main{padding-left:10px;padding-right:10px}
+    #navegacionInferior{left:4px;right:4px;gap:0}
+    #navegacionInferior a,#navegacionInferior button{font-size:9px}
+    .month-weekdays,.month-grid{gap:2px}
+}

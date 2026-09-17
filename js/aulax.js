@@ -76,6 +76,17 @@ const AulaX = (() => {
         const main = document.querySelector(".main");
         if (!sidebar || !main) return;
 
+        let fondo = document.getElementById("fondoMenuMovil");
+        if (!fondo) {
+            fondo = document.createElement("button");
+            fondo.id = "fondoMenuMovil";
+            fondo.className = "menu-mobile-backdrop";
+            fondo.type = "button";
+            fondo.setAttribute("aria-label", "Cerrar menú");
+            fondo.hidden = true;
+            document.body.appendChild(fondo);
+        }
+
         let boton = document.getElementById("menuMobile");
         if (!boton) {
             boton = document.createElement("button");
@@ -83,17 +94,34 @@ const AulaX = (() => {
             boton.className = "menu-mobile";
             boton.type = "button";
             boton.setAttribute("aria-label", "Abrir menú");
+            boton.setAttribute("aria-controls", "navegacionPrincipal");
+            boton.setAttribute("aria-expanded", "false");
             boton.textContent = "☰";
             main.prepend(boton);
         }
+        sidebar.id ||= "navegacionPrincipal";
+        const cambiarEstado = (abrir) => {
+            sidebar.classList.toggle("mostrar", abrir);
+            document.body.classList.toggle("menu-movil-abierto", abrir);
+            boton.setAttribute("aria-expanded", String(abrir));
+            boton.setAttribute("aria-label", abrir ? "Cerrar menú" : "Abrir menú");
+            fondo.hidden = !abrir;
+        };
+        window.STESIN_MENU_MOVIL = {
+            abrir: () => cambiarEstado(true),
+            cerrar: () => cambiarEstado(false),
+            alternar: () => cambiarEstado(!sidebar.classList.contains("mostrar"))
+        };
         boton.addEventListener("click", (evento) => {
             evento.stopPropagation();
-            sidebar.classList.toggle("mostrar");
+            window.STESIN_MENU_MOVIL.alternar();
         });
+        fondo.addEventListener("click", () => cambiarEstado(false));
         document.addEventListener("click", (evento) => {
-            if (!sidebar.contains(evento.target) && !boton.contains(evento.target)) sidebar.classList.remove("mostrar");
+            if (!sidebar.contains(evento.target) && !boton.contains(evento.target) && !evento.target.closest("#navegacionInferior")) cambiarEstado(false);
         });
-        sidebar.querySelectorAll("a").forEach((enlace) => enlace.addEventListener("click", () => sidebar.classList.remove("mostrar")));
+        document.addEventListener("keydown", (evento) => { if (evento.key === "Escape") cambiarEstado(false); });
+        sidebar.addEventListener("click", (evento) => { if (evento.target.closest("a")) cambiarEstado(false); });
     }
 
     function configurarBusquedaGlobal() {
@@ -294,7 +322,11 @@ const AulaX = (() => {
         mas.type = "button";
         mas.innerHTML = "<span>•••</span>Más";
         mas.setAttribute("aria-label", "Abrir menú completo");
-        mas.addEventListener("click", () => document.querySelector(".sidebar")?.classList.toggle("mostrar"));
+        mas.addEventListener("click", (evento) => {
+            evento.stopPropagation();
+            if (window.STESIN_MENU_MOVIL) window.STESIN_MENU_MOVIL.alternar();
+            else document.querySelector(".sidebar")?.classList.toggle("mostrar");
+        });
         nav.appendChild(mas);
         document.body.appendChild(nav);
     }
@@ -424,12 +456,12 @@ const AulaX = (() => {
         const calendario = document.querySelector(".calendar");
         if (!calendario) return;
         const eventos = {
-            3: "Homilética Bíblica II · 6:00 – 7:30",
-            10: "Administración Eclesiástica · 6:00 – 8:15",
-            11: "Teología Bíblica III y Sociología · 6:00 – 9:45",
-            17: "Administración Eclesiástica · 6:00 – 8:15",
-            18: "Consejería Pastoral y Teología Bíblica III · 6:00 – 9:45",
-            26: "Psicopedagogía · 6:00 – 7:30"
+            7: "Homilética Bíblica II y Hermenéutica Bíblica II · 6:00 – 9:00",
+            14: "Administración Eclesiástica · 6:00 – 8:15",
+            15: "Teología Bíblica III y Sociología · 6:00 – 9:45",
+            21: "Homilética Bíblica II y Hermenéutica Bíblica II · 6:00 – 9:00",
+            22: "Consejería Pastoral · 6:00 – 7:30",
+            30: "Psicopedagogía · 6:00 – 7:30"
         };
         const detalle = document.createElement("div");
         detalle.className = "calendar-detail";
@@ -443,7 +475,7 @@ const AulaX = (() => {
             const seleccionar = () => {
                 calendario.querySelectorAll(".day.selected").forEach((elemento) => elemento.classList.remove("selected"));
                 dia.classList.add("selected");
-                detalle.textContent = eventos[numero] || `No hay actividades programadas para el ${numero} de agosto.`;
+                detalle.textContent = eventos[numero] || `No hay actividades programadas para el ${numero} de septiembre.`;
             };
             dia.addEventListener("click", seleccionar);
             dia.addEventListener("keydown", (evento) => {
