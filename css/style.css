@@ -3047,6 +3047,22 @@ body.dark .page-breadcrumb,body.dark .page-breadcrumb a{color:#c5d4ce}body.dark 
 .library-resource-tag{display:inline-flex;width:max-content;margin-top:8px;padding:3px 8px;border-radius:999px;background:#edf3ee;color:#315646;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}.library-resource-tag.new{background:#e5c55d;color:#102b25}.library-entry .library-open{align-items:flex-start}.library-entry .library-file-data{padding-right:24px}body.dark .library-resource-tag{background:#264b41;color:#d7e5df}body.dark .library-resource-tag.new{background:#dca91b;color:#102b25}
 .library-report{margin:0 14px 13px;padding:6px 0;border:0;background:transparent;color:#766031;font-size:12px;font-weight:800;text-align:left;box-shadow:none}.library-report:hover{text-decoration:underline}.update-app{position:fixed;z-index:6000;right:16px;bottom:18px;padding:12px 15px;border:0;border-radius:12px;background:#dca91b;color:#102b25;font-weight:800;box-shadow:0 14px 30px rgba(0,0,0,.24)}
 
+/* Acciones de Biblioteca separadas para evitar pulsaciones accidentales. */
+.library-entry{display:grid;grid-template-columns:minmax(0,1fr);overflow:hidden}
+.library-entry .library-open{width:100%;padding-right:68px}
+.library-favorite{display:grid;place-items:center;right:14px;top:14px;width:44px;height:44px;min-height:44px;padding:0;border:1px solid #ead8a2;border-radius:50%;background:#fffaf0;font-size:25px;line-height:1}
+.library-favorite:hover{background:#f8ebc4;transform:none;box-shadow:none}
+.library-report{display:flex;align-items:center;justify-content:flex-start;width:100%;min-height:44px;margin:0;padding:10px 18px;border:0;border-top:1px solid #eee3cf;border-radius:0;background:#faf8f2;color:#766031;font-size:12px;font-weight:800;text-align:left;box-shadow:none}
+.library-report::before{content:"!";display:grid;place-items:center;width:20px;height:20px;margin-right:8px;border:1px solid currentColor;border-radius:50%;font-size:12px}
+.library-report:hover{background:#f8ebc4;text-decoration:none;transform:none;box-shadow:none}
+body.dark .library-favorite{background:#173d34;border-color:#6a835f;color:#f1c64d}
+body.dark .library-report{background:#0d2b24;border-color:#31564c;color:#e5cf8a}
+@media(max-width:700px){
+    .library-entry .library-open{min-height:150px;padding:20px 72px 18px 18px}
+    .library-favorite{right:16px;top:16px}
+    .library-report{padding:12px 18px;font-size:13px}
+}
+
 /* Experiencia integral STESIN: interfaz pública y administrativa */
 :root{--stesin-ink:#102f27;--stesin-muted:#61716a;--stesin-surface:#fffefa;--stesin-line:#e2e8e3;--stesin-gold:#f1c644;--stesin-green:#0c392f;--stesin-shadow:0 16px 42px rgba(12,47,39,.08)}
 .skip-link{position:fixed;z-index:10000;left:18px;top:-60px;padding:11px 15px;border-radius:10px;background:#fff;color:#102f27;font-weight:800;transition:top .2s}.skip-link:focus{top:14px}

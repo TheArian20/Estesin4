@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         favorito.type = "button";
         favorito.className = `library-favorite${favoritos.has(id) ? " active" : ""}`;
         favorito.setAttribute("aria-label", "Guardar en favoritos");
+        favorito.setAttribute("aria-pressed", String(favoritos.has(id)));
+        favorito.title = "Guardar en favoritos";
         favorito.textContent = favoritos.has(id) ? "★" : "☆";
         favorito.addEventListener("click", () => {
             const estabaGuardado = favoritos.has(id);
@@ -84,6 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         reportar.type = "button";
         reportar.className = "library-report";
         reportar.textContent = "Reportar enlace";
+        reportar.title = "Informar que este enlace tiene un problema";
         reportar.addEventListener("click", async () => {
             const cliente = window.STESIN_DATOS;
             const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
