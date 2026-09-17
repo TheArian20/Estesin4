@@ -424,6 +424,13 @@ const AulaX = (() => {
             manifest.href = "manifest.json";
             document.head.appendChild(manifest);
         }
+        if (!document.querySelector('link[rel="icon"]')) {
+            const icono = document.createElement("link");
+            icono.rel = "icon";
+            icono.href = "stesin-app-icon-v2.svg";
+            icono.type = "image/svg+xml";
+            document.head.appendChild(icono);
+        }
         if (!document.querySelector('meta[name="theme-color"]')) {
             const tema = document.createElement("meta");
             tema.name = "theme-color";

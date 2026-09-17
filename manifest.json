@@ -3,8 +3,13 @@
   "short_name": "STESIN",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#f7f4ed",
+  "background_color": "#123a31",
   "theme_color": "#14382f",
   "description": "Plataforma académica del Seminario Teológico Superior Internacional.",
-  "icons": [{ "src": "stesin-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "icons": [
+    { "src": "stesin-app-icon-v2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "stesin-app-icon-v2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "stesin-app-maskable-v2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "stesin-app-maskable-v2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }
