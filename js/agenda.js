@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ];
   const select = document.getElementById("filtroAgenda"), chips = document.getElementById("agendaChips"), lista = document.getElementById("agendaLista"), grid = document.getElementById("mesAgenda");
   if (!select || !chips || !lista || !grid) return;
+  if (window.matchMedia("(max-width: 700px)").matches) document.querySelector(".schedule-details")?.removeAttribute("open");
   const cliente = window.STESIN_DATOS, ymd = d => d.toISOString().slice(0,10), mesNombre = d => new Intl.DateTimeFormat("es-ES", { month:"long", year:"numeric" }).format(d).replace(/^./, c => c.toUpperCase()), diaTexto = f => new Date(`${f}T12:00:00`).toLocaleDateString("es-ES", {weekday:"long",day:"2-digit"}).replace(/^./,c=>c.toUpperCase());
   let ciclo = "Ciclo V", visible = new Date(2026,8,1), sesiones = base.map(([fecha,hora,materia]) => ({fecha,hora,materia,detalle:"",ciclo:"Ciclo V"}));
   if (cliente) {
@@ -16,6 +17,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     (data || []).filter(e => !e.ciclo || e.ciclo === ciclo).forEach(e => { if (!sesiones.some(s => s.fecha===e.fecha && s.hora===e.hora && s.materia===e.materia)) sesiones.push(e); });
   }
   sesiones = sesiones.filter(s => s.ciclo === ciclo || !s.ciclo);
+  const proximaClase = document.getElementById("proximaClase");
+  if (proximaClase) {
+    const ahora = new Date();
+    const siguiente = [...sesiones].sort((a,b)=>`${a.fecha}${a.hora}`.localeCompare(`${b.fecha}${b.hora}`)).find(s => new Date(`${s.fecha}T23:59:59`) >= ahora);
+    const titulo = proximaClase.querySelector("strong"), detalle = proximaClase.querySelector("small");
+    if (siguiente) {
+      titulo.textContent = siguiente.materia;
+      detalle.textContent = `${diaTexto(siguiente.fecha)} · ${siguiente.hora}`;
+    } else {
+      titulo.textContent = "No hay otra clase programada";
+      detalle.textContent = "Consulta nuevamente cuando se publique el próximo calendario.";
+    }
+  }
   document.querySelectorAll(".month-view h2,.schedule-intro h2").forEach(h => h.textContent = mesNombre(visible));
   document.querySelector(".schedule-wrap")?.toggleAttribute("hidden", ciclo !== "Ciclo V");
   function render(fecha="todas") {

@@ -363,6 +363,30 @@ const AulaX = (() => {
             }
         };
     }
+    function configurarEstadoConexion() {
+        if (document.getElementById("estadoConexion")) return;
+        const estado = document.createElement("div");
+        estado.id = "estadoConexion";
+        estado.className = "connection-status";
+        estado.setAttribute("role", "status");
+        estado.hidden = true;
+        document.body.appendChild(estado);
+        const actualizar = () => {
+            if (navigator.onLine) {
+                if (!estado.hidden) window.STESIN_UI?.notificar("Conexión recuperada", "exito");
+                estado.hidden = true;
+                estado.textContent = "";
+                document.body.classList.remove("sin-conexion");
+            } else {
+                estado.textContent = "Sin conexión · mostrando contenido disponible";
+                estado.hidden = false;
+                document.body.classList.add("sin-conexion");
+            }
+        };
+        window.addEventListener("online", actualizar);
+        window.addEventListener("offline", actualizar);
+        actualizar();
+    }
     function aplicarMarcaInstitucional() { /* El escudo institucional se muestra desde la hoja de estilos. */ }
 
     function agregarEnlaceAdministracion() {
@@ -989,6 +1013,7 @@ const AulaX = (() => {
         organizarNavegacion();
         configurarContextoPagina();
         configurarNotificacionesInterfaz();
+        configurarEstadoConexion();
         registrarAplicacionInstalable();
         configurarMenuMovil();
         configurarModoOscuroGlobal();

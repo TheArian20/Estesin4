@@ -16,10 +16,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const total = document.getElementById("totalDocumentos");
     const vacio = document.getElementById("bibliotecaVacia");
     const cargarMas = document.getElementById("cargarMas");
+    const herramientas = document.getElementById("herramientasBiblioteca");
+    const alternarFiltros = document.getElementById("alternarFiltros");
+    const limpiarFiltros = document.getElementById("limpiarFiltros");
     const bibliotecaDrive = document.body.dataset.bibliotecaDrive;
     let documentos = [];
     let filtro = "todos";
-    let limite = 24;
+    const incremento = window.matchMedia("(max-width: 700px)").matches ? 20 : 24;
+    let limite = incremento;
     const favoritos = new Set(JSON.parse(localStorage.getItem("bibliotecaFavoritos") || "[]"));
     const busquedaInicial = new URLSearchParams(window.location.search).get("buscar");
     if (busquedaInicial) buscador.value = busquedaInicial;
@@ -103,6 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function renderizar() {
+        lista.setAttribute("aria-busy", "true");
         const consulta = normalizar(buscador.value.trim());
         const filtrados = documentos.filter((documento) => {
             const coincideTexto = !consulta || normalizar(documento.nombre).includes(consulta);
@@ -114,11 +119,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             ? new Date(b.creadoEn || 0) - new Date(a.creadoEn || 0)
             : a.nombre.localeCompare(b.nombre, "es"));
         const visibles = filtrados.slice(0, limite);
-        lista.innerHTML = "";
-        visibles.forEach((documento) => lista.appendChild(crearTarjeta(documento)));
-        contador.textContent = `${filtrados.length} resultado${filtrados.length === 1 ? "" : "s"}`;
+        const fragmento = document.createDocumentFragment();
+        visibles.forEach((documento) => fragmento.appendChild(crearTarjeta(documento)));
+        lista.replaceChildren(fragmento);
+        contador.textContent = filtrados.length ? `Mostrando ${visibles.length} de ${filtrados.length}` : "0 resultados";
         vacio.hidden = filtrados.length !== 0;
         cargarMas.hidden = visibles.length >= filtrados.length;
+        lista.setAttribute("aria-busy", "false");
     }
 
     function mostrarContinuidadDeLectura() {
@@ -176,17 +183,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         vacio.textContent = "El catálogo se está preparando. Vuelve a cargar la página en unos momentos.";
     }
 
-    buscador.addEventListener("input", () => { limite = 24; renderizar(); });
-    categoria.addEventListener("change", () => { limite = 24; renderizar(); });
-    ciclo.addEventListener("change", () => { limite = 24; renderizar(); });
+    let esperaBusqueda;
+    buscador.addEventListener("input", () => {
+        clearTimeout(esperaBusqueda);
+        esperaBusqueda = setTimeout(() => { limite = incremento; renderizar(); }, 160);
+    });
+    categoria.addEventListener("change", () => { limite = incremento; renderizar(); });
+    ciclo.addEventListener("change", () => { limite = incremento; renderizar(); });
     orden.addEventListener("change", renderizar);
     filtros.addEventListener("click", (evento) => {
         const boton = evento.target.closest("button[data-filtro]");
         if (!boton) return;
         filtro = boton.dataset.filtro;
         filtros.querySelectorAll("button").forEach((item) => item.classList.toggle("active", item === boton));
-        limite = 24;
+        limite = incremento;
         renderizar();
     });
-    cargarMas.addEventListener("click", () => { limite += 24; renderizar(); });
+    cargarMas.addEventListener("click", () => { limite += incremento; renderizar(); });
+    alternarFiltros?.addEventListener("click", () => {
+        const abierto = herramientas.classList.toggle("filters-open");
+        alternarFiltros.setAttribute("aria-expanded", String(abierto));
+        alternarFiltros.lastChild.textContent = abierto ? " Ocultar filtros" : " Filtros";
+    });
+    limpiarFiltros?.addEventListener("click", () => {
+        buscador.value = "";
+        categoria.value = "todas";
+        ciclo.value = "todos";
+        orden.value = "titulo";
+        filtro = "todos";
+        limite = incremento;
+        filtros.querySelectorAll("button").forEach((item) => item.classList.toggle("active", item.dataset.filtro === "todos"));
+        renderizar();
+        buscador.focus();
+    });
 });
