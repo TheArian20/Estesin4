@@ -48,7 +48,7 @@
 
     const estado = {
         usuario: localStorage.getItem("usuario") || "Estudiante",
-        foto: user ? (localStorage.getItem(`fotoPerfil:${user.id}`) || "stesin-icon.svg") : "stesin-icon.svg",
+        foto: user ? (localStorage.getItem(`fotoPerfil:${user.id}`) || "stesin-app-icon-v2-192.png") : "stesin-app-icon-v2-192.png",
         clases: leerJSON("clasesCompletadas", []),
         tareas: leerJSON("tareasEntregadas", []),
         progreso: limitar(Number(localStorage.getItem("progresoCurso")) || 0, 0, 100)

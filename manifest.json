@@ -1,7 +1,9 @@
 {
   "name": "STESIN — Plataforma Académica",
   "short_name": "STESIN",
+  "id": "index.html",
   "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#123a31",
   "theme_color": "#14382f",

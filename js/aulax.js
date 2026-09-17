@@ -1,5 +1,5 @@
 const AulaX = (() => {
-    const fotoPredeterminada = "stesin-icon.svg";
+    const fotoPredeterminada = "stesin-app-icon-v2-192.png";
 
     function leerJSON(clave, valorPredeterminado) {
         try {
