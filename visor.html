@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123a31">
+<title>Visor de documentos | STESIN</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/firebase-inicio.js"></script>
+<script src="js/aulax.js" defer></script>
+<script src="js/visor.js" defer></script>
+</head>
+<body class="viewer-page">
+<aside class="sidebar"><h2>STESIN</h2><a href="index.html">Inicio</a><a href="biblioteca.html" class="active">Biblioteca</a><a href="calendario.html">Calendario</a></aside>
+<main class="main viewer-main">
+  <header class="viewer-header"><div><p class="eyebrow">LECTOR STESIN</p><h1 id="tituloVisor">Documento</h1><p>Lee el material sin salir de la plataforma.</p></div></header>
+  <nav class="viewer-actions" aria-label="Acciones del documento"><a href="biblioteca.html">← Volver a Biblioteca</a><button type="button" id="compartirDocumento">Compartir</button><a id="abrirOriginal" target="_blank" rel="noopener">Abrir original ↗</a></nav>
+  <section class="viewer-shell"><div class="viewer-loading" id="cargandoVisor">Cargando documento…</div><iframe id="marcoDocumento" title="Documento académico" loading="eager"></iframe></section>
+  <p class="viewer-help">Si el documento no aparece, utiliza “Abrir original”. Algunos proveedores impiden mostrar archivos dentro de otras páginas.</p>
+</main>
+</body>
+</html>

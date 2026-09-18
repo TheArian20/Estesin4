@@ -256,12 +256,14 @@
     function actualizarEspacioEstudio() {
         const ultima = localStorage.getItem("ultimaLectura");
         const favoritos = leerJSON("bibliotecaFavoritos", []);
+        const historial = leerJSON("bibliotecaHistorial", []);
         const titulo = $("#ultimaLecturaInicio");
         const abrir = $("#abrirUltimaLectura");
         const contador = $("#favoritosInicio");
         if (titulo) titulo.textContent = ultima || "Aún no abriste un documento";
         if (abrir && ultima) {
-            abrir.href = `biblioteca.html?buscar=${encodeURIComponent(ultima)}`;
+            const reciente = historial.find((item) => item.nombre === ultima);
+            abrir.href = reciente?.tipo === "pdf" ? `visor.html?src=${encodeURIComponent(reciente.enlace)}&nombre=${encodeURIComponent(reciente.nombre)}` : `biblioteca.html?buscar=${encodeURIComponent(ultima)}`;
             abrir.textContent = "Continuar leyendo";
         }
         if (contador) contador.textContent = `${favoritos.length} recurso${favoritos.length === 1 ? "" : "s"} guardado${favoritos.length === 1 ? "" : "s"}`;

@@ -147,9 +147,26 @@ const AulaX = (() => {
         if (["admin", "rector"].includes(rol)) {
             opciones.push(["Rectorado", "Indicadores institucionales", "rectorado.html"], ["Equipo STESIN", "Equipo académico", "equipo.html"]);
         }
-        const abrir = () => { dialogo.hidden = false; campo.value = ""; pintar(); window.setTimeout(() => campo.focus(), 0); };
+        let documentosCargados = false;
+        const cargarDocumentos = async () => {
+            if (documentosCargados) return;
+            documentosCargados = true;
+            if (!Array.isArray(window.BIBLIOTECA_CATALOGO)) {
+                await new Promise((resolver) => {
+                    const script = document.createElement("script");
+                    script.src = "biblioteca-catalogo.js";
+                    script.onload = script.onerror = resolver;
+                    document.head.appendChild(script);
+                });
+            }
+            (window.BIBLIOTECA_CATALOGO || []).slice(0, 1500).forEach((documento) => {
+                const nombre = documento.nombre || "Documento";
+                opciones.push([nombre, `Biblioteca · ${documento.grupo || documento.categoria || "Recurso académico"}`, `biblioteca.html?buscar=${encodeURIComponent(nombre)}`]);
+            });
+        };
+        const abrir = async () => { dialogo.hidden = false; campo.value = ""; resultados.innerHTML = "<p>Preparando búsqueda…</p>"; await cargarDocumentos(); pintar(); window.setTimeout(() => campo.focus(), 0); };
         const cerrar = () => { dialogo.hidden = true; };
-        const pintar = () => { const texto = campo.value.toLocaleLowerCase(); const coincidencias = opciones.filter(([titulo, detalle]) => `${titulo} ${detalle}`.toLocaleLowerCase().includes(texto)); resultados.innerHTML = coincidencias.map(([titulo, detalle, enlace]) => `<a href="${enlace}"><strong>${titulo}</strong><span>${detalle}</span></a>`).join("") || '<p>No encontramos resultados.</p>'; };
+        const pintar = () => { const texto = campo.value.trim().toLocaleLowerCase(); const coincidencias = opciones.filter(([titulo, detalle]) => `${titulo} ${detalle}`.toLocaleLowerCase().includes(texto)).slice(0, 35); resultados.innerHTML = coincidencias.map(([titulo, detalle, enlace]) => `<a href="${enlace}"><strong>${titulo}</strong><span>${detalle}</span></a>`).join("") || '<p>No encontramos resultados.</p>'; };
         campo.addEventListener("input", pintar);
         dialogo.querySelector("button").addEventListener("click", cerrar);
         dialogo.addEventListener("click", (evento) => { if (evento.target === dialogo) cerrar(); });

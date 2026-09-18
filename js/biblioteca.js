@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const incremento = window.matchMedia("(max-width: 700px)").matches ? 20 : 24;
     let limite = incremento;
     const favoritos = new Set(JSON.parse(localStorage.getItem("bibliotecaFavoritos") || "[]"));
+    let historial = JSON.parse(localStorage.getItem("bibliotecaHistorial") || "[]");
+    const idsHistorial = () => new Set(historial.map((item) => item.id));
     const busquedaInicial = new URLSearchParams(window.location.search).get("buscar");
     if (busquedaInicial) buscador.value = busquedaInicial;
 
@@ -54,9 +56,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         tarjeta.className = "library-item library-entry";
         const enlace = document.createElement("a");
         enlace.className = "library-open";
-        enlace.href = documento.enlaceDrive || bibliotecaDrive;
-        enlace.target = "_blank";
-        enlace.rel = "noopener";
+        const destinoDocumento = documento.enlaceDrive || bibliotecaDrive;
+        const puedePrevisualizar = tipo === "pdf" && (destinoDocumento.startsWith("documentos/") || /^https:\/\/drive\.google\.com\//.test(destinoDocumento));
+        enlace.href = puedePrevisualizar ? `visor.html?src=${encodeURIComponent(destinoDocumento)}&nombre=${encodeURIComponent(documento.nombre)}` : destinoDocumento;
+        if (!puedePrevisualizar) { enlace.target = "_blank"; enlace.rel = "noopener"; }
         enlace.innerHTML = `<span class="library-file-icon ${tipo}">${iconoDocumento(tipo)}</span><span class="library-file-data"><strong></strong><small></small></span>`;
         enlace.querySelector("strong").textContent = documento.nombre;
         const fecha = documento.creadoEn ? new Date(documento.creadoEn) : null;
@@ -82,6 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
         enlace.addEventListener("click", async () => {
             localStorage.setItem("ultimaLectura", documento.nombre);
+            historial = [{ id, nombre: documento.nombre, enlace: destinoDocumento, tipo, fecha: Date.now() }, ...historial.filter((item) => item.id !== id)].slice(0, 30);
+            localStorage.setItem("bibliotecaHistorial", JSON.stringify(historial));
             const cliente = window.STESIN_DATOS;
             const { data: { user } = {} } = await cliente?.auth.getUser?.() || {};
             if (user) await cliente.from("progreso_lectura").upsert({ usuario_id: user.id, recurso_id: id, recurso_nombre: documento.nombre, ciclo: documento.ciclo || null, leido_en: new Date().toISOString() });
@@ -111,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const consulta = normalizar(buscador.value.trim());
         const filtrados = documentos.filter((documento) => {
             const coincideTexto = !consulta || normalizar(documento.nombre).includes(consulta);
-            const coincideTipo = filtro === "todos" || (filtro === "favoritos" ? favoritos.has(documento.enlaceDrive || documento.nombre) : tipoDocumento(documento.nombre) === filtro);
+            const coincideTipo = filtro === "todos" || (filtro === "favoritos" ? favoritos.has(documento.enlaceDrive || documento.nombre) : filtro === "historial" ? idsHistorial().has(documento.enlaceDrive || documento.nombre) : tipoDocumento(documento.nombre) === filtro);
             const coincideCategoria = categoria.value === "todas" || documento.categoria === categoria.value;
             const coincideCiclo = ciclo.value === "todos" || documento.ciclo === ciclo.value;
             return coincideTexto && coincideTipo && coincideCategoria && coincideCiclo;
@@ -216,4 +221,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderizar();
         buscador.focus();
     });
+    const selectorVista = document.querySelector(".library-view-switch");
+    const vistaGuardada = localStorage.getItem("bibliotecaVista") || "cuadricula";
+    const aplicarVista = (vista) => {
+        lista.classList.toggle("list-view", vista === "lista");
+        selectorVista?.querySelectorAll("button").forEach((boton) => {
+            const activa = boton.dataset.vista === vista;
+            boton.classList.toggle("active", activa);
+            boton.setAttribute("aria-pressed", String(activa));
+        });
+        localStorage.setItem("bibliotecaVista", vista);
+    };
+    selectorVista?.addEventListener("click", (evento) => {
+        const boton = evento.target.closest("button[data-vista]");
+        if (boton) aplicarVista(boton.dataset.vista);
+    });
+    aplicarVista(vistaGuardada);
 });
