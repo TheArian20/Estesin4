@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const vacio = document.getElementById("sinSilabos");
   const conteo = document.getElementById("conteoSilabos");
   if (!buscador || !filtro || !tarjetas.length) return;
+  const busquedaInicial = new URLSearchParams(location.search).get("buscar");
+  if (busquedaInicial) buscador.value = busquedaInicial;
 
   const normalizar = (texto) => String(texto || "")
     .normalize("NFD")
@@ -36,4 +38,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   buscador.addEventListener("input", actualizar);
   filtro.addEventListener("change", actualizar);
+  actualizar();
 });
