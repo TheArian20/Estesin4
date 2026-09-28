@@ -4,7 +4,10 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function esAdministrador() {
       return request.auth != null
-        && request.auth.uid == 'eeKKifjIAmXICHCQua6s2fmTVnl1';
+        && (request.auth.uid == 'eeKKifjIAmXICHCQua6s2fmTVnl1'
+          || (exists(/databases/$(database)/documents/perfiles/$(request.auth.uid))
+            && get(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.rol == 'admin'
+            && get(/databases/$(database)/documents/perfiles/$(request.auth.uid)).data.activo == true));
     }
 
     // Contenido institucional que puede consultar cualquier visitante.
@@ -24,6 +27,11 @@ service cloud.firestore {
     }
 
     match /mensajes_internos/{documento} {
+      allow read: if true;
+      allow write: if esAdministrador();
+    }
+
+    match /equipo_docente/{documento} {
       allow read: if true;
       allow write: if esAdministrador();
     }

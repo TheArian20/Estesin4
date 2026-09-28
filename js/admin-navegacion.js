@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   asignar("Publicar aviso", "adminComunicados");
   asignar("Publicar recurso", "adminBiblioteca");
+  asignar("Calendario administrable", "adminCalendario");
+  asignar("Equipo institucional", "adminEquipo");
   asignar("Usuarios registrados", "adminCuenta");
 
   const navegacion = document.createElement("nav");
@@ -21,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
     <a href="#resumenAdmin">Resumen</a>
     <a href="#adminComunicados">Comunicados</a>
     <a href="#adminBiblioteca">Biblioteca</a>
+    <a href="#adminCalendario">Calendario</a>
+    <a href="#adminEquipo">Equipo</a>
     <a href="#adminCuenta">Cuenta</a>
     <a href="estadisticas.html">Estadísticas</a>`;
   hero.insertAdjacentElement("afterend", navegacion);

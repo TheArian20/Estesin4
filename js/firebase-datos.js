@@ -8,7 +8,7 @@
     const cancelar = auth.onAuthStateChanged(() => { cancelar(); resolver(); }, () => resolver());
   });
   const errorLegible = e => ({ message:e?.message || "No se pudo completar la operacion en Firebase.", code:e?.code });
-  const tablasAuditables = new Set(["perfiles","recursos_personalizados","eventos_calendario","avisos","asistencia","tareas_academicas","evaluaciones","mensajes_internos"]);
+  const tablasAuditables = new Set(["perfiles","recursos_personalizados","eventos_calendario","avisos","equipo_docente","asistencia","tareas_academicas","evaluaciones","mensajes_internos"]);
   async function auditar(tabla, accion) {
     const usuario = usuarioActual();
     if (!usuario || !tablasAuditables.has(tabla)) return;
